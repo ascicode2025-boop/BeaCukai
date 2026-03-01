@@ -1,0 +1,162 @@
+/* Container Utama */
+.navbar-container {
+    display: flex;
+    margin: 0;
+    width: 100%;
+    height: 85px;
+    position: relative;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.05));
+    overflow: hidden; /* Mencegah scrollbar horizontal pada mobile */
+}
+
+/* Bagian Kiri (Putih/Terang) */
+.custom-navbar-left {
+    flex: 1.5; /* Memberi ruang lebih besar untuk brand & profile */
+    background: linear-gradient(90deg, #FFFFFF 0%, #B8C1E2 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    border-radius: 0 0 50px 0;
+    z-index: 10;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Bagian Kanan (Abu-biru) */
+.custom-navbar-right {
+    flex: 1;
+    background: linear-gradient(90deg, #c7cde0 0%, #B8C1E2 100%);
+;
+    margin-left: -100px; /* Efek menyambung di bawah lengkungan */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 35px;
+    z-index: 1;
+    height: 65px; /* Sedikit lebih ramping dari sisi kiri */
+    margin-top: 0;
+    transition: all 0.3s ease;
+}
+
+/* Brand Section */
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand-logo {
+    height: 50px;
+    width: auto;
+}
+
+.brand-name {
+    color: #5558d4;
+    font-weight: 800;
+    font-size: 1.4rem;
+    white-space: nowrap;
+}
+
+/* Profile Circle Overlap */
+.profile-section-overlap {
+    position: absolute;
+    right: 40px; /* Posisi di ujung lengkungan */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+}
+
+.profile-circle-btn {
+    width: 55px;
+    height: 55px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #5558d4;
+    color: #5558d4;
+    font-size: 28px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.profile-circle-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Logout Button */
+.logout-icon-btn {
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    border-radius: 50%;
+    border: 2px solid #5558d4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5558d4;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+/* --- RESPONSIVE TABLET (Max 992px) --- */
+@media (max-width: 992px) {
+    .custom-navbar-left {
+        padding: 0 25px;
+        border-radius: 0 0 80px 0;
+    }
+
+    .custom-navbar-right {
+        margin-left: -80px;
+        padding-right: 25px;
+    }
+
+    .brand-name {
+        font-size: 1.2rem;
+    }
+}
+
+/* --- RESPONSIVE MOBILE (Max 600px) --- */
+@media (max-width: 600px) {
+    .navbar-container {
+        height: 70px;
+    }
+
+    .custom-navbar-left {
+        padding: 0 15px;
+        border-radius: 0 0 45px 0; /* Lengkungan lebih kecil agar tidak menutupi logout */
+    }
+
+    .custom-navbar-right {
+        margin-left: -40px;
+        height: 50px; /* Menyesuaikan tinggi navbar yang lebih kecil */
+        padding-right: 15px;
+    }
+
+    .brand-logo {
+        height: 35px;
+    }
+
+    .brand-name {
+        font-size: 0.9rem; /* Mengecilkan teks agar tidak bertabrakan */
+    }
+
+    .profile-section-overlap {
+        right: 15px; /* Menempel di ujung lengkungan mobile */
+    }
+
+    .profile-circle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        border-width: 2px;
+    }
+
+    .logout-icon-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+}

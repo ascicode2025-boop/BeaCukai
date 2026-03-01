@@ -1,0 +1,98 @@
+:root {
+    --primary-purple: #5850ec;
+    --accent-yellow: #facc15;
+    --bg-gradient: linear-gradient(135deg, #f5f7ff 0%, #e0e7ff 100%);
+}
+
+body {
+    background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
+    ;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-container {
+    padding: 40px 20px;
+}
+
+/* Card Styling */
+.custom-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.custom-card.card-gray {
+    padding: 40px !important;
+}
+
+.card-yellow {
+    background-color: var(--accent-yellow);
+}
+
+.card-gray {
+    background-color: #cbd5e1;
+    color: #1e1b4b;
+}
+
+.card-gray h3 {
+    color: --primary-purple;
+}
+
+.card-gray p {
+    color: #1e1b4b;
+}
+
+.card-white {
+    background-color: white;
+}
+
+/* Button Styling */
+.btn-dark-blue {
+    background-color: #333366;
+    color: white;
+    border-radius: 12px;
+    padding: 8px 24px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-dark-blue:hover {
+    background-color: #242551;
+    color: white;
+}
+
+.btn-yellow-gradient {
+    background: linear-gradient(to right, #fde047, #facc15);
+    border: none;
+    border-radius: 12px;
+    color: #1e1b4b;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-yellow-gradient:hover {
+    background: linear-gradient(to right, #fcd34d, #f59e0b);
+    color: #1e1b4b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+}
+
+/* Status Badge */
+.status-badge {
+    background-color: #bbf7d0;
+    color: #166534;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Profile Circles in Background */
+.bg-circle {
+    position: fixed;
+    background: rgba(199, 210, 254, 0.4);
+    border-radius: 50%;
+    z-index: -1;
+}
