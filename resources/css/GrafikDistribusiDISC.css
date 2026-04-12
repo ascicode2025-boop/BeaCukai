@@ -1,0 +1,188 @@
+/* ============ GRAFIK CONTAINER ============ */
+.grafik-container {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    margin-top: 50px;
+    font-family: 'Oxanium', sans-serif;
+}
+
+.grafik-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.grafik-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2);
+    font-family: 'Oxanium', sans-serif;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+    background: linear-gradient(135deg, #b8a4f9 0%, #9d6be8 100%);
+}
+
+/* ============ LEGEND ============ */
+.grafik-legend {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.legend-label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ============ SVG CHART ============ */
+.grafik-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.grafik-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: default;
+}
+
+/* ============ TOOLTIP ============ */
+.tooltip {
+    position: absolute;
+    background: white;
+    border: 2px solid #e0e7ff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    font-size: 12px;
+    font-family: 'Oxanium', sans-serif;
+    z-index: 100;
+    animation: tooltipShow 0.2s ease-out;
+    transform: translateX(-50%);
+}
+
+@keyframes tooltipShow {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid white;
+}
+
+.tooltip-header {
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+}
+
+.tooltip-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+}
+
+.tooltip-label {
+    font-weight: 600;
+    color: #666;
+    min-width: 70px;
+}
+
+.tooltip-value {
+    font-weight: 700;
+    color: #1e3a8a;
+    text-align: right;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    .grafik-container {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .grafik-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .grafik-title {
+        font-size: 20px;
+    }
+
+    .btn-export {
+        width: 100%;
+        text-align: center;
+    }
+
+    .grafik-legend {
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+}

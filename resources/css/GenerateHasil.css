@@ -1,0 +1,832 @@
+/* ============ CONTAINER & HEADER ============ */
+.generate-hasil-container {
+    padding: 40px 20px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #ffffff 0%, #dfdfff 100%);
+}
+
+.hasil-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.hasil-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+.hasil-description {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ============ BUTTON GROUP ============ */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 50px;
+}
+
+.btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #5850ec 0%, #7c3aed 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(88, 80, 236, 0.3);
+}
+
+.btn-download:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(88, 80, 236, 0.4);
+}
+
+.btn-detail {
+    background: linear-gradient(135deg, #facc15 0%, #fbbf24 100%);
+    color: #1e1b4b;
+    box-shadow: 0 4px 15px rgba(250, 204, 21, 0.3);
+}
+
+.btn-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(250, 204, 21, 0.4);
+}
+
+.btn-back {
+    background-color: #e2e8f0;
+    color: #1e1b4b;
+}
+
+.btn-back:hover {
+    background-color: #cbd5e1;
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+/* ============ PDF PREVIEW CONTAINER ============ */
+.pdf-preview-container {
+    max-width: 920px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+}
+
+.pdf-content-wrapper {
+    background-color: #ffffff;
+    padding: 0;
+}
+
+.pdf-page {
+    padding: 30px;
+    line-height: 1.6;
+    color: #1e1b4b;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    position: relative;
+}
+
+/* ============ COVER SECTION ============ */
+.report-cover {
+    text-align: center;
+    padding: 0;
+    border-bottom: none;
+    margin: 0;
+    position: relative;
+    background: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    page-break-after: always;
+    break-after: page;
+}
+
+.report-cover::before {
+    display: none;
+}
+
+.report-cover::after {
+    display: none;
+}
+
+.cover-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1e1b4b;
+    margin: 0 0 40px 0;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    word-spacing: 8px;
+    padding: 0 40px;
+}
+
+.cover-name {
+    font-size: 40px;
+    font-weight: 900;
+    color: #1e1b4b;
+    margin: 0 auto 40px auto;
+    letter-spacing: 2px;
+    text-transform: capitalize;
+    display: inline-block;
+    max-width: 75%;
+    word-break: break-word;
+    padding: 0 40px;
+}
+
+.cover-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 30px;
+    position: relative;
+    padding: 0 40px;
+}
+
+.cover-info::before {
+    display: none;
+}
+
+.cover-org {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4b5563;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.cover-loc {
+    font-size: 17px;
+    color: #7b8a99;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.cover-date {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-top: 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+/* ============ SECTION STYLES ============ */
+.section-overview,
+.section-charts,
+.section-primary,
+.section-characteristics,
+.section-recommendations {
+    margin-bottom: 25px;
+    page-break-inside: avoid;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #5850ec;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* ============ OVERVIEW SECTION ============ */
+.overview-box {
+    background: linear-gradient(135deg, #f0ecff 0%, #f5f3ff 100%);
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 5px solid #5850ec;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(88, 80, 236, 0.1);
+    page-break-inside: avoid;
+}
+
+.overview-text {
+    font-size: 12px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.info-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 10px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+    border-radius: 8px;
+    border-top: 3px solid #facc15;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(250, 204, 21, 0.2);
+}
+
+.info-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #8b92a1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.info-data {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e1b4b;
+    text-align: center;
+}
+
+/* ============ CHARTS SECTION ============ */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    page-break-inside: avoid;
+}
+
+.chart-item {
+    background: linear-gradient(135deg, #f5f3ff 0%, #f0ecff 100%);
+    padding: 15px 10px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #e9d5ff;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    page-break-inside: avoid;
+}
+
+.chart-item:hover {
+    border-color: #5850ec;
+    box-shadow: 0 8px 30px rgba(88, 80, 236, 0.2);
+    transform: translateY(-8px);
+}
+
+.chart-placeholder {
+    font-size: 56px;
+    margin-bottom: 15px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.chart-svg {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    filter: drop-shadow(0 4px 8px rgba(88, 80, 236, 0.1));
+    animation: chartFadeIn 0.6s ease-out;
+}
+
+/* Disable animasi saat PDF generation */
+.pdf-generating .chart-svg {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes chartFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.chart-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    margin: 15px 0 0 0;
+}
+
+/* ============ PRIMARY TYPE SECTION ============ */
+.section-primary {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid #facc15;
+    box-shadow: 0 4px 15px rgba(250, 204, 21, 0.15);
+    page-break-inside: avoid;
+}
+
+.primary-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #5850ec 0%, #7c3aed 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(88, 80, 236, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.primary-summary {
+    font-size: 12px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ============ CHARACTERISTICS SECTION ============ */
+.characteristics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    page-break-inside: avoid;
+}
+
+.char-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+    padding: 15px;
+    border-radius: 8px;
+    border-top: 3px solid #5850ec;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    page-break-inside: avoid;
+}
+
+.char-box:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 25px rgba(88, 80, 236, 0.15);
+}
+
+.char-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e1b4b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.char-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.char-list li {
+    font-size: 11px;
+    color: #4b5563;
+    padding: 6px 0;
+    padding-left: 18px;
+    line-height: 1.5;
+    position: relative;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.char-list li:last-child {
+    border-bottom: none;
+}
+
+.char-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5850ec;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ============ RECOMMENDATIONS SECTION ============ */
+.recommendations-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    page-break-inside: avoid;
+}
+
+.rec-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+    border-radius: 8px;
+    border-left: 3px solid #5850ec;
+    transition: all 0.3s ease;
+    page-break-inside: avoid;
+}
+
+.rec-item:hover {
+    transform: translateX(8px);
+    box-shadow: 0 6px 20px rgba(88, 80, 236, 0.15);
+}
+
+.rec-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #5850ec 0%, #7c3aed 100%);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(88, 80, 236, 0.3);
+}
+
+.rec-text {
+    font-size: 11px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ============ PDF FOOTER ============ */
+.pdf-footer {
+    border-top: 2px solid #5850ec;
+    padding-top: 15px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pdf-footer p {
+    margin: 4px 0;
+    font-size: 9px;
+    color: #8b92a1;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+}
+
+/* ============ RESPONSIVE DESIGN ============ */
+@media (max-width: 1024px) {
+
+    .charts-grid,
+    .characteristics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .recommendations-container {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .pdf-page {
+        padding: 30px;
+    }
+
+    .cover-name {
+        font-size: 32px;
+    }
+
+    .cover-title {
+        font-size: 22px;
+    }
+
+    .info-grid,
+    .charts-grid,
+    .characteristics-grid,
+    .recommendations-container {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+}
+
+/* ============ PRINT OPTIMIZATION ============ */
+@media print {
+
+    .button-group,
+    .hasil-header {
+        display: none !important;
+    }
+
+    /* Ensure SVG visible in print */
+    .chart-svg {
+        animation: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .generate-hasil-container {
+        padding: 0 !important;
+        background: white !important;
+        min-height: auto;
+    }
+
+    .pdf-preview-container {
+        box-shadow: none !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+
+    .pdf-content-wrapper {
+        background: white !important;
+    }
+
+    .pdf-page {
+        padding: 12mm 12mm !important;
+        box-shadow: none !important;
+        background: white !important;
+        page-break-after: auto;
+    }
+
+    body {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Cover styling for print */
+    .report-cover {
+        page-break-after: always !important;
+        break-after: page !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background: #ffffff !important;
+    }
+
+    .cover-title {
+        font-size: 28px !important;
+        margin: 0 0 40px 0 !important;
+        letter-spacing: 3px !important;
+        font-weight: 900 !important;
+        padding: 0 40px !important;
+    }
+
+    .cover-name {
+        font-size: 40px !important;
+        margin: 0 auto 40px auto !important;
+        font-weight: 900 !important;
+        letter-spacing: 2px !important;
+        color: #1e1b4b !important;
+        max-width: 75% !important;
+        padding: 0 40px !important;
+    }
+
+    .cover-info {
+        gap: 16px !important;
+        margin-top: 30px !important;
+        padding: 0 40px !important;
+    }
+
+    .cover-org {
+        font-size: 20px !important;
+        font-weight: 700 !important;
+    }
+
+    .cover-loc {
+        font-size: 17px !important;
+        font-weight: 500 !important;
+    }
+
+    /* Sections styling for print */
+    .section-title {
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+        padding-bottom: 8px !important;
+    }
+
+    .section-overview,
+    .section-charts,
+    .section-primary,
+    .section-characteristics,
+    .section-recommendations {
+        margin-bottom: 20px !important;
+        page-break-inside: avoid;
+    }
+
+    /* Overview section */
+    .overview-text {
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+        margin-top: 15px !important;
+    }
+
+    .info-card {
+        padding: 12px 8px !important;
+    }
+
+    .info-label {
+        font-size: 9px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .info-data {
+        font-size: 12px !important;
+    }
+
+    /* Charts section - optimize for print */
+    .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    .chart-item {
+        min-height: 180px !important;
+        padding: 15px !important;
+        margin-bottom: 10px !important;
+        page-break-inside: avoid;
+    }
+
+    .chart-svg {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: 150px !important;
+    }
+
+    .chart-label {
+        font-size: 12px !important;
+        margin-top: 8px !important;
+    }
+
+    /* Primary section */
+    .primary-badge {
+        padding: 10px 20px !important;
+        font-size: 14px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .primary-summary {
+        font-size: 12px !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Characteristics grid */
+    .characteristics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    .char-box {
+        padding: 15px !important;
+        page-break-inside: avoid;
+    }
+
+    .char-title {
+        font-size: 12px !important;
+        margin-bottom: 10px !important;
+        padding-bottom: 8px !important;
+    }
+
+    .char-list {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .char-list li {
+        font-size: 11px !important;
+        padding: 5px 0 5px 15px !important;
+        line-height: 1.5 !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+    }
+
+    .char-list li:last-child {
+        border-bottom: none !important;
+    }
+
+    /* Recommendations */
+    .recommendations-container {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .rec-item {
+        padding: 12px !important;
+        gap: 12px !important;
+        page-break-inside: avoid;
+    }
+
+    .rec-number {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 12px !important;
+    }
+
+    .rec-text {
+        font-size: 11px !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Footer */
+    .pdf-footer {
+        border-top: 1px solid #5850ec !important;
+        padding-top: 15px !important;
+        margin-top: 20px !important;
+        font-size: 9px !important;
+    }
+
+    .pdf-footer p {
+        margin: 5px 0 !important;
+    }
+
+    /* Remove hover effects and transitions */
+    .chart-item:hover,
+    .rec-item:hover,
+    .info-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        border-color: inherit !important;
+    }
+}
+
+/* ============ HTML2PDF SPECIFIC STYLES ============ */
+@page {
+    size: A4;
+    margin: 10mm;
+}
+
+html {
+    font-size: 14px;
+}

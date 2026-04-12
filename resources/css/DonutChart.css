@@ -1,0 +1,246 @@
+/* ============ DONUT CHART CARD ============ */
+.donut-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s ease;
+    animation: cardSlideIn 0.6s ease-out;
+}
+
+.donut-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+/* ============ TITLE ============ */
+.donut-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 0;
+    letter-spacing: 0.3px;
+    font-family: 'Oxanium', sans-serif;
+}
+
+/* ============ CONTENT LAYOUT ============ */
+.donut-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.donut-content.bottom {
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ============ CHART WRAPPER ============ */
+.donut-chart-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    animation: chartFadeIn 0.8s ease-out;
+}
+
+.donut-chart-wrapper svg {
+    display: block;
+    width: 180px;
+    height: 180px;
+}
+
+/* ============ DONUT SEGMENTS ============ */
+.donut-segment {
+    opacity: 1;
+    animation: segmentReveal 1s ease-out forwards;
+}
+
+@keyframes segmentReveal {
+    0% {
+        opacity: 0;
+        stroke-width: 15;
+    }
+
+    100% {
+        opacity: 1;
+        stroke-width: 20;
+    }
+}
+
+/* ============ CENTER TEXT ============ */
+.donut-center-text {
+    font-size: 36px;
+    font-weight: 700;
+    fill: #1e3a8a;
+    font-family: 'Oxanium', sans-serif;
+    animation: centerTextPulse 0.8s ease-out;
+}
+
+@keyframes centerTextPulse {
+    0% {
+        font-size: 20px;
+        opacity: 0;
+    }
+
+    100% {
+        font-size: 36px;
+        opacity: 1;
+    }
+}
+
+/* ============ LEGEND ============ */
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.donut-legend.bottom {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: legendFadeIn 0.6s ease-out backwards;
+}
+
+.legend-item:nth-child(1) {
+    animation-delay: 0.2s;
+}
+
+.legend-item:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.legend-item:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.donut-legend.bottom .legend-item {
+    gap: 12px;
+    min-width: 130px;
+}
+
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: dotPulse 0.6s ease-out;
+}
+
+.legend-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+}
+
+.legend-value {
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 0.2px;
+}
+
+.legend-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: capitalize;
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes chartFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes legendFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes dotPulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+    .donut-card {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .donut-title {
+        font-size: 16px;
+    }
+
+    .donut-content {
+        flex-direction: column !important;
+        gap: 15px;
+    }
+
+    .donut-chart-wrapper svg {
+        width: 150px;
+        height: 150px;
+    }
+
+    .donut-center-text {
+        font-size: 28px;
+    }
+
+    .donut-legend.bottom {
+        gap: 10px;
+    }
+
+    .donut-legend.bottom .legend-item {
+        min-width: auto;
+        gap: 6px;
+    }
+}

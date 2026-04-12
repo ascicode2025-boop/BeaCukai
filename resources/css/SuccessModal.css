@@ -1,0 +1,75 @@
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.success-modal-content {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 450px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.success-header {
+    background: linear-gradient(135deg, #facc15 0%, #fbbf24 100%);
+    color: #1e1b4b;
+    padding: 30px;
+    text-align: center;
+}
+
+.success-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e1b4b;
+}
+
+.success-footer {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-ok {
+    background: linear-gradient(135deg, #5850ec 0%, #7c3aed 100%);
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-ok:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(88, 80, 236, 0.4);
+}
+
+.btn-ok:active {
+    transform: translateY(0);
+}

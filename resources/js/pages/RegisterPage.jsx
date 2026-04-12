@@ -35,7 +35,7 @@ export default function RegisterPage() {
             let message = "";
 
             // Ambil error message (bisa string atau array)
-            const getErrorMsg = (err) => Array.isArray(err) ? err[0] : err;
+            const getErrorMsg = (err) => (Array.isArray(err) ? err[0] : err);
 
             if (allErrors.name) {
                 message = getErrorMsg(allErrors.name);
@@ -59,7 +59,13 @@ export default function RegisterPage() {
         e.preventDefault();
 
         // Cek field kosong SEBELUM submit
-        if (!data.name || !data.nip || !data.email || !data.password || !data.password_confirmation) {
+        if (
+            !data.name ||
+            !data.nip ||
+            !data.email ||
+            !data.password ||
+            !data.password_confirmation
+        ) {
             showError("⚠️ Semua field harus diisi");
             return;
         }
@@ -87,52 +93,31 @@ export default function RegisterPage() {
 
     return (
         <div className="register-wrapper">
-{/* Pop Up Error Validasi */}
+            {/* Pop Up Error Validasi */}
             {showErrorPopup && (
-                <div style={{
-                    position: "fixed",
-                    top: 20,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 9999,
-                    background: "#ff4d4d",
-                    color: "white",
-                    padding: "14px 28px",
-                    borderRadius: "10px",
-                    fontWeight: "bold",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-                    maxWidth: "500px",
-                    animation: "slideDown 0.3s ease-out",
-                    fontSize: "14px"
-                }}>
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 20,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        zIndex: 9999,
+                        background: "#ff4d4d",
+                        color: "white",
+                        padding: "14px 28px",
+                        borderRadius: "10px",
+                        fontWeight: "bold",
+                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+                        maxWidth: "500px",
+                        width: "calc(100% - 40px)",
+                        animation: "slideDown 0.3s ease-out",
+                        fontSize: "14px",
+                    }}
+                >
                     {errorMessage}
                 </div>
             )}
 
-            <Link href="/" className="back-btn" style={{ position: "absolute", top: 30, left: 40, zIndex: 20, textDecoration: "none" }}>
-                <button
-                    type="button"
-                    style={{
-                        background: "linear-gradient(90deg, #5c5fb6 0%, #2d3269 100%)",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50px",
-                        padding: "10px 28px",
-                        fontWeight: 800,
-                        fontSize: "14px",
-                        boxShadow: "0 4px 15px rgba(44, 50, 105, 0.2)",
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
-                        display: "flex",
-                        alignItems: "center"
-                    }}
-                    onMouseOver={e => e.currentTarget.style.filter = "brightness(1.08)"}
-                    onMouseOut={e => e.currentTarget.style.filter = "none"}
-                >
-                    <i className="fas fa-arrow-left" style={{marginRight: 8}}></i>
-                    Kembali
-                </button>
-            </Link>
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;700;800;900&display=swap');
 
@@ -162,7 +147,7 @@ export default function RegisterPage() {
 
                 .register-wrapper {
                     min-height: 100vh;
-                    background: #f3f4ff; /* Very light blue-ish background */
+                    background: linear-gradient(135deg, #f3f4ff 0%, #e8e9ff 50%, #dfdfff 100%);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -193,24 +178,10 @@ export default function RegisterPage() {
                     left: 5%;
                 }
 
-                .logo-top-right {
-                    position: absolute;
-                    top: 30px;
-                    right: 40px;
-                    width: 100px;
-                    height: auto;
-                    z-index: 10;
-                    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.05));
-                    transition: transform 0.3s ease;
-                }
 
-                .logo-top-right:hover {
-                    transform: scale(1.05);
-                }
 
                 .register-card {
                     width: 950px;
-                    height: 420px;
                     background: white;
                     border: 1px solid rgba(0,0,0,0.1);
                     border-top-left-radius: 20px;
@@ -246,60 +217,67 @@ export default function RegisterPage() {
 
                 .register-right {
                     flex: 1.2;
-                    padding: 30px 25px;
+                    padding: 25px 50px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    justify-content: center;
+                    justify-content: flex-start;
                     background: white;
+                    overflow-y: auto;
                 }
 
                 .register-right h2 {
                     font-weight: 800;
                     font-size: 24px;
                     color: #2d3269;
-                    margin-bottom: 25px;
+                    margin-bottom: 18px;
                     letter-spacing: 1px;
+                    margin-top: 10px;
                 }
 
                 .form-container {
                   width: 100%;
-                  max-width: 320px; /* Shorter width for the form */
+                  max-width: 100%;
+                  padding: 0 10px;
+
                 }
 
                 .form-group-custom {
                     display: flex;
+                    flex-direction: row;
                     align-items: center;
                     width: 100%;
-                    margin-bottom: 10px;
-                    gap: 12px;
+                    margin-bottom: 20px;
+                    gap: 15px;
                 }
 
                 .label-custom {
-                    width: 120px;
+                    width: 100px;
                     font-weight: 800;
                     font-size: 14px;
                     color: #2d3269;
                     text-align: left;
+                    flex-shrink: 0;
                 }
 
                 .input-capsule {
-                    flex: 1;
+                    width: 100%;
                     background: #e0e0e0;
-                    border: 2px solid #ccc;
+                    border: 1px solid #ccc;
                     border-radius: 50px;
-                    padding: 8px 15px;
+                    padding: 12px 20px;
                     font-size: 14px;
                     font-weight: 600;
                     color: #333;
                     box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
                     outline: none;
-                    transition: border-color 0.3s ease;
+                    transition: all 0.3s ease;
                 }
 
                 .input-capsule:focus {
+                    background: #f5f5f5;
                     border-color: #5c5fb6;
-                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 3px rgba(92, 95, 182, 0.1);
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(92, 95, 182, 0.2);
                 }
 
                 .input-capsule::placeholder {
@@ -310,17 +288,17 @@ export default function RegisterPage() {
                     width: 100%;
                     display: flex;
                     justify-content: center;
-                    margin-top: 20px;
+                    margin-top: 12px;
                 }
 
                 .signup-btn {
                     background: linear-gradient(90deg, #ffcc00 0%, #ffdb4d 100%);
                     color: white;
                     border: none;
-                    padding: 12px 50px;
+                    padding: 10px 30px;
                     border-radius: 50px;
                     font-weight: 900;
-                    font-size: 15px;
+                    font-size: 14px;
                     cursor: pointer;
                     box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
                     transition: all 0.3s ease;
@@ -333,55 +311,82 @@ export default function RegisterPage() {
                     filter: brightness(1.05);
                 }
 
+                .footer-text {
+                    margin-top: 15px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #444;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+
+                .regist-here-link {
+                    background: #ffcc00;
+                    color: white;
+                    border: none;
+                    padding: 5px 15px;
+                    border-radius: 50px;
+                    font-weight: 800;
+                    font-size: 11px;
+                    text-decoration: none;
+                    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.2);
+                }
+
                 @media (max-width: 768px) {
                     .register-card {
                         flex-direction: column;
+                        width: 100%;
+                        max-width: 400px;
                     }
                     .register-left {
                         display: none;
                     }
-                    .logo-top-right {
-                        right: 20px;
-                        top: 20px;
-                        width: 80px;
+                    .register-right {
+                        padding: 20px;
+                    }
+                    .register-right h2 {
+                        font-size: 20px;
+                        margin-bottom: 15px;
+                    }
+                    .form-container {
+                        max-width: 100%;
+                    }
+                    .form-group-custom {
+                        flex-direction: column;
+                        align-items: flex-start;
+                    }
+                    .label-custom {
+                        width: 100%;
+                        font-size: 12px;
+                    }
+                    .input-capsule {
+                        padding: 7px 12px;
+                        font-size: 13px;
+                    }
+                    .signup-btn {
+                        font-size: 13px;
                     }
                 }
             `}</style>
 
-            {/* Background Decorations */}
-            <img
-                src="/assets/Ellipse 2.png"
-                alt=""
-                className="bg-circle circle-1"
-                style={{ width: "450px", height: "auto", filter: "blur(40px)" }}
-            />
-            <img
-                src="/assets/Ellipse 2.png"
-                alt=""
-                className="bg-circle circle-2"
-                style={{ width: "350px", height: "auto", filter: "blur(40px)" }}
-            />
-
-            <Link href="/">
-                <img
-                    src="/assets/LogoBC.png"
-                    alt="Logo"
-                    className="logo-top-right"
-                />
-            </Link>
+            {/* Background Decorations - Removed (replaced with CSS gradient) */}
 
             <div className="register-card">
                 <div className="register-left">
                     {/* Placeholder for Character Illustration */}
                     <img
-                        src="/assets/register2.png"
-                        alt="Characters"
-                        style={{ width: "150px" }}
-                    />
-                    <img
                         src="/assets/register1.png"
                         alt="Characters"
-                        style={{ width: "95px" }}
+                        style={{
+                            width: "766px",
+                            height: "498px",
+                            position: "absolute",
+                            top: "110px",
+                            marginLeft: "30px",
+                        }}
                     />
                 </div>
                 <div className="register-right">
@@ -389,57 +394,75 @@ export default function RegisterPage() {
                     <form className="form-container" onSubmit={handleSubmit}>
                         <div className="form-group-custom">
                             <label className="label-custom">Nama</label>
-                            <div style={{ position: "relative", flex: 1 }}>
+                            <div
+                                style={{ position: "relative", width: "100%" }}
+                            >
                                 <input
                                     type="text"
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.name}
-                                    onChange={e => setData("name", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("name", e.target.value)
+                                    }
                                     placeholder="Masukkan nama"
                                 />
                             </div>
                         </div>
                         <div className="form-group-custom">
                             <label className="label-custom">NIP</label>
-                            <div style={{ position: "relative", flex: 1 }}>
+                            <div
+                                style={{ position: "relative", width: "100%" }}
+                            >
                                 <input
                                     type="text"
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.nip}
-                                    onChange={e => setData("nip", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("nip", e.target.value)
+                                    }
                                     placeholder="Masukkan NIP"
                                 />
                             </div>
                         </div>
                         <div className="form-group-custom">
                             <label className="label-custom">Email</label>
-                            <div style={{ position: "relative", flex: 1 }}>
+                            <div
+                                style={{ position: "relative", width: "100%" }}
+                            >
                                 <input
                                     type="email"
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.email}
-                                    onChange={e => setData("email", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("email", e.target.value)
+                                    }
                                     placeholder="Masukkan email"
                                 />
                             </div>
                         </div>
                         <div className="form-group-custom">
                             <label className="label-custom">Password</label>
-                            <div style={{ position: "relative", flex: 1 }}>
+                            <div
+                                style={{ position: "relative", width: "100%" }}
+                            >
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.password}
-                                    onChange={e => setData("password", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
                                     placeholder="Masukkan password"
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={() =>
+                                        setShowPassword(!showPassword)
+                                    }
                                     style={{
                                         position: "absolute",
                                         right: "15px",
@@ -452,24 +475,43 @@ export default function RegisterPage() {
                                         color: "#2d3269",
                                     }}
                                 >
-                                    <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                                    <i
+                                        className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+                                    ></i>
                                 </button>
                             </div>
                         </div>
                         <div className="form-group-custom">
-                            <label className="label-custom">Confirm Password</label>
-                            <div style={{ position: "relative", flex: 1 }}>
+                            <label className="label-custom">
+                                Confirm Password
+                            </label>
+                            <div
+                                style={{ position: "relative", width: "100%" }}
+                            >
                                 <input
-                                    type={showConfirmPassword ? "text" : "password"}
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.password_confirmation}
-                                    onChange={e => setData("password_confirmation", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "password_confirmation",
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="Konfirmasi password"
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    onClick={() =>
+                                        setShowConfirmPassword(
+                                            !showConfirmPassword,
+                                        )
+                                    }
                                     style={{
                                         position: "absolute",
                                         right: "15px",
@@ -482,14 +524,29 @@ export default function RegisterPage() {
                                         color: "#2d3269",
                                     }}
                                 >
-                                    <i className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                                    <i
+                                        className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}
+                                    ></i>
                                 </button>
                             </div>
                         </div>
                         <div className="signup-btn-container">
-                            <button className="signup-btn" disabled={processing} type="submit">Sign Up</button>
+                            <button
+                                className="signup-btn"
+                                disabled={processing}
+                                type="submit"
+                            >
+                                Sign Up
+                            </button>
                         </div>
                     </form>
+
+                    <div className="footer-text">
+                        <span>Already have an account?</span>
+                        <Link href="/login" className="regist-here-link">
+                            Login
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

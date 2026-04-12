@@ -6,12 +6,14 @@
     height: 85px;
     position: relative;
     filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.05));
-    overflow: hidden; /* Mencegah scrollbar horizontal pada mobile */
+    overflow: hidden;
+    /* Mencegah scrollbar horizontal pada mobile */
 }
 
 /* Bagian Kiri (Putih/Terang) */
 .custom-navbar-left {
-    flex: 1.5; /* Memberi ruang lebih besar untuk brand & profile */
+    flex: 1;
+    /* Memberi ruang lebih besar untuk brand & profile */
     background: linear-gradient(90deg, #FFFFFF 0%, #B8C1E2 100%);
     display: flex;
     align-items: center;
@@ -26,14 +28,16 @@
 .custom-navbar-right {
     flex: 1;
     background: linear-gradient(90deg, #c7cde0 0%, #B8C1E2 100%);
-;
-    margin-left: -100px; /* Efek menyambung di bawah lengkungan */
+    ;
+    margin-left: -100px;
+    /* Efek menyambung di bawah lengkungan */
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding-right: 35px;
     z-index: 1;
-    height: 65px; /* Sedikit lebih ramping dari sisi kiri */
+    height: 65px;
+    /* Sedikit lebih ramping dari sisi kiri */
     margin-top: 0;
     transition: all 0.3s ease;
 }
@@ -60,7 +64,8 @@
 /* Profile Circle Overlap */
 .profile-section-overlap {
     position: absolute;
-    right: 40px; /* Posisi di ujung lengkungan */
+    right: 40px;
+    /* Posisi di ujung lengkungan */
     top: 50%;
     transform: translateY(-50%);
     z-index: 20;
@@ -69,12 +74,10 @@
 .profile-circle-btn {
     width: 55px;
     height: 55px;
-    background: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid #5558d4;
     color: #5558d4;
     font-size: 28px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -92,71 +95,261 @@
     height: 38px;
     background: transparent;
     border-radius: 50%;
-    border: 2px solid #5558d4;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #5558d4;
     font-size: 1.1rem;
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-icon-btn:hover {
+    transform: scale(1.1);
+    background-color: rgba(85, 88, 212, 0.05);
+}
+
+/* Mobile Profile Circle Button */
+.profile-circle-btn-mobile {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #5558d4;
+    color: #5558d4;
+    font-size: 22px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.profile-circle-btn-mobile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(85, 88, 212, 0.2);
+}
+
+/* Dropdown Menu Mobile */
+.profile-dropdown-mobile {
+    position: fixed;
+    top: 85px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 240px;
+    overflow: hidden;
+    z-index: 9998;
+    animation: slideDown 0.3s ease-out;
+    border: 1px solid #e5e7eb;
+}
+
+@media (min-width: 769px) {
+    .profile-dropdown-mobile {
+        display: none !important;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    background: none;
+    color: #1e1b4b;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-align: left;
+    font-family: 'Oxanium', sans-serif;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+    padding-left: 20px;
+}
+
+.dropdown-item svg {
+    color: #5558d4;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.dropdown-item.logout-item {
+    border-top: 1px solid #e5e7eb;
+    color: #dc2626;
+}
+
+.dropdown-item.logout-item svg {
+    color: #dc2626;
 }
 
 /* --- RESPONSIVE TABLET (Max 992px) --- */
 @media (max-width: 992px) {
     .custom-navbar-left {
         padding: 0 25px;
-        border-radius: 0 0 80px 0;
+        border-radius: 0 0 40px 0;
     }
 
     .custom-navbar-right {
-        margin-left: -80px;
+        margin-left: -50px;
         padding-right: 25px;
     }
 
+    .brand-section {
+        gap: 12px;
+    }
+
+    .brand-logo {
+        height: 42px;
+    }
+
     .brand-name {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+    }
+
+    .profile-section-overlap {
+        right: 25px;
+    }
+
+    .profile-circle-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        border-width: 2px;
+    }
+
+    .logout-icon-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
     }
 }
 
-/* --- RESPONSIVE MOBILE (Max 600px) --- */
-@media (max-width: 600px) {
+/* --- RESPONSIVE MOBILE (Max 768px) --- */
+@media (max-width: 768px) {
+    .navbar-container {
+        height: 75px;
+    }
+
+    .custom-navbar-left {
+        padding: 0 20px;
+        border-radius: 0 0 40px 0;
+    }
+
+    .custom-navbar-right {
+        margin-left: -45px;
+        height: 55px;
+        padding-right: 20px;
+    }
+
+    .brand-section {
+        gap: 10px;
+    }
+
+    .brand-logo {
+        height: 56px;
+    }
+
+    .brand-name {
+        font-size: 1rem;
+    }
+
+    .profile-section-overlap {
+        display: none;
+    }
+
+    .profile-circle-btn {
+        display: none;
+    }
+
+    .logout-icon-btn {
+        display: none;
+    }
+
+    .profile-circle-btn-mobile {
+        display: flex;
+    }
+
+    .profile-dropdown-mobile {
+        top: 75px;
+        right: 15px;
+    }
+}
+
+/* --- RESPONSIVE SMALL MOBILE (Max 480px) --- */
+@media (max-width: 480px) {
     .navbar-container {
         height: 70px;
     }
 
     .custom-navbar-left {
         padding: 0 15px;
-        border-radius: 0 0 45px 0; /* Lengkungan lebih kecil agar tidak menutupi logout */
+        border-radius: 0 0 35px 0;
     }
 
     .custom-navbar-right {
-        margin-left: -40px;
-        height: 50px; /* Menyesuaikan tinggi navbar yang lebih kecil */
+        margin-left: -35px;
+        height: 50px;
         padding-right: 15px;
     }
 
+    .brand-section {
+        gap: 8px;
+    }
+
     .brand-logo {
-        height: 35px;
+        height: 48px;
     }
 
     .brand-name {
-        font-size: 0.9rem; /* Mengecilkan teks agar tidak bertabrakan */
+        font-size: 0.9rem;
     }
 
     .profile-section-overlap {
-        right: 15px; /* Menempel di ujung lengkungan mobile */
+        display: none;
     }
 
     .profile-circle-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-        border-width: 2px;
+        display: none;
     }
 
     .logout-icon-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 0.85rem;
+        display: none;
+    }
+
+    .profile-circle-btn-mobile {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .profile-dropdown-mobile {
+        top: 70px;
+        right: 10px;
+        min-width: 220px;
+    }
+
+    .dropdown-item {
+        padding: 12px 14px;
+        font-size: 13px;
     }
 }

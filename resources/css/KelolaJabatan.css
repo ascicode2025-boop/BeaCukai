@@ -1,0 +1,663 @@
+/* ============ CONTAINER ============ */
+.kelola-jabatan-container {
+    padding: 40px 20px;
+    flex: 1;
+}
+
+/* ============ HEADER SECTION ============ */
+.header-section {
+    margin-bottom: 40px;
+}
+
+.header-accent {
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #facc15 0%, #fbbf24 100%);
+    border-radius: 2px;
+    margin-bottom: 20px;
+}
+
+.header-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 0 0 15px 0;
+    letter-spacing: 0.5px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+}
+
+.header-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 500px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ============ TABLE SECTION ============ */
+.table-section {
+    background: linear-gradient(180deg, #002366 0%, rgba(253, 203, 2, 0.79) 100%);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+/* ============ SEARCH & HEADER ============ */
+.search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.search-container {
+    position: relative;
+    flex: 0 1 300px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(180deg, rgba(0, 35, 102, 0.95) 0%, #002366 100%);
+    border-radius: 12px;
+    padding: 10px 15px;
+    height: 44px;
+    margin: 0;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #999;
+}
+
+.search-icon {
+    color: #facc15;
+    cursor: pointer;
+}
+
+.btn-tambah-jabatan {
+    background: linear-gradient(180deg, #facc15 0%, #e8b800 100%);
+    color: #004d26;
+    border: none;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    white-space: nowrap;
+    height: 44px;
+    margin: 0;
+}
+
+.btn-tambah-jabatan:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+    background: linear-gradient(180deg, #fde047 0%, #f0c000 100%);
+}
+
+/* ============ TABLE STYLING ============ */
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    background: white;
+}
+
+.jabatan-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.jabatan-table thead {
+    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+}
+
+.jabatan-table thead th {
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.jabatan-table thead th:first-child,
+.jabatan-table thead th:nth-child(2) {
+    text-align: left;
+}
+
+.jabatan-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.jabatan-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.jabatan-table tbody td {
+    padding: 15px 16px;
+    font-size: 14px;
+    color: #4b5563;
+    text-align: center;
+}
+
+.nama-jabatan-cell {
+    text-align: left;
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+.disc-cell {
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+.aksi-cell {
+    text-align: center;
+}
+
+/* ============ BUTTON STYLING ============ */
+.btn-edit {
+    background: linear-gradient(180deg, rgba(253, 203, 2, 0.79) 0%, #002366 100%);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 35, 102, 0.3);
+    background: linear-gradient(180deg, rgba(253, 213, 52, 0.85) 0%, #003d7a 100%);
+}
+
+/* ============ STANDARD SECTION ============ */
+.standard-section {
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.standard-header {
+    background: linear-gradient(90deg, rgba(253, 203, 2, 0.79) 0%, #002366 100%);
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.standard-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    font-family: 'Oxanium', sans-serif;
+    text-transform: uppercase;
+    text-align: center;
+    flex: 1;
+}
+
+.btn-kembali {
+    background: white;
+    color: #002366;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oxanium', sans-serif;
+    white-space: nowrap;
+}
+
+.btn-kembali:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.standard-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    padding: 30px;
+}
+
+/* ============ JABATAN INFO ============ */
+.jabatan-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.jabatan-info-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #666;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.jabatan-info-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 0;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-simpan {
+    background: linear-gradient(180deg, rgba(253, 203, 2, 0.79) 0%, #002366 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+}
+
+.btn-simpan:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 35, 102, 0.3);
+    background: linear-gradient(180deg, rgba(253, 213, 52, 0.85) 0%, #003d7a 100%);
+}
+
+/* ============ STANDARD VALUES ============ */
+.standard-values {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.standard-values-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #666;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.standard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.standard-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.standard-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.standard-input {
+    padding: 10px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.standard-input:focus {
+    outline: none;
+    border-color: #facc15;
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1);
+}
+
+/* ============ NO DATA STATE ============ */
+.no-data {
+    text-align: center;
+    padding: 40px 16px !important;
+    color: #999;
+    font-style: italic;
+}
+
+/* ============ ADD JABATAN SECTION ============ */
+.add-jabatan-section {
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.add-jabatan-header {
+    background: linear-gradient(180deg, #facc15 0%, #e8b800 100%);
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+}
+
+.add-jabatan-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+}
+
+.add-jabatan-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group-full {
+    width: 100%;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form-input {
+    padding: 12px 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #facc15;
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1);
+}
+
+.form-input::placeholder {
+    color: #999;
+}
+
+.disc-input-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    justify-content: flex-end;
+}
+
+.btn-batal {
+    background: white;
+    color: #666;
+    border: 2px solid #dee2e6;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-batal:hover {
+    border-color: #999;
+    color: #333;
+    background: #f8f9fa;
+}
+
+.btn-submit {
+    background: linear-gradient(180deg, #002366 0%, #1e3a8a 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 35, 102, 0.3);
+    background: linear-gradient(180deg, #003d7a 0%, #2a4bad 100%);
+}
+
+/* ============ RESPONSIVE DESIGN ============ */
+@media (max-width: 1024px) {
+    .kelola-jabatan-container {
+        padding: 30px 15px;
+    }
+
+    .header-title {
+        font-size: 28px;
+    }
+
+    .standard-content {
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .jabatan-table thead th {
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    .jabatan-table tbody td {
+        padding: 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .kelola-jabatan-container {
+        padding: 20px 10px;
+    }
+
+    .header-title {
+        font-size: 24px;
+    }
+
+    .search-header {
+        flex-direction: column;
+    }
+
+    .btn-tambah-jabatan {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .standard-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .standard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .disc-input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .jabatan-table thead th {
+        padding: 10px;
+        font-size: 11px;
+    }
+
+    .jabatan-table tbody td {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .btn-edit {
+        padding: 6px 16px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kelola-jabatan-container {
+        padding: 15px 8px;
+    }
+
+    .header-title {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .header-description {
+        font-size: 12px;
+    }
+
+    .table-section {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .search-header {
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    .btn-tambah-jabatan {
+        width: 100%;
+    }
+
+    .jabatan-table {
+        min-width: 600px;
+    }
+
+    .jabatan-table thead th {
+        padding: 8px;
+        font-size: 10px;
+    }
+
+    .jabatan-table tbody td {
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    .standard-header {
+        padding: 15px 20px;
+    }
+
+    .standard-title {
+        font-size: 14px;
+    }
+
+    .standard-content {
+        padding: 15px;
+    }
+
+    .jabatan-info-name {
+        font-size: 22px;
+    }
+
+    .standard-inut {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .add-jabatan-section {
+        padding: 0;
+    }
+
+    .add-jabatan-header {
+        padding: 15px 20px;
+    }
+
+    .add-jabatan-title {
+        font-size: 14px;
+    }
+
+    .add-jabatan-content {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .disc-input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-input {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-batal,
+    .btn-submit {
+        width: 100%;
+    }
+}

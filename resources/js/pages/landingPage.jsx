@@ -4,9 +4,12 @@ import { Link } from "@inertiajs/react";
 
 export default function LandingPage() {
     const [activeNav, setActiveNav] = useState("SIGN IN");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showTestQuestion, setShowTestQuestion] = useState(false);
 
     const scrollToSection = (id, navName) => {
         setActiveNav(navName);
+        setSidebarOpen(false);
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({ behavior: "smooth" });
@@ -34,10 +37,9 @@ export default function LandingPage() {
         /* Absolute Navbar & Logo (Tetap di atas halaman, tidak mengikuti scroll) */
         .header-fixed-container {
           position: absolute;
-          top: 50px;
-          left: 0;
-          width: 100%;
-          padding: 0 50px;
+          top: 43.48px;
+          left: 34px;
+          width: calc(100% - 84px);
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
@@ -49,13 +51,16 @@ export default function LandingPage() {
           pointer-events: auto; /* Active links */
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 10px;
           border: 1px solid rgba(255, 255, 255, 0.6);
-          border-radius: 50px;
-          padding: 6px;
+          border-radius: 20px;
+          padding: 0 15px;
           background: rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(15px);
           box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+          width: 485px;
+          height: 50.34px;
         }
 
         .nav-link-item {
@@ -90,7 +95,10 @@ export default function LandingPage() {
 
         .logo-container {
           pointer-events: auto;
-          margin-top: -10px;
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+          margin-right: 50px;
         }
 
         .logo-main {
@@ -108,14 +116,21 @@ export default function LandingPage() {
         }
 
         .hero-image-container {
-          flex: 1.2;
-          height: 100vh;
+          position: absolute;
+          width: 646px;
+          height: 523px;
+          top: -15px;
+          left: -120px;
+          border-radius: 10px;
+          overflow: hidden;
+          transform: rotate(11.17deg);
+          opacity: 1;
         }
 
         .hero-image {
           width: 100%;
           height: 100%;
-          border-radius: 0 0 80px 0;
+          border-radius: 10px;
           object-fit: cover;
           }
 
@@ -149,9 +164,9 @@ export default function LandingPage() {
         }
 
         .regist-here-btn {
-          background: linear-gradient(90deg, rgba(255, 204, 0, 0.79) 50%, rgba(160, 160, 229, 0.79) 100%);
+          background: linear-gradient(90deg, rgba(253, 203, 2, 0.79) 26.44%, rgba(0, 35, 102, 0.79) 100%);
           color: white;
-          padding: 16px 50px;
+          padding: 0;
           border: none;
           border-radius: 25px;
           font-weight: 800;
@@ -159,6 +174,11 @@ export default function LandingPage() {
           cursor: pointer;
           box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
           transition: transform 0.3s;
+          height: 45px;
+          width: 197px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .regist-here-btn:hover {
@@ -217,7 +237,7 @@ export default function LandingPage() {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          background: linear-gradient(90deg, rgba(255, 204, 0, 0.79) 0%, #D9D9D9 100%);}
+          background: linear-gradient(90deg, rgba(253, 203, 2, 0.79) 0%, #D9D9D9 100%);}
 
         .card-body-custom h5 {
           font-weight: 800;
@@ -243,6 +263,8 @@ export default function LandingPage() {
         .assessment-container {
           padding: 60px 40px;
           background: transparent;
+          max-width: 1200px;
+          margin: 0 auto;
         }
 
         .assessment-box {
@@ -263,7 +285,7 @@ export default function LandingPage() {
 
         .assessment-left h2 {
           font-weight: 900;
-          font-size: 48px;
+          font-size: 30px;
           margin-bottom: 30px;
           line-height: 1.1;
           letter-spacing: -0.5px;
@@ -372,6 +394,217 @@ export default function LandingPage() {
           margin-top: 10px;
         }
 
+        /* Back Button Styles */
+        .back-button {
+          position: absolute;
+          top: 8px;
+          left: 20px;
+          width: 45px;
+          height: 45px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.2s ease;
+        }
+
+        .back-button:hover {
+          transform: scale(1.05);
+        }
+
+        .back-button svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        /* Test Question Display Styles */
+        .test-question-wrapper {
+          position: relative;
+          background: white;
+          border-radius: 20px;
+          padding: 30px;
+          color: #1a1a1a;
+        }
+
+        .test-question-header {
+          margin-top: 30px;
+          margin-bottom: 25px;
+          background: linear-gradient(135deg, #4a3f83 0%, #6b5fa8 100%);
+          color: white;
+          padding: 20px 25px;
+          border-radius: 14px;
+        }
+
+        .test-question-header h3 {
+          font-size: 16px;
+          font-weight: 900;
+          margin: 0 0 12px 0;
+          text-align: center;
+        }
+
+        .test-question-header .instructions {
+          font-size: 13px;
+          line-height: 1.7;
+        }
+
+        .instructions-item {
+          margin-bottom: 8px;
+        }
+
+        .test-question-table {
+          margin-top: 25px;
+          border: 1px solid #ddd;
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .table-header {
+          display: grid;
+          grid-template-columns: 80px 80px 1fr;
+          background: #d4d4d4;
+          font-weight: 800;
+          font-size: 14px;
+          color: #2d3269;
+        }
+
+        .table-header-cell {
+          padding: 15px;
+          text-align: center;
+          border-right: 1px solid #ccc;
+        }
+
+        .table-row {
+          display: grid;
+          grid-template-columns: 80px 80px 1fr;
+          border-top: 1px solid #e0e0e0;
+        }
+
+        .table-cell {
+          padding: 15px;
+          text-align: center;
+          border-right: 1px solid #e0e0e0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .table-cell-checkbox {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          border: 2.5px solid #666;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .table-cell-description {
+          padding: 15px;
+          text-align: left;
+          font-size: 13px;
+          font-weight: 600;
+          color: #2d3269;
+          display: flex;
+          align-items: center;
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-btn {
+          display: none;
+          flex-direction: column;
+          gap: 5px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          pointer-events: auto;
+        }
+
+        .hamburger-btn span {
+          width: 25px;
+          height: 3px;
+          background: black;
+          border-radius: 2px;
+          transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.open span:nth-child(1) {
+          transform: rotate(45deg) translate(10px, 10px);
+        }
+
+        .hamburger-btn.open span:nth-child(2) {
+          opacity: 0;
+        }
+
+        .hamburger-btn.open span:nth-child(3) {
+          transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Sidebar Styles */
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+          display: block;
+          opacity: 1;
+        }
+
+        .sidebar {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 280px;
+          height: 100%;
+          background: linear-gradient(180deg, rgba(60, 60, 120, 0.95) 0%, rgba(100, 100, 180, 0.95) 100%);
+          z-index: 999;
+          padding: 80px 30px 30px 30px;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          gap: 20px;
+          flex-direction: column;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.open {
+          display: flex;
+          transform: translateX(0);
+        }
+
+        .sidebar .nav-link-item {
+          width: 100%;
+          padding: 14px 16px;
+          font-size: 13px;
+          border-radius: 8px;
+          text-align: left;
+          margin-bottom: 8px;
+          background: rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
+          border: none;
+          color: white;
+        }
+
+        .sidebar .nav-link-item:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar .nav-link-item.active {
+          background: linear-gradient(180deg, rgba(255, 204, 0, 0.79) 0%, #A0A0E5 100%);
+          color: white;
+        }
+
         .footer-logo-container {
           position: relative;
           padding: 20px;
@@ -407,7 +640,8 @@ export default function LandingPage() {
 
         @media (max-width: 1024px) {
           .header-fixed-container {
-            padding: 0 30px;
+            top: 43.48px;
+            left: 34px;
           }
 
           .logo-main {
@@ -417,6 +651,8 @@ export default function LandingPage() {
           .nav-capsule {
             gap: 5px;
             background: linear-gradient(90deg, rgba(184, 193, 226, 0.95) 0%, rgba(184, 193, 226, 0.95) 100%);
+            width: 420px;
+            height: 45px;
           }
 
           .nav-link-item {
@@ -524,22 +760,280 @@ export default function LandingPage() {
           .powered-by-label {
             font-size: 11px;
           }
+
+          .back-button {
+            width: 40px;
+            height: 40px;
+            top: 6px;
+            left: 15px;
+          }
+
+          .test-question-wrapper {
+            padding: 20px;
+          }
+
+          .test-question-header {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+          }
+
+          .test-question-header h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+          }
+
+          .test-question-header .instructions {
+            font-size: 12px;
+            line-height: 1.6;
+          }
+
+          .table-header {
+            grid-template-columns: 70px 70px 1fr;
+            font-size: 13px;
+          }
+
+          .table-header-cell {
+            padding: 12px;
+            font-size: 12px;
+          }
+
+          .table-row {
+            grid-template-columns: 70px 70px 1fr;
+          }
+
+          .table-cell {
+            padding: 12px;
+          }
+
+          .table-cell-description {
+            padding: 12px;
+            font-size: 12px;
+          }
+        }
+
+        @media (max-width: 820px) {
+          .header-fixed-container {
+            top: 35px;
+            left: 20px;
+            width: calc(100% - 40px);
+          }
+
+          .logo-main {
+            width: 70px;
+          }
+
+          .nav-capsule {
+            width: 360px;
+            height: 42px;
+            gap: 3px;
+          }
+
+          .nav-link-item {
+            font-size: 9.5px;
+            padding: 5px 10px;
+          }
+
+          .hero-section {
+            padding: 0 20px 20px 0;
+            min-height: 90vh;
+          }
+
+          .hero-image-container {
+            width: 520px;
+            height: 420px;
+            top: -10px;
+            left: -80px;
+          }
+
+          .hero-content {
+            padding-left: 40px;
+            padding-right: 20px;
+            align-items: center;
+          }
+
+          .hero-content h1 {
+            font-size: 32px;
+            margin-bottom: 18px;
+            text-align: center;
+          }
+
+          .hero-content p {
+            font-size: 11px;
+            margin-bottom: 25px;
+            text-align: center;
+            max-width: 420px;
+          }
+
+          .regist-here-btn {
+            height: 42px;
+            width: 180px;
+            font-size: 16px;
+          }
+
+          .disc-section {
+            padding: 50px 30px;
+            gap: 20px;
+          }
+
+          .disc-card {
+            height: 150px;
+            border-left: 10px solid #2d3269;
+          }
+
+          .card-letter-wrapper {
+            width: 33%;
+          }
+
+          .letter-circle {
+            width: 80px;
+            height: 80px;
+            font-size: 52px;
+          }
+
+          .card-body-custom h5 {
+            font-size: 17px;
+            margin-bottom: 6px;
+          }
+
+          .card-body-custom p {
+            font-size: 13px;
+            line-height: 1.3;
+          }
+
+          .assessment-container {
+            padding: 50px 30px;
+          }
+
+          .assessment-box {
+            padding: 60px 50px;
+            gap: 40px;
+          }
+
+          .assessment-left h2 {
+            font-size: 40px;
+            margin-bottom: 25px;
+          }
+
+          .assessment-left p {
+            font-size: 13px;
+            line-height: 1.7;
+          }
+
+          .inner-test-card {
+            max-width: 380px;
+            padding: 35px;
+          }
+
+          .inner-test-card img {
+            height: 200px;
+            margin-bottom: 25px;
+          }
+
+          .test-example-btn {
+            padding: 14px 35px;
+            font-size: 14px;
+          }
+
+          .footer-section {
+            padding: 50px 50px;
+            gap: 30px;
+          }
+
+          .footer-left h3 {
+            font-size: 22px;
+          }
+
+          .footer-left p {
+            font-size: 12px;
+          }
+
+          .powered-by-label {
+            font-size: 11px;
+          }
+
+          .back-button {
+            width: 38px;
+            height: 38px;
+            top: 5px;
+            left: 12px;
+          }
+
+          .test-question-wrapper {
+            padding: 20px;
+          }
+
+          .test-question-header {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+          }
+
+          .test-question-header h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+          }
+
+          .test-question-header .instructions {
+            font-size: 12px;
+            line-height: 1.6;
+          }
+
+          .table-header {
+            grid-template-columns: 65px 65px 1fr;
+            font-size: 12px;
+          }
+
+          .table-header-cell {
+            padding: 12px 10px;
+            font-size: 11px;
+          }
+
+          .table-row {
+            grid-template-columns: 65px 65px 1fr;
+          }
+
+          .table-cell {
+            padding: 12px 10px;
+          }
+
+          .table-cell-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #666;
+          }
+
+          .table-cell-description {
+            padding: 12px 10px;
+            font-size: 12px;
+          }
         }
 
         @media (max-width: 768px) {
           .header-fixed-container {
-            padding: 0 20px;
             top: 30px;
+            left: 0;
+            width: 100%;
+            padding: 0 15px;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+          }
+
+          .hamburger-btn {
+            display: flex;
+            margin-right: auto;
           }
 
           .logo-main {
-            width: 60px;
+            width: 55px;
+          }
+
+          .logo-container {
+            margin-left: 0;
+            margin-right: 0;
           }
 
           .nav-capsule {
-            gap: 4px;
-            padding: 4px;
-            background: linear-gradient(90deg, rgba(184, 193, 226, 0.95) 0%, rgba(184, 193, 226, 0.95) 100%);
+            display: none !important;
           }
 
           .nav-link-item {
@@ -550,9 +1044,9 @@ export default function LandingPage() {
           /* Hero Section */
           .hero-section {
             flex-direction: column;
-            padding: 20px;
+            padding: 15px;
             min-height: auto;
-            margin-top: 80px;
+            margin-top: 100px;
           }
 
           .hero-image-container {
@@ -564,29 +1058,33 @@ export default function LandingPage() {
           }
 
           .hero-content {
-            padding: 20px 15px;
+            padding: 20px 10px;
             align-items: center;
-            text-align: center;
             flex: 1;
           }
 
           .hero-content h1 {
-            font-size: 26px;
+            font-size: 28px;
             line-height: 1.2;
             margin-bottom: 15px;
+            font-weight: 700;
+            text-align: center;
           }
 
           .hero-content p {
-            font-size: 11px;
-            line-height: 1.5;
-            margin-bottom: 20px;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 25px;
             max-width: 100%;
+            text-align: center;
           }
 
           .regist-here-btn {
-            padding: 10px 30px;
-            font-size: 13px;
+            padding: 0;
+            font-size: 14px;
             width: auto;
+            height: 40px;
+            min-width: 160px;
           }
 
           /* DISC Cards Section */
@@ -683,7 +1181,7 @@ export default function LandingPage() {
 
           .footer-left {
             max-width: 100%;
-            margin-bottom: 5px;
+            margin-bottom: 0;
           }
 
           .footer-left h3 {
@@ -709,28 +1207,111 @@ export default function LandingPage() {
             align-items: center;
             gap: 0;
             width: 100%;
+            margin-right: 0 !important;
+            margin-top: 0 !important;
           }
 
           .powered-by-label {
             font-size: 11px;
             margin-top: 8px;
           }
+
+          .back-button {
+            width: 35px;
+            height: 35px;
+            top: 5px;
+            left: 12px;
+          }
+
+          .test-question-wrapper {
+            padding: 15px;
+          }
+
+          .test-question-header {
+            padding: 12px 15px;
+            margin-bottom: 15px;
+          }
+
+          .test-question-header h3 {
+            font-size: 13px;
+            margin-bottom: 8px;
+          }
+
+          .test-question-header .instructions {
+            font-size: 11px;
+            line-height: 1.5;
+          }
+
+          .instructions-item {
+            margin-bottom: 6px;
+          }
+
+          .test-question-table {
+            margin-top: 15px;
+          }
+
+          .table-header {
+            grid-template-columns: 60px 60px 1fr;
+            font-size: 11px;
+          }
+
+          .table-header-cell {
+            padding: 10px;
+            font-size: 10px;
+          }
+
+          .table-row {
+            grid-template-columns: 60px 60px 1fr;
+          }
+
+          .table-cell {
+            padding: 10px;
+          }
+
+          .table-cell-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #666;
+          }
+
+          .table-cell-description {
+            padding: 10px;
+            font-size: 11px;
+          }
         }
 
         @media (max-width: 480px) {
           .header-fixed-container {
-            padding: 0 10px;
-            top: 20px;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            padding: 0 12px;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 12px;
+          }
+
+          .hamburger-btn {
+            display: flex;
+            margin-right: auto;
+          }
+
+          .hamburger-btn span {
+            width: 22px;
+            height: 2.5px;
           }
 
           .logo-main {
-            width: 50px;
+            width: 45px;
+          }
+
+          .logo-container {
+            margin-left: 0;
+            margin-right: 0;
           }
 
           .nav-capsule {
-            gap: 2px;
-            padding: 3px;
-            background: linear-gradient(90deg, rgba(184, 193, 226, 0.95) 0%, rgba(184, 193, 226, 0.95) 100%);
+            display: none !important;
           }
 
           .nav-link-item {
@@ -739,8 +1320,8 @@ export default function LandingPage() {
           }
 
           .hero-section {
-            margin-top: 70px;
-            padding: 15px;
+            margin-top: 90px;
+            padding: 12px;
           }
 
           .hero-image-container {
@@ -748,32 +1329,37 @@ export default function LandingPage() {
           }
 
           .hero-content {
-            padding: 15px 10px;
+            padding: 15px 8px;
           }
 
           .hero-content h1 {
-            font-size: 20px;
+            font-size: 22px;
             margin-bottom: 12px;
+            line-height: 1.3;
           }
 
           .hero-content p {
-            font-size: 10px;
-            margin-bottom: 15px;
+            font-size: 11px;
+            margin-bottom: 18px;
+            line-height: 1.5;
           }
 
           .regist-here-btn {
-            padding: 8px 25px;
+            padding: 0;
             font-size: 12px;
+            height: 38px;
+            width: 150px;
           }
 
           .disc-section {
-            padding: 20px 10px;
-            gap: 12px;
+            padding: 18px 10px;
+            grid-template-columns: 1fr;
+            gap: 10px;
           }
 
           .disc-card {
-            height: 110px;
-            border-left: 8px solid #2d3269;
+            height: 100px;
+            border-left: 6px solid #2d3269;
           }
 
           .card-letter-wrapper {
@@ -781,84 +1367,157 @@ export default function LandingPage() {
           }
 
           .letter-circle {
-            width: 60px;
-            height: 60px;
-            font-size: 38px;
+            width: 55px;
+            height: 55px;
+            font-size: 32px;
           }
 
           .card-body-custom {
             width: 75%;
-            padding: 12px 15px;
+            padding: 10px 12px;
           }
 
           .card-body-custom h5 {
-            font-size: 12px;
-            margin-bottom: 4px;
+            font-size: 11px;
+            margin-bottom: 3px;
           }
 
           .card-body-custom p {
-            font-size: 9px;
+            font-size: 8px;
             line-height: 1.2;
           }
 
           .assessment-container {
-            padding: 20px 10px;
+            padding: 15px 10px;
           }
 
           .assessment-box {
-            padding: 20px 15px;
-            border-radius: 20px;
-            gap: 15px;
+            padding: 18px 12px;
+            border-radius: 18px;
+            gap: 12px;
           }
 
           .assessment-left h2 {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 10px;
           }
 
           .assessment-left p {
             font-size: 9px;
+            line-height: 1.5;
           }
 
           .inner-test-card {
-            padding: 15px;
+            padding: 12px;
           }
 
           .inner-test-card img {
-            height: 120px;
-            margin-bottom: 12px;
-          }
-
-          .test-example-btn {
-            padding: 8px 20px;
-            font-size: 11px;
-          }
-
-          .footer-section {
-            padding: 30px 20px;
-            border-radius: 30px 30px 0 0;
-            gap: 0;
-          }
-
-          .footer-left h3 {
-            font-size: 18px;
+            height: 100px;
             margin-bottom: 10px;
           }
 
+          .test-example-btn {
+            padding: 8px 18px;
+            font-size: 10px;
+          }
+
+          .footer-section {
+            padding: 25px 15px;
+            border-radius: 30px 30px 0 0;
+            gap: 15px;
+          }
+
+          .footer-left {
+            margin-bottom: 8px;
+          }
+
+          .footer-left h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+          }
+
           .footer-left p {
-            font-size: 11px;
-            margin-bottom: 15px;
+            font-size: 10px;
+            margin-bottom: 12px;
           }
 
           .footer-socials {
-            gap: 15px;
-            font-size: 18px;
-            margin-bottom: 15px;
+            gap: 12px;
+            font-size: 16px;
+            margin-bottom: 12px;
+          }
+
+          .footer-right {
+            margin-right: 0 !important;
+            margin-top: 0 !important;
           }
 
           .powered-by-label {
+            font-size: 9px;
+            margin-top: 4px;
+          }
+
+          .back-button {
+            width: 32px;
+            height: 32px;
+            top: 4px;
+            left: 10px;
+          }
+
+          .test-question-wrapper {
+            padding: 12px;
+          }
+
+          .test-question-header {
+            padding: 10px 12px;
+            margin-bottom: 12px;
+          }
+
+          .test-question-header h3 {
+            font-size: 12px;
+            margin-bottom: 6px;
+          }
+
+          .test-question-header .instructions {
             font-size: 10px;
-            margin-top: 5px;
+            line-height: 1.4;
+          }
+
+          .instructions-item {
+            margin-bottom: 5px;
+          }
+
+          .test-question-table {
+            margin-top: 12px;
+          }
+
+          .table-header {
+            grid-template-columns: 50px 50px 1fr;
+            font-size: 10px;
+          }
+
+          .table-header-cell {
+            padding: 8px 5px;
+            font-size: 9px;
+          }
+
+          .table-row {
+            grid-template-columns: 50px 50px 1fr;
+          }
+
+          .table-cell {
+            padding: 8px 5px;
+          }
+
+          .table-cell-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid #666;
+          }
+
+          .table-cell-description {
+            padding: 8px 5px;
+            font-size: 9px;
           }
         }
       `}</style>
@@ -893,6 +1552,14 @@ export default function LandingPage() {
                         SIGN IN
                     </Link>
                 </div>
+                <button
+                    className={`hamburger-btn ${sidebarOpen ? "open" : ""}`}
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <div className="logo-container">
                     <img
                         src="/assets/LogoBC.png"
@@ -901,6 +1568,42 @@ export default function LandingPage() {
                     />
                 </div>
             </header>
+
+            {/* Sidebar Overlay */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`}
+                onClick={() => setSidebarOpen(false)}
+            ></div>
+
+            {/* Sidebar */}
+            <nav className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+                <button
+                    className={`nav-link-item ${activeNav === "DISC" ? "active" : ""}`}
+                    onClick={() => scrollToSection("disc", "DISC")}
+                >
+                    DISC
+                </button>
+                <button
+                    className={`nav-link-item ${activeNav === "TEST" ? "active" : ""}`}
+                    onClick={() => scrollToSection("about", "TEST")}
+                >
+                    TEST
+                </button>
+                <button
+                    className={`nav-link-item ${activeNav === "ABOUT US" ? "active" : ""}`}
+                    onClick={() => scrollToSection("footer", "ABOUT US")}
+                >
+                    ABOUT US
+                </button>
+                <Link
+                    href="/login"
+                    className={`nav-link-item ${activeNav === "SIGN IN" ? "active" : ""}`}
+                    style={{ textDecoration: "none" }}
+                    onClick={() => setActiveNav("SIGN IN")}
+                >
+                    SIGN IN
+                </Link>
+            </nav>
 
             {/* Hero Section */}
             <section className="hero-section" id="hero">
@@ -918,11 +1621,9 @@ export default function LandingPage() {
                         Assessment
                     </h1>
                     <p>
-                        Lorem ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem ipsum has been the
-                        industry's standard dummy text ever since the 1500s,
-                        when an unknown printer took a galley of type and
-                        scrambled it to make a type specimen book.
+                        DISC Self Assessment adalah tes kepribadian yang
+                        mengelompokkan perilaku seseorang ke dalam empat tipe
+                        (D, I, S, C) untuk memahami gaya kerja dan komunikasi.
                     </p>
                     <Link
                         href="/register"
@@ -988,39 +1689,135 @@ export default function LandingPage() {
 
             {/* Assessment Box Section */}
             <section className="assessment-container" id="about">
-                <div className="assessment-box">
-                    <div className="assessment-left">
-                        <h2>DISC Self-Assessment</h2>
-                        <p>
-                            Lorem ipsum is simply dummy text of the printing and
-                            typesetting industry. Lorem ipsum has been the
-                            industry's standard dummy text ever since the 1500s,
-                            when an unknown printer took a galley of type and
-                            scrambled it to make a type specimen book. It has
-                            survived not only five centuries, but also the leap
-                            into electronic typesetting, remaining essentially
-                            unchanged. Lorem ipsum is simply dummy text of the
-                            printing and typesetting industry. Lorem ipsum has
-                            been the industry's standard dummy text ever since
-                            the 1500s, when an unknown printer took a galley of
-                            type and scrambled it to make a type specimen book.
-                            It has survived not only five centuries, but also
-                            the leap into electronic typesetting, remaining
-                            essentially unchanged.
-                        </p>
-                    </div>
-                    <div className="assessment-right">
-                        <div className="inner-test-card">
-                            <img
-                                src="/assets/contohSoal.png"
-                                alt="Test Preview"
-                            />
-                            <button className="test-example-btn">
-                                Lihat Contoh Tes
-                            </button>
+                {!showTestQuestion ? (
+                    <div className="assessment-box">
+                        <div className="assessment-left">
+                            <h2>DISC Self-Assessment</h2>
+                            <p>
+                                Tes DISC adalah tes kepribadian yang membantu
+                                kamu memahami cara berperilaku dan berinteraksi
+                                dengan orang lain. Hasilnya akan menunjukkan
+                                profil kepribadianmu serta tingkat kecocokan
+                                dengan jabatan yang dipilih.
+                            </p>
+
+                            <p>
+                                DISC is a personality test that helps you
+                                understand how you behave and interact with
+                                others. The results show your personality
+                                profile and how well it matches a job role.
+                            </p>
+                        </div>
+                        <div className="assessment-right">
+                            <div className="inner-test-card">
+                                <img
+                                    src="/assets/contohSoal.png"
+                                    alt="Test Preview"
+                                />
+                                <button
+                                    className="test-example-btn"
+                                    onClick={() => setShowTestQuestion(true)}
+                                >
+                                    Lihat Contoh Tes
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="test-question-wrapper">
+                        {/* Back Button */}
+                        <button
+                            onClick={() => setShowTestQuestion(false)}
+                            className="back-button"
+                        >
+                            <svg
+                                viewBox="0 0 45 45"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    clipRule="evenodd"
+                                    d="M41.25 38.2837C36.6625 32.6837 32.5888 29.5062 29.0288 28.7512C25.4688 27.9963 22.0794 27.8822 18.8606 28.4091V38.4375L3.75 22.0734L18.8606 6.5625V16.0941C24.8125 16.1409 29.8725 18.2762 34.0406 22.5C38.2081 26.7237 40.6113 31.985 41.25 38.2837Z"
+                                    fill="#002366"
+                                    stroke="#002366"
+                                    strokeWidth="2"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* Title & Instructions */}
+                        <div className="test-question-header">
+                            <h3>Soal ke-N</h3>
+
+                            <div className="instructions">
+                                <div className="instructions-item">
+                                    <strong>1.</strong> Untuk setiap nomor
+                                    dibawah ini, pilihlah satu karakteristik
+                                    yang paling cocok dengan diri anda dan beri
+                                    tanda silang (x) di kolom M.
+                                </div>
+                                <div className="instructions-item">
+                                    <strong>2.</strong> Kemudiam, pilih satu
+                                    karakteristik yang lain yang paling tidak
+                                    cocok dengan diri anda dan beri tanda silang
+                                    (X) di kolom J.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Table */}
+                        <div className="test-question-table">
+                            {/* Header Row */}
+                            <div className="table-header">
+                                <div className="table-header-cell">M</div>
+                                <div className="table-header-cell">J</div>
+                                <div
+                                    className="table-header-cell"
+                                    style={{
+                                        textAlign: "left",
+                                        borderRight: "none",
+                                    }}
+                                >
+                                    Gambaran diri
+                                </div>
+                            </div>
+
+                            {/* Data Rows */}
+                            {[
+                                "Bahagia, Tanpa beban",
+                                "Tenang, Pendiam",
+                                "Menyenangkan, Baik hati",
+                                "Tak gentar, Berani",
+                            ].map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className="table-row"
+                                    style={{
+                                        background:
+                                            idx % 2 === 0 ? "#f9f9f9" : "white",
+                                    }}
+                                >
+                                    {/* M Column */}
+                                    <div className="table-cell">
+                                        <div className="table-cell-checkbox"></div>
+                                    </div>
+
+                                    {/* J Column */}
+                                    <div className="table-cell">
+                                        <div className="table-cell-checkbox"></div>
+                                    </div>
+
+                                    {/* Description Column */}
+                                    <div className="table-cell-description">
+                                        {item}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </section>
 
             {/* Footer Section */}

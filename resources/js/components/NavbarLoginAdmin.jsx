@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../../css/Navbar.css";
-import { Person, EyeFill, Clock, ChevronDown } from "react-bootstrap-icons";
+import {
+    Person,
+    EyeFill,
+    Clock,
+    ChevronDown,
+    BoxArrowRight,
+} from "react-bootstrap-icons";
 import { useForm } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 
-const NavbarLogin = ({ children }) => {
+const NavbarLoginAdmin = ({ children }) => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -264,8 +270,8 @@ const NavbarLogin = ({ children }) => {
                                     <defs>
                                         <clipPath id="clip0_401_9">
                                             <rect
-                                                width="45"
-                                                height="40"
+                                                width="24"
+                                                height="24"
                                                 fill="white"
                                             />
                                         </clipPath>
@@ -382,22 +388,22 @@ const NavbarLogin = ({ children }) => {
                         <button
                             className="dropdown-item"
                             onClick={() => {
-                                router.visit("/perserta-tes/hasil");
+                                router.visit("/kelola-akun");
                                 setShowDropdown(false);
                             }}
                         >
                             <EyeFill size={18} />
-                            <span>Hasil Akhir</span>
+                            <span>Kelola Akun</span>
                         </button>
                         <button
                             className="dropdown-item"
                             onClick={() => {
-                                router.visit("/perserta-tes/riwayat");
+                                router.visit("/data-peserta");
                                 setShowDropdown(false);
                             }}
                         >
                             <Clock size={18} />
-                            <span>Riwayat</span>
+                            <span>Data Peserta</span>
                         </button>
                         <button
                             className="dropdown-item logout-item"
@@ -406,31 +412,7 @@ const NavbarLogin = ({ children }) => {
                                 setShowDropdown(false);
                             }}
                         >
-                            <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <g clipPath="url(#clip0_401_9)">
-                                    <path
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                        d="M12 2.5C10.4249 2.49997 8.8745 2.89157 7.48834 3.63958C6.10217 4.38758 4.92375 5.4685 4.05911 6.78507C3.19447 8.10164 2.67076 9.61254 2.5351 11.1818C2.39944 12.751 2.65609 14.3294 3.28196 15.7748C3.90783 17.2202 4.88327 18.4874 6.1205 19.4622C7.35773 20.437 8.81792 21.0888 10.3697 21.3591C11.9214 21.6294 13.516 21.5096 15.0099 21.0105C16.5039 20.5114 17.8503 19.6487 18.928 18.5H22.088C21.0014 20.188 19.5083 21.5761 17.7457 22.5371C15.9832 23.498 14.0075 24.0011 12 24C5.373 24 0 18.627 0 12C0 5.373 5.373 2.24235e-06 12 2.24235e-06C14.0077 -0.00122548 15.9835 0.501712 17.7463 1.46268C19.509 2.42364 21.0023 3.81187 22.089 5.5H18.929C18.0415 4.55148 16.9684 3.79567 15.7764 3.27957C14.5844 2.76347 13.299 2.49811 12 2.5ZM24 12L19.5 7.5H18V10.75H8.5V13.25H18V16.5H19.5L24 12Z"
-                                        fill="#002366"
-                                    />
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_401_9">
-                                        <rect
-                                            width="24"
-                                            height="24"
-                                            fill="white"
-                                        />
-                                    </clipPath>
-                                </defs>
-                            </svg>
+                            <BoxArrowRight size={18} />
                             <span>Logout</span>
                         </button>
                     </div>
@@ -443,4 +425,4 @@ const NavbarLogin = ({ children }) => {
     );
 };
 
-export default NavbarLogin;
+export default NavbarLoginAdmin;
