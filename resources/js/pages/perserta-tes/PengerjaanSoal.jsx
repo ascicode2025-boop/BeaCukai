@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight } from "react-bootstrap-icons";
+import { useForm } from "@inertiajs/react";
+import axios from "axios";
 import NavbarLogin from "../../components/NavbarLogin";
 
 const PengerjaanSoal = () => {
@@ -65,198 +67,150 @@ const PengerjaanSoal = () => {
 
     // Sample questions data
     const questionsData = {
-        1: {
-            characteristics: [
-                "Mudah bergaul, menyenangkan",
-                "Mudah percaya orang lain",
-                "Suka berpetualang, pengambil risiko",
-                "Penuh toleransi, menghormati orang lain",
-            ],
-        },
-        2: {
-            characteristics: [
-                "Berbicara lembut, pendiam/penyendiri",
-                "Optimis, berpikir positif, memiliki visi/tujuan",
-                "Pusat perhatian, mudah bersosialisasi",
-                "Pendamai, pembawa keharmonisan",
-            ],
-        },
-        3: {
-            characteristics: [
-                "Memberikan dorongan kepada orang lain",
-                "Berusaha untuk selalu sempurna",
-                "Menjadi bagian dari sebuah kelompok",
-                "Ingin menetapkan tujuan",
-            ],
-        },
-        4: {
-            characteristics: [
-                "Mudah menjadi frustrasi",
-                "Memendam perasaan, tertutup",
-                "Menyampaikan pendapatnya, terbuka",
-                "Berani menghadapi pihak oposisi",
-            ],
-        },
-        5: {
-            characteristics: [
-                "Penuh semangat, banyak bicara",
-                "Bertindak cepat, tegas",
-                "Mencoba untuk menjaga kedamaian",
-                "Mencoba untuk mengikuti peraturan",
-            ],
-        },
-        6: {
-            characteristics: [
-                "Mengatur waktu dengan baik",
-                "Seringkali terburu-buru, merasa tertekan",
-                "Berhubungan dengan orang lain adalah penting",
-                "Senang menyelesaikan hal yang telah dimulai",
-            ],
-        },
-        7: {
-            characteristics: [
-                "Menolak perubahan yang mendadak",
-                "Cenderung terlalu banyak berjanji",
-                "Menarik diri ketika dibawah tekanan",
-                "Tidak takut untuk konfrontasi langsung",
-            ],
-        },
-        8: {
-            characteristics: [
-                "Pendorong, pemberi semangat yang baik",
-                "Pendengar yang baik",
-                "Penganalisa yang baik",
-                "Pendelegasi yang baik",
-            ],
-        },
-        9: {
-            characteristics: [
-                "Hasil adalah segalanya",
-                "Lakukan dengan benar, ketepatan adalah penting",
-                "Buatlah sesuatu menjadi menyenangkan",
-                "Mari lakukan bersama-sama",
-            ],
-        },
-        10: {
-            characteristics: [
-                "Tidak tergantung orang lain",
-                "Akan membeli mengikuti dorongan hati",
-                "Akan menunggu dengan sabar",
-                "Akan mengeluarkan uang untuk hal yang diinginkan",
-            ],
-        },
-        11: {
-            characteristics: [
-                "Ramah, mudah berteman",
-                "Unik, mudah bosan terhadap rutinitas",
-                "Aktif mengubah sesuatu",
-                "Ingin segala sesuatu tepat",
-            ],
-        },
-        12: {
-            characteristics: [
-                "Tidak melawan/mengalah",
-                "Menyukai hal rinci/detil",
-                "Berubah di saat-saat akhir",
-                "Penuntut, kasar",
-            ],
-        },
-        13: {
-            characteristics: [
-                "Ingin maju",
-                "Puas dengan apa yang ada, puas hati",
-                "Terbuka mengungkapkan perasaan",
-                "Rendah hati, sederhana",
-            ],
-        },
-        14: {
-            characteristics: [
-                "Tenang, suka menyendiri/pendiam",
-                "Gembira, periang",
-                "Menyenangkan, ramah",
-                "Tegas, berani",
-            ],
-        },
-        15: {
-            characteristics: [
-                "Menghabiskan waktu dengan orang lain",
-                "Merencanakan masa depan, penuh persiapan",
-                "Mencari tantangan baru",
-                "Menerima penghargaan untuk tujuan yang tercapai",
-            ],
-        },
-        16: {
-            characteristics: [
-                "Peraturan perlu diuji",
-                "Peraturan membuat adil",
-                "Peraturan membuat bosan",
-                "Peraturan membuat aman",
-            ],
-        },
-        17: {
-            characteristics: [
-                "Pendidikan, budaya",
-                "Prestasi, penghargaan",
-                "Keselamatan, keamanan",
-                "Bergaul, berkumpul dalam kelompok",
-            ],
-        },
-        18: {
-            characteristics: [
-                "Memimpin, bicara langsung",
-                "Terbuka, antusias, bersemangat",
-                "Mudah diduga, konsisten",
-                "Berhati-hati",
-            ],
-        },
-        19: {
-            characteristics: [
-                "Tidak mudah dikalahkan/ditundukkan",
-                "Mengikuti keinginan/perintah pimpinan",
-                "Bersemangat, periang",
-                "Ingin teratur, rapi",
-            ],
-        },
-        20: {
-            characteristics: [
-                "Saya akan memimpin orang lain",
-                "Saya akan melaksanakannya",
-                "Saya akan meyakinkan orang lain",
-                "Saya akan mendapatkan fakta",
-            ],
-        },
-        21: {
-            characteristics: [
-                "Mendahulukan kepentingan orang lain",
-                "Suka bersaing, suka tantangan",
-                "Optimis, berpikir positif",
-                "Berpikir logis, sistematis",
-            ],
-        },
-        22: {
-            characteristics: [
-                "Menyenangkan orang, mudah setuju",
-                "Tertawa dengan keras, hidup",
-                "Berani, tegas",
-                "Pendiam, suka menyendiri",
-            ],
-        },
-        23: {
-            characteristics: [
-                "Menginginkan otoritas lebih",
-                "Menginginkan kesempatan baru",
-                "Menghindari konflik",
-                "Menginginkan arahan yang jelas",
-            ],
-        },
-        24: {
-            characteristics: [
-                "Dapat dipercaya/diandalkan",
-                "Kreatif/Unik",
-                "Berorientasi pada hasil",
-                "Memegang standar yang tinggi, teliti",
-            ],
-        },
+        1: [
+            { id: "1A", text: "Mudah bergaul, menyenangkan" },
+            { id: "1B", text: "Mudah percaya orang lain" },
+            { id: "1C", text: "Suka berpetualang, pengambil risiko" },
+            { id: "1D", text: "Penuh toleransi, menghormati orang lain" },
+        ],
+        2: [
+            { id: "2A", text: "Berbicara lembut, pendiam/penyendiri" },
+            { id: "2B", text: "Optimis, berpikir positif, memiliki visi/tujuan" },
+            { id: "2C", text: "Pusat perhatian, mudah bersosialisasi" },
+            { id: "2D", text: "Pendamai, pembawa keharmonisan" },
+        ],
+        3: [
+            { id: "3A", text: "Memberikan dorongan kepada orang lain" },
+            { id: "3B", text: "Berusaha untuk selalu sempurna" },
+            { id: "3C", text: "Menjadi bagian dari sebuah kelompok" },
+            { id: "3D", text: "Ingin menetapkan tujuan" },
+        ],
+        4: [
+            { id: "4A", text: "Mudah menjadi frustrasi" },
+            { id: "4B", text: "Memendam perasaan, tertutup" },
+            { id: "4C", text: "Menyampaikan pendapatnya, terbuka" },
+            { id: "4D", text: "Berani menghadapi pihak oposisi" },
+        ],
+        5: [
+            { id: "5A", text: "Penuh semangat, banyak bicara" },
+            { id: "5B", text: "Bertindak cepat, tegas" },
+            { id: "5C", text: "Mencoba untuk menjaga kedamaian" },
+            { id: "5D", text: "Mencoba untuk mengikuti peraturan" },
+        ],
+        6: [
+            { id: "6A", text: "Mengatur waktu dengan baik" },
+            { id: "6B", text: "Seringkali terburu-buru, merasa tertekan" },
+            { id: "6C", text: "Berhubungan dengan orang lain adalah penting" },
+            { id: "6D", text: "Senang menyelesaikan hal yang telah dimulai" },
+        ],
+        7: [
+            { id: "7A", text: "Menolak perubahan yang mendadak" },
+            { id: "7B", text: "Cenderung terlalu banyak berjanji" },
+            { id: "7C", text: "Menarik diri ketika dibawah tekanan" },
+            { id: "7D", text: "Tidak takut untuk konfrontasi langsung" },
+        ],
+        8: [
+            { id: "8A", text: "Pendorong, pemberi semangat yang baik" },
+            { id: "8B", text: "Pendengar yang baik" },
+            { id: "8C", text: "Penganalisa yang baik" },
+            { id: "8D", text: "Pendelegasi yang baik" },
+        ],
+        9: [
+            { id: "9A", text: "Hasil adalah segalanya" },
+            { id: "9B", text: "Lakukan dengan benar, ketepatan adalah penting" },
+            { id: "9C", text: "Buatlah sesuatu menjadi menyenangkan" },
+            { id: "9D", text: "Mari lakukan bersama-sama" },
+        ],
+        10: [
+            { id: "10A", text: "Tidak tergantung orang lain" },
+            { id: "10B", text: "Akan membeli mengikuti dorongan hati" },
+            { id: "10C", text: "Akan menunggu dengan sabar" },
+            { id: "10D", text: "Akan mengeluarkan uang untuk hal yang diinginkan" },
+        ],
+        11: [
+            { id: "11A", text: "Ramah, mudah berteman" },
+            { id: "11B", text: "Unik, mudah bosan terhadap rutinitas" },
+            { id: "11C", text: "Aktif mengubah sesuatu" },
+            { id: "11D", text: "Ingin segala sesuatu tepat" },
+        ],
+        12: [
+            { id: "12A", text: "Tidak melawan/mengalah" },
+            { id: "12B", text: "Menyukai hal rinci/detil" },
+            { id: "12C", text: "Berubah di saat-saat akhir" },
+            { id: "12D", text: "Penuntut, kasar" },
+        ],
+        13: [
+            { id: "13A", text: "Ingin maju" },
+            { id: "13B", text: "Puas dengan apa yang ada, puas hati" },
+            { id: "13C", text: "Terbuka mengungkapkan perasaan" },
+            { id: "13D", text: "Rendah hati, sederhana" },
+        ],
+        14: [
+            { id: "14A", text: "Tenang, suka menyendiri/pendiam" },
+            { id: "14B", text: "Gembira, periang" },
+            { id: "14C", text: "Menyenangkan, ramah" },
+            { id: "14D", text: "Tegas, berani" },
+        ],
+        15: [
+            { id: "15A", text: "Menghabiskan waktu dengan orang lain" },
+            { id: "15B", text: "Merencanakan masa depan, penuh persiapan" },
+            { id: "15C", text: "Mencari tantangan baru" },
+            { id: "15D", text: "Menerima penghargaan untuk tujuan yang tercapai" },
+        ],
+        16: [
+            { id: "16A", text: "Peraturan perlu diuji" },
+            { id: "16B", text: "Peraturan membuat adil" },
+            { id: "16C", text: "Peraturan membuat bosan" },
+            { id: "16D", text: "Peraturan membuat aman" },
+        ],
+        17: [
+            { id: "17A", text: "Pendidikan, budaya" },
+            { id: "17B", text: "Prestasi, penghargaan" },
+            { id: "17C", text: "Keselamatan, keamanan" },
+            { id: "17D", text: "Bergaul, berkumpul dalam kelompok" },
+        ],
+        18: [
+            { id: "18A", text: "Memimpin, bicara langsung" },
+            { id: "18B", text: "Terbuka, antusias, bersemangat" },
+            { id: "18C", text: "Mudah diduga, konsisten" },
+            { id: "18D", text: "Berhati-hati" },
+        ],
+        19: [
+            { id: "19A", text: "Tidak mudah dikalahkan/ditundukkan" },
+            { id: "19B", text: "Mengikuti keinginan/perintah pimpinan" },
+            { id: "19C", text: "Bersemangat, periang" },
+            { id: "19D", text: "Ingin teratur, rapi" },
+        ],
+        20: [
+            { id: "20A", text: "Saya akan memimpin orang lain" },
+            { id: "20B", text: "Saya akan melaksanakannya" },
+            { id: "20C", text: "Saya akan meyakinkan orang lain" },
+            { id: "20D", text: "Saya akan mendapatkan fakta" },
+        ],
+        21: [
+            { id: "21A", text: "Mendahulukan kepentingan orang lain" },
+            { id: "21B", text: "Suka bersaing, suka tantangan" },
+            { id: "21C", text: "Optimis, berpikir positif" },
+            { id: "21D", text: "Berpikir logis, sistematis" },
+        ],
+        22: [
+            { id: "22A", text: "Menyenangkan orang, mudah setuju" },
+            { id: "22B", text: "Tertawa dengan keras, hidup" },
+            { id: "22C", text: "Berani, tegas" },
+            { id: "22D", text: "Pendiam, suka menyendiri" },
+        ],
+        23: [
+            { id: "23A", text: "Menginginkan otoritas lebih" },
+            { id: "23B", text: "Menginginkan kesempatan baru" },
+            { id: "23C", text: "Menghindari konflik" },
+            { id: "23D", text: "Menginginkan arahan yang jelas" },
+        ],
+        24: [
+            { id: "24A", text: "Dapat dipercaya/diandalkan" },
+            { id: "24B", text: "Kreatif/Unik" },
+            { id: "24C", text: "Berorientasi pada hasil" },
+            { id: "24D", text: "Memegang standar yang tinggi, teliti" },
+        ],
     };
 
     const currentData = questionsData[currentQuestion] || questionsData[1];
@@ -276,10 +230,26 @@ const PengerjaanSoal = () => {
     });
 
     // Handle submit
-    const handleSubmit = () => {
-        console.log("Jawaban dikirim:", answers);
-        // Redirect to dashboard after submission
-        window.location.href = "/perserta-tes/dashboard";
+    const handleSubmit = async () => {
+        try {
+            // Mengirim data ke API Laravel
+            const response = await axios.post('/api/submit-disc', {
+                answers: answers
+            });
+
+            if (response.data.status === 'success') {
+                console.log("Hasil DISC dari backend:", response.data);
+
+                // Simpan hasil perhitungan (JSON dari Laravel) ke localStorage
+                localStorage.setItem('discResultData', JSON.stringify(response.data.data));
+
+                // Arahkan user ke halaman ringkasan terlebih dahulu sebelum laporan PDF
+                window.location.href = "/perserta-tes/hasil-ringkas";
+            }
+        } catch (error) {
+            console.error("Terjadi kesalahan:", error);
+            alert("Gagal memproses tes. Pastikan koneksi aman dan coba lagi.");
+        }
     };
 
     // Clear error when changing questions
@@ -1108,10 +1078,10 @@ const PengerjaanSoal = () => {
                                               : "15px",
                                 }}
                             >
-                                {currentData.characteristics.map(
-                                    (characteristic, index) => (
+                                {currentData.map(
+                                    (item, index) => (
                                         <div
-                                            key={index}
+                                            key={item.id}
                                             style={{
                                                 display:
                                                     window.innerWidth <= 480
@@ -1175,7 +1145,7 @@ const PengerjaanSoal = () => {
                                                     handleAnswerChange(
                                                         index,
                                                         "M",
-                                                        characteristic,
+                                                        item.id,
                                                     )
                                                 }
                                             >
@@ -1183,7 +1153,7 @@ const PengerjaanSoal = () => {
                                                     className={`custom-radio ${
                                                         answers[currentQuestion]
                                                             ?.M ===
-                                                        characteristic
+                                                        item.id
                                                             ? "checked"
                                                             : ""
                                                     }`}
@@ -1204,7 +1174,7 @@ const PengerjaanSoal = () => {
                                                     handleAnswerChange(
                                                         index,
                                                         "L",
-                                                        characteristic,
+                                                        item.id,
                                                     )
                                                 }
                                             >
@@ -1212,7 +1182,7 @@ const PengerjaanSoal = () => {
                                                     className={`custom-radio ${
                                                         answers[currentQuestion]
                                                             ?.L ===
-                                                        characteristic
+                                                        item.id
                                                             ? "checked"
                                                             : ""
                                                     }`}
@@ -1248,7 +1218,7 @@ const PengerjaanSoal = () => {
                                                             "break-word",
                                                     }}
                                                 >
-                                                    {characteristic}
+                                                    {item.text}
                                                 </p>
                                             </div>
                                         </div>

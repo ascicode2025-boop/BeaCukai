@@ -7,11 +7,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class LoginController extends Controller
 {
-    /**
+/**
      * Menangani proses login user
      */
     public function store(Request $request)
@@ -28,16 +29,47 @@ class LoginController extends Controller
         $user = User::where('nip', $request->nip)->first();
 
         if (!$user) {
-            return back()->withErrors([
-                'nip' => 'NIP tidak terdaftar',
-            ]);
+            $errors = ['nip' => 'NIP tidak terdaftar'];
+            // Jika request berasal dari Inertia (AJAX), kirim kembali Inertia response
+            if ($request->headers->has('X-Inertia')) {
+                return Inertia::render('LoginPage', [
+                    'errors' => ['nip' => [$errors['nip']]],
+                ])->toResponse($request)->setStatusCode(422);
+            }
+
+            return back()->withErrors($errors);
+        }
+
+        // Debug - check user status
+        Log::info('User found', [
+            'id' => $user->id,
+            'nip' => $user->nip,
+            'role' => $user->role,
+            'is_active' => $user->is_active ?? 'null',
+            'isAdmin' => $user->isAdmin(),
+        ]);
+
+        if (!$user->is_active) {
+            $errors = ['nip' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi admin.'];
+            if ($request->headers->has('X-Inertia')) {
+                return Inertia::render('LoginPage', [
+                    'errors' => ['nip' => [$errors['nip']]],
+                ])->toResponse($request)->setStatusCode(422);
+            }
+
+            return back()->withErrors($errors);
         }
 
         // Cek password
         if (!Hash::check($request->password, $user->password)) {
-            return back()->withErrors([
-                'password' => 'Password salah',
-            ]);
+            $errors = ['password' => 'Password salah'];
+            if ($request->headers->has('X-Inertia')) {
+                return Inertia::render('LoginPage', [
+                    'errors' => ['password' => [$errors['password']]],
+                ])->toResponse($request)->setStatusCode(422);
+            }
+
+            return back()->withErrors($errors);
         }
 
         // Login user dengan Remember Me
@@ -46,6 +78,12 @@ class LoginController extends Controller
 
         // Set initial session activity time
         session(['last_activity_time' => time()]);
+
+        // Debug - check if login successful
+        Log::info('Login successful', [
+            'user_id' => Auth::id(),
+            'is_admin' => $user->isAdmin(),
+        ]);
 
         // Redirect berdasarkan role
         if ($user->isAdmin()) {

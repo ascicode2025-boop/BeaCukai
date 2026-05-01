@@ -263,107 +263,35 @@ const GenerateHasil = () => {
                                             </defs>
 
                                             {/* Vertical grid lines */}
-                                            <line
-                                                x1="40"
-                                                y1="20"
-                                                x2="40"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="80"
-                                                y1="20"
-                                                x2="80"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="120"
-                                                y1="20"
-                                                x2="120"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="160"
-                                                y1="20"
-                                                x2="160"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="200"
-                                                y1="20"
-                                                x2="200"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
+                                            <line x1="40" y1="20" x2="40" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="80" y1="20" x2="80" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="120" y1="20" x2="120" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="160" y1="20" x2="160" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="200" y1="20" x2="200" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
 
-                                            {/* Horizontal grid lines */}
-                                            <line
-                                                x1="20"
-                                                y1="40"
-                                                x2="220"
-                                                y2="40"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="70"
-                                                x2="220"
-                                                y2="70"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="100"
-                                                x2="220"
-                                                y2="100"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="130"
-                                                x2="220"
-                                                y2="130"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
+                                            {/* Horizontal grid lines - setiap 8 value (0, 8, 16, 24, 32) */}
+                                            <line x1="20" y1="150" x2="220" y2="150" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="110" x2="220" y2="110" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="70" x2="220" y2="70" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="30" x2="220" y2="30" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
 
                                             {/* Axes */}
-                                            <line
-                                                x1="20"
-                                                y1="150"
-                                                x2="220"
-                                                y2="150"
-                                                stroke="#cbd5e1"
-                                                strokeWidth="1.5"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="20"
-                                                x2="20"
-                                                y2="150"
-                                                stroke="#cbd5e1"
-                                                strokeWidth="1.5"
-                                            />
+                                            <line x1="20" y1="150" x2="220" y2="150" stroke="#000" strokeWidth="1.5"/>
+                                            <line x1="20" y1="20" x2="20" y2="150" stroke="#000" strokeWidth="1.5"/>
+
+                                            {/* Y-axis labels - Detail 0-32 dengan font lebih kecil */}
+                                            {[0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32].map((val) => {
+                                                const y = 150 - (val * 130 / 32);
+                                                return (
+                                                    <text key={`y-label-${val}`} x="12" y={y + 2} fontSize="5.5" fill="#333" textAnchor="end">{val}</text>
+                                                );
+                                            })}
+
+                                            {/* X-axis labels (1-4) */}
+                                            <text x="40" y="165" fontSize="8" fill="#333" textAnchor="middle">1</text>
+                                            <text x="80" y="165" fontSize="8" fill="#333" textAnchor="middle">2</text>
+                                            <text x="120" y="165" fontSize="8" fill="#333" textAnchor="middle">3</text>
+                                            <text x="160" y="165" fontSize="8" fill="#333" textAnchor="middle">4</text>
 
                                             {/* Line chart - Profil trend */}
                                             <polyline
@@ -429,107 +357,35 @@ const GenerateHasil = () => {
                                         >
                                             {/* Grid */}
                                             {/* Vertical grid lines */}
-                                            <line
-                                                x1="40"
-                                                y1="20"
-                                                x2="40"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="80"
-                                                y1="20"
-                                                x2="80"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="120"
-                                                y1="20"
-                                                x2="120"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="160"
-                                                y1="20"
-                                                x2="160"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="200"
-                                                y1="20"
-                                                x2="200"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
+                                            <line x1="40" y1="20" x2="40" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="80" y1="20" x2="80" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="120" y1="20" x2="120" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="160" y1="20" x2="160" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="200" y1="20" x2="200" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
 
-                                            {/* Horizontal grid lines */}
-                                            <line
-                                                x1="20"
-                                                y1="40"
-                                                x2="220"
-                                                y2="40"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="70"
-                                                x2="220"
-                                                y2="70"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="100"
-                                                x2="220"
-                                                y2="100"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="130"
-                                                x2="220"
-                                                y2="130"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
+                                            {/* Horizontal grid lines - setiap 8 value (0, 8, 16, 24, 32) */}
+                                            <line x1="20" y1="150" x2="220" y2="150" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="110" x2="220" y2="110" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="70" x2="220" y2="70" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="30" x2="220" y2="30" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
 
                                             {/* Axes */}
-                                            <line
-                                                x1="20"
-                                                y1="150"
-                                                x2="220"
-                                                y2="150"
-                                                stroke="#cbd5e1"
-                                                strokeWidth="1.5"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="20"
-                                                x2="20"
-                                                y2="150"
-                                                stroke="#cbd5e1"
-                                                strokeWidth="1.5"
-                                            />
+                                            <line x1="20" y1="150" x2="220" y2="150" stroke="#000" strokeWidth="1.5"/>
+                                            <line x1="20" y1="20" x2="20" y2="150" stroke="#000" strokeWidth="1.5"/>
+
+                                            {/* Y-axis labels - Detail 0-32 dengan font lebih kecil */}
+                                            {[0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32].map((val) => {
+                                                const y = 150 - (val * 130 / 32);
+                                                return (
+                                                    <text key={`y-label2-${val}`} x="12" y={y + 2} fontSize="5.5" fill="#333" textAnchor="end">{val}</text>
+                                                );
+                                            })}
+
+                                            {/* X-axis labels (1-4) */}
+                                            <text x="40" y="165" fontSize="8" fill="#333" textAnchor="middle">1</text>
+                                            <text x="80" y="165" fontSize="8" fill="#333" textAnchor="middle">2</text>
+                                            <text x="120" y="165" fontSize="8" fill="#333" textAnchor="middle">3</text>
+                                            <text x="160" y="165" fontSize="8" fill="#333" textAnchor="middle">4</text>
 
                                             {/* Line chart - Score trend (goes up and down) */}
                                             <polyline
@@ -595,107 +451,40 @@ const GenerateHasil = () => {
                                         >
                                             {/* Grid */}
                                             {/* Vertical grid lines */}
-                                            <line
-                                                x1="40"
-                                                y1="20"
-                                                x2="40"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="80"
-                                                y1="20"
-                                                x2="80"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="120"
-                                                y1="20"
-                                                x2="120"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="160"
-                                                y1="20"
-                                                x2="160"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="200"
-                                                y1="20"
-                                                x2="200"
-                                                y2="150"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
+                                            <line x1="40" y1="20" x2="40" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="80" y1="20" x2="80" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="120" y1="20" x2="120" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="160" y1="20" x2="160" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
+                                            <line x1="200" y1="20" x2="200" y2="150" stroke="#e9d5ff" strokeWidth="0.8" opacity="0.4"/>
 
-                                            {/* Horizontal grid lines */}
-                                            <line
-                                                x1="20"
-                                                y1="40"
-                                                x2="220"
-                                                y2="40"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="70"
-                                                x2="220"
-                                                y2="70"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="100"
-                                                x2="220"
-                                                y2="100"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="130"
-                                                x2="220"
-                                                y2="130"
-                                                stroke="#e9d5ff"
-                                                strokeWidth="0.8"
-                                                opacity="0.4"
-                                            />
+                                            {/* Horizontal grid lines - Main lines (0, 8, 16, 24, 32) */}
+                                            <line x1="20" y1="150" x2="220" y2="150" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="110" x2="220" y2="110" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="70" x2="220" y2="70" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+                                            <line x1="20" y1="30" x2="220" y2="30" stroke="#d1d5db" strokeWidth="0.8" opacity="0.5"/>
+
+                                            {/* Horizontal grid lines - Middle lines (4, 12, 20, 28) */}
+                                            <line x1="20" y1="130" x2="220" y2="130" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.4"/>
+                                            <line x1="20" y1="90" x2="220" y2="90" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.4"/>
+                                            <line x1="20" y1="50" x2="220" y2="50" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.4"/>
 
                                             {/* Axes */}
-                                            <line
-                                                x1="20"
-                                                y1="150"
-                                                x2="220"
-                                                y2="150"
-                                                stroke="#cbd5e1"
-                                                strokeWidth="1.5"
-                                            />
-                                            <line
-                                                x1="20"
-                                                y1="20"
-                                                x2="20"
-                                                y2="150"
-                                                stroke="#cbd5e1"
-                                                strokeWidth="1.5"
-                                            />
+                                            <line x1="20" y1="150" x2="220" y2="150" stroke="#000" strokeWidth="1.5"/>
+                                            <line x1="20" y1="20" x2="20" y2="150" stroke="#000" strokeWidth="1.5"/>
+
+                                            {/* Y-axis labels - Detail 0-32 dengan font lebih kecil */}
+                                            {[0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32].map((val) => {
+                                                const y = 150 - (val * 130 / 32);
+                                                return (
+                                                    <text key={`y-label3-${val}`} x="12" y={y + 2} fontSize="5.5" fill="#333" textAnchor="end">{val}</text>
+                                                );
+                                            })}
+
+                                            {/* X-axis labels (1-4) */}
+                                            <text x="40" y="165" fontSize="8" fill="#333" textAnchor="middle">1</text>
+                                            <text x="80" y="165" fontSize="8" fill="#333" textAnchor="middle">2</text>
+                                            <text x="120" y="165" fontSize="8" fill="#333" textAnchor="middle">3</text>
+                                            <text x="160" y="165" fontSize="8" fill="#333" textAnchor="middle">4</text>
 
                                             {/* Line chart - Analysis trend */}
                                             <polyline

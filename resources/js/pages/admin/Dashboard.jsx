@@ -4,9 +4,27 @@ import NavbarLoginAdmin from "../../components/NavbarLoginAdmin";
 import Footer from "../../components/Footer";
 import DonutChart from "../../components/DonutChart";
 import GrafikDistribusiDISC from "../../components/GrafikDistribusiDISC";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 
 const AdminDashboard = () => {
+    // Get props dari Inertia menggunakan usePage hook - HARUS di dalam component!
+    const { props } = usePage();
+    const adminData = props.admin || {};
+    const statsData = props.stats || {
+        total_peserta: 0,
+        total_tes_selesai: 0,
+        total_admins: 0,
+        jabatan_terbanyak: 'Belum ada data',
+        peserta_jabatan: 0,
+        disc_averages: { D: 0, I: 0, S: 0, C: 0 },
+        peserta_per_jabatan: [],
+        tes_per_bulan: [],
+        recent_users: [],
+    };
+
+    const admin = adminData;
+    const stats = statsData;
+
     const handleKelolaAkun = () => {
         router.visit("/admin/kelola-akun");
     };
@@ -19,30 +37,29 @@ const AdminDashboard = () => {
         router.visit("/admin/data-peserta");
     };
 
-    // Dashboard statistics
-    const stats = {
-        totalPeserta: 45,
-        totalTesSelesai: 45,
-        jabatanTerbanyak: "Pemeriksaan Bea Cukai - 28 Peserta",
-        pesertaJabatan: 20,
-        discAverages: {
-            D: 22,
-            I: 18,
-            S: 24,
-            C: 20,
-        },
+    // Helper to format month for display
+    const formatMonth = (monthStr) => {
+        if (!monthStr || monthStr === 'Tidak ada data') return 'Tidak ada data';
+        const [year, month] = monthStr.split('-');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return monthNames[parseInt(month) - 1] + ' ' + year;
+    };
+
+    // Calculate center text for donut charts
+    const calculateCenterText = (dataArray) => {
+        if (!dataArray || dataArray.length === 0) return "0";
+        const total = dataArray.reduce((sum, item) => sum + item.value, 0);
+        return total.toString();
     };
 
     return (
         <NavbarLoginAdmin>
             <div className="admin-dashboard-container">
-                {/* Header Section */}
+{/* Header Section */}
                 <div className="admin-header-section">
-                    <h1 className="admin-header-title">Welcome, Admin!</h1>
+                    <h1 className="admin-header-title">Welcome, {admin.name || 'Admin'}!</h1>
                     <p className="admin-header-description">
-                        Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of
-                        "de Finibus Bonorum et Malorum" (The Extremes of Good
-                        and Evil) by Cicero.
+                        Berikut adalah ringkasan data peserta tes DISC Bea Cukai hari ini.
                     </p>
                     <button
                         className="btn-kelola-akun"
@@ -77,9 +94,9 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <div className="card-content">
-                            <div>
+<div>
                                 <h3 className="card-number">
-                                    {stats.totalPeserta}
+                                    {stats.total_peserta}
                                 </h3>
                                 <div
                                     className="card-badge"
@@ -125,8 +142,8 @@ const AdminDashboard = () => {
                                 Jabatan Terbanyak
                             </h3>
                         </div>
-                        <p className="card-subtitle">
-                            {stats.jabatanTerbanyak} - {stats.pesertaJabatan}{" "}
+<p className="card-subtitle">
+                            {stats.jabatan_terbanyak} - {stats.peserta_jabatan}{" "}
                             peserta
                         </p>
                         <button
@@ -162,8 +179,8 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <div className="card-content">
-                            <h3 className="card-number">
-                                {stats.totalTesSelesai}
+<h3 className="card-number">
+                                {stats.total_tes_selesai}
                             </h3>
                             <p className="card-label">Total Tes Selesai</p>
                         </div>
@@ -190,8 +207,8 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <h3 className="card-title">Rata-rata DISC</h3>
-                        <div className="disc-values-grid">
-                            {Object.entries(stats.discAverages).map(
+<div className="disc-values-grid">
+                            {Object.entries(stats.disc_averages).map(
                                 ([key, value]) => (
                                     <div key={key} className="disc-value-item">
                                         <span className="disc-letter">
@@ -210,26 +227,26 @@ const AdminDashboard = () => {
                 {/* Grafik Distribusi DISC */}
                 <GrafikDistribusiDISC />
 
-                {/* Donut Charts Section */}
+{/* Donut Charts Section */}
                 <div className="donut-charts-grid">
                     <DonutChart
                         title="Peserta per Jabatan"
-                        centerText="12"
-                        legend={[
-                            { value: 4, label: "HRD", color: "#facc15" },
-                            { value: 4, label: "Finance", color: "#00d9ff" },
-                            { value: 4, label: "Operations", color: "#00ffaa" },
-                        ]}
+                        centerText={calculateCenterText(stats.peserta_per_jabatan)}
+                        legend={stats.peserta_per_jabatan.map(item => ({
+                            value: item.value,
+                            label: item.label,
+                            color: item.color
+                        }))}
                         layout="bottom"
                     />
                     <DonutChart
                         title="Periode Tes"
-                        centerText="23"
-                        legend={[
-                            { value: 8, label: "January", color: "#facc15" },
-                            { value: 8, label: "February", color: "#00d9ff" },
-                            { value: 7, label: "March", color: "#00ffaa" },
-                        ]}
+                        centerText={calculateCenterText(stats.tes_per_bulan)}
+                        legend={stats.tes_per_bulan.map(item => ({
+                            value: item.value,
+                            label: formatMonth(item.label),
+                            color: item.color
+                        }))}
                         layout="right"
                     />
                 </div>

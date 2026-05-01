@@ -1,0 +1,369 @@
+.hasil-ringkas-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f6f8ff 0%, #e5eaff 100%);
+    padding: 28px 22px 36px;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.ringkas-bg-circle {
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(74, 103, 173, 0.25);
+    z-index: 0;
+}
+
+.ringkas-bg-circle-top {
+    width: 220px;
+    height: 220px;
+    top: -82px;
+    right: -78px;
+}
+
+.ringkas-bg-circle-bottom {
+    width: 260px;
+    height: 260px;
+    bottom: -122px;
+    left: -90px;
+}
+
+.hasil-ringkas-header {
+    text-align: left;
+    max-width: 1140px;
+    margin: 0 auto 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.hasil-ringkas-header h1 {
+    font-size: 42px;
+    margin: 0 0 8px;
+    color: #1a3f82;
+    font-weight: 800;
+}
+
+.hasil-ringkas-header p {
+    margin: 0;
+    color: #4e678f;
+    font-size: 13px;
+}
+
+.hasil-ringkas-info-cards {
+    max-width: 1140px;
+    margin: 0 auto 14px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.hr-card {
+    background: #fff;
+    border: 1px solid #dae4f8;
+    border-bottom: 5px solid #facc15;
+    border-radius: 16px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 10px rgba(18, 39, 84, 0.14);
+    min-height: 70px;
+}
+
+.hr-card span {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.hr-card strong {
+    color: #1f3b79;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.hasil-ringkas-chart-card {
+    max-width: 1140px;
+    margin: 0 auto 14px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    padding: 8px 8px 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.chart-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+    padding: 2px 8px 0;
+}
+
+.chart-header-row h2 {
+    margin: 0;
+    color: #1f3b79;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.chart-legend span {
+    font-size: 10px;
+    color: #60708a;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-legend i {
+    width: 14px;
+    height: 3px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.ringkas-chart-svg {
+    width: 100%;
+    height: auto;
+    background: linear-gradient(180deg, #f1f5f9 0%, #dbeafe 100%);
+    border-radius: 8px;
+}
+
+.ringkas-chart-svg text {
+    font-size: 10px;
+    fill: #e2e8f0;
+    font-weight: 500;
+}
+
+.hasil-ringkas-bottom-grid {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.cards-only {
+    margin-top: 2px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.ringkas-main-type,
+.ringkas-list-box {
+    background: #f4f6fb;
+    border-radius: 10px;
+    border: 1px solid #dae4f8;
+    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.08);
+    padding: 10px 14px;
+}
+
+.ringkas-summary-card {
+    border-top: 5px solid #facc15;
+    min-height: 148px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.summary-label {
+    margin: 0 0 10px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.trait-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.trait-badge {
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.trait-badge-primary {
+    color: #f6b900;
+    background: #fef3c7;
+}
+
+.trait-badge-secondary {
+    color: #6d63d8;
+    background: #e0e7ff;
+}
+
+.summary-text {
+    margin: 0;
+    color: #425166;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.ringkas-jpm-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #dae4f8;
+    box-shadow: 0 4px 14px rgba(30, 41, 59, 0.1);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ringkas-jpm-card h4 {
+    margin: 0;
+    color: #23396e;
+    font-size: 14px;
+}
+
+.jpm-value {
+    color: #111827;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.jpm-meter-wrap {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 6px;
+    align-items: end;
+}
+
+.jpm-meter-scale {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 160px;
+    font-size: 9px;
+    color: #4b5563;
+    text-align: right;
+    padding-bottom: 2px;
+}
+
+.jpm-meter {
+    position: relative;
+    height: 160px;
+    border: 2px solid #374151;
+    background: repeating-linear-gradient(
+        to top,
+        #f3f4f6 0,
+        #f3f4f6 31px,
+        #d1d5db 32px
+    );
+    overflow: hidden;
+}
+
+.jpm-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(180deg, #16a34a 0%, #22c55e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #052e16;
+    font-weight: 800;
+    font-size: 10px;
+}
+
+.ringkas-list-box h4 {
+    margin: 0 0 10px;
+    color: #1f3b79;
+    font-size: 13px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+}
+
+.ringkas-list-box ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #425166;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.hasil-ringkas-actions {
+    max-width: 1140px;
+    margin: 14px auto 0;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.hasil-ringkas-actions button {
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #facc15 0%, #fde68a 100%);
+    color: #1e2a66;
+    padding: 8px 22px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.35);
+}
+
+.hasil-ringkas-loading {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 900px) {
+    .hasil-ringkas-info-cards,
+    .hasil-ringkas-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cards-only {
+        grid-template-columns: 1fr;
+    }
+
+    .hasil-ringkas-header h1 {
+        font-size: 26px;
+    }
+
+    .chart-header-row h2 {
+        font-size: 22px;
+    }
+
+    .chart-legend span,
+    .ringkas-chart-svg text,
+    .summary-label,
+    .summary-text,
+    .ringkas-list-box ul,
+    .jpm-meter-scale,
+    .jpm-fill {
+        font-size: 12px;
+    }
+
+    .ringkas-jpm-card h4,
+    .jpm-value,
+    .ringkas-list-box h4 {
+        font-size: 20px;
+    }
+
+    .jpm-meter-scale,
+    .jpm-meter {
+        height: 180px;
+    }
+}

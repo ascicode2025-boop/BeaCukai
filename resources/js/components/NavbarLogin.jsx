@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "../../css/Navbar.css";
 import { Person, EyeFill, Clock, ChevronDown } from "react-bootstrap-icons";
-import { useForm } from "@inertiajs/react";
-import { router } from "@inertiajs/react";
+import { useForm, usePage, router } from "@inertiajs/react";
 
 const NavbarLogin = ({ children }) => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const { post, processing } = useForm();
+    const { props } = usePage();
+    const user = props.user || props.auth?.user;
+    const profilePhotoUrl =
+        user?.profile_photo_url ||
+        (user?.profile_photo ? `/storage/${user.profile_photo}` : null);
 
     // Detect window resize for responsive behavior
     useEffect(() => {
@@ -243,34 +247,47 @@ const NavbarLogin = ({ children }) => {
                             <div
                                 className="profile-circle-btn"
                                 onClick={() => router.visit("/profile")}
-                                style={{ cursor: "pointer" }}
+                                style={{ cursor: "pointer", overflow: "hidden" }}
                                 title="Profil"
                             >
-                                <svg
-                                    width="45"
-                                    height="45"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <g clipPath="url(#clip0_401_9)">
-                                        <path
-                                            fillRule="evenodd"
-                                            clipRule="evenodd"
-                                            d="M12 0C5.373 0 0 5.373 0 12C0 18.627 5.373 24 12 24C18.627 24 24 18.627 24 12C24 5.373 18.627 0 12 0ZM12 6C13.657 6 15 7.343 15 9C15 10.657 13.657 12 12 12C10.343 12 9 10.657 9 9C9 7.343 10.343 6 12 6ZM12 18C10.134 18 8.459 17.211 7.402 15.923C9.208 15.268 11.054 14.98 12.919 15.101C14.785 15.223 16.598 15.751 18.212 16.656C17.206 17.684 15.705 18 12 18Z"
-                                            fill="#002366"
-                                        />
-                                    </g>
-                                    <defs>
-                                        <clipPath id="clip0_401_9">
-                                            <rect
-                                                width="45"
-                                                height="40"
-                                                fill="white"
+                                {profilePhotoUrl ? (
+                                    <img
+                                        src={profilePhotoUrl}
+                                        alt="Foto Profil"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: "50%",
+                                        }}
+                                    />
+                                ) : (
+                                    <svg
+                                        width="45"
+                                        height="45"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <g clipPath="url(#clip0_401_9)">
+                                            <path
+                                                fillRule="evenodd"
+                                                clipRule="evenodd"
+                                                d="M12 0C5.373 0 0 5.373 0 12C0 18.627 5.373 24 12 24C18.627 24 24 18.627 24 12C24 5.373 18.627 0 12 0ZM12 6C13.657 6 15 7.343 15 9C15 10.657 13.657 12 12 12C10.343 12 9 10.657 9 9C9 7.343 10.343 6 12 6ZM12 18C10.134 18 8.459 17.211 7.402 15.923C9.208 15.268 11.054 14.98 12.919 15.101C14.785 15.223 16.598 15.751 18.212 16.656C17.206 17.684 15.705 18 12 18Z"
+                                                fill="#002366"
                                             />
-                                        </clipPath>
-                                    </defs>
-                                </svg>
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_401_9">
+                                                <rect
+                                                    width="45"
+                                                    height="40"
+                                                    fill="white"
+                                                />
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -285,34 +302,48 @@ const NavbarLogin = ({ children }) => {
                                 style={{
                                     cursor: "pointer",
                                     position: "relative",
+                                    overflow: "hidden",
                                 }}
                                 title="Profil"
                             >
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <g clipPath="url(#clip0_401_9)">
-                                        <path
-                                            fillRule="evenodd"
-                                            clipRule="evenodd"
-                                            d="M12 0C5.373 0 0 5.373 0 12C0 18.627 5.373 24 12 24C18.627 24 24 18.627 24 12C24 5.373 18.627 0 12 0ZM12 6C13.657 6 15 7.343 15 9C15 10.657 13.657 12 12 12C10.343 12 9 10.657 9 9C9 7.343 10.343 6 12 6ZM12 18C10.134 18 8.459 17.211 7.402 15.923C9.208 15.268 11.054 14.98 12.919 15.101C14.785 15.223 16.598 15.751 18.212 16.656C17.206 17.684 15.705 18 12 18Z"
-                                            fill="#002366"
-                                        />
-                                    </g>
-                                    <defs>
-                                        <clipPath id="clip0_401_9">
-                                            <rect
-                                                width="24"
-                                                height="24"
-                                                fill="white"
+                                {profilePhotoUrl ? (
+                                    <img
+                                        src={profilePhotoUrl}
+                                        alt="Foto Profil"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: "50%",
+                                        }}
+                                    />
+                                ) : (
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <g clipPath="url(#clip0_401_9)">
+                                            <path
+                                                fillRule="evenodd"
+                                                clipRule="evenodd"
+                                                d="M12 0C5.373 0 0 5.373 0 12C0 18.627 5.373 24 12 24C18.627 24 24 18.627 24 12C24 5.373 18.627 0 12 0ZM12 6C13.657 6 15 7.343 15 9C15 10.657 13.657 12 12 12C10.343 12 9 10.657 9 9C9 7.343 10.343 6 12 6ZM12 18C10.134 18 8.459 17.211 7.402 15.923C9.208 15.268 11.054 14.98 12.919 15.101C14.785 15.223 16.598 15.751 18.212 16.656C17.206 17.684 15.705 18 12 18Z"
+                                                fill="#002366"
                                             />
-                                        </clipPath>
-                                    </defs>
-                                </svg>
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_401_9">
+                                                <rect
+                                                    width="24"
+                                                    height="24"
+                                                    fill="white"
+                                                />
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                )}
                                 <ChevronDown
                                     size={14}
                                     style={{

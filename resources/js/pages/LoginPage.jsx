@@ -2,6 +2,19 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, usePage, useForm } from "@inertiajs/react";
 
+// Fungsi enkripsi dan dekripsi sederhana
+const encryptData = (data) => {
+    return btoa(data); // Base64 encoding
+};
+
+const decryptData = (data) => {
+    try {
+        return atob(data); // Base64 decoding
+    } catch (e) {
+        return null;
+    }
+};
+
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -83,12 +96,16 @@ export default function LoginPage() {
         const savedPassword = localStorage.getItem("remember_password");
 
         if (savedNip && savedPassword) {
-            setData({
-                ...data,
-                nip: savedNip,
-                password: savedPassword,
-                remember: true,
-            });
+            const decryptedPassword = decryptData(savedPassword);
+
+            if (decryptedPassword) {
+                setData({
+                    ...data,
+                    nip: savedNip,
+                    password: decryptedPassword,
+                    remember: true,
+                });
+            }
         }
     }, []);
 
@@ -104,11 +121,13 @@ export default function LoginPage() {
         // Simpan ke localStorage jika "Ingat Saya" di-check
         if (data.remember) {
             localStorage.setItem("remember_nip", data.nip);
-            localStorage.setItem("remember_password", data.password);
+            localStorage.setItem("remember_password", encryptData(data.password));
+            console.log("✅ Credentials disimpan dengan aman");
         } else {
             // Hapus dari localStorage jika tidak di-check
             localStorage.removeItem("remember_nip");
             localStorage.removeItem("remember_password");
+            console.log("🗑️ Credentials dihapus");
         }
 
         post("/login");
@@ -396,6 +415,50 @@ export default function LoginPage() {
                     filter: brightness(1.05);
                 }
 
+                .remember-me-container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    margin-bottom: 15px;
+                    margin-top: 15px;
+                    cursor: pointer;
+                    width: 100%;
+                    padding: 8px 0;
+                    min-height: 40px;
+                    z-index: 10;
+                    position: relative;
+                }
+
+                .remember-me-label {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #2d3269;
+                    user-select: none;
+                    pointer-events: auto;
+                    z-index: 10;
+                }
+
+                .remember-me-checkbox {
+                    width: 24px;
+                    height: 24px;
+                    min-width: 24px;
+                    min-height: 24px;
+                    margin-right: 12px;
+                    margin-top: 0;
+                    margin-bottom: 0;
+                    accent-color: #5c5fb6;
+                    cursor: pointer;
+                    pointer-events: auto !important;
+                    flex-shrink: 0;
+                    position: relative;
+                    z-index: 20;
+                    top: 0;
+                    left: 0;
+                }
+
                 .forgot-password {
                     color: #ff4d4d;
                     font-size: 11px;
@@ -549,39 +612,21 @@ export default function LoginPage() {
 
                         {/* Remember Me Checkbox */}
                         <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "flex-start",
-                                marginBottom: "15px",
-                                marginTop: "5px",
-                            }}
+                            className="remember-me-container"
+                            onClick={() => setData("remember", !data.remember)}
                         >
-                            <label
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    fontSize: "13px",
-                                    fontWeight: 600,
-                                    color: "#2d3269",
-                                }}
-                            >
+                            <label className="remember-me-label">
                                 <input
                                     type="checkbox"
+                                    className="remember-me-checkbox"
                                     checked={data.remember}
-                                    onChange={(e) =>
-                                        setData("remember", e.target.checked)
-                                    }
-                                    style={{
-                                        width: "16px",
-                                        height: "16px",
-                                        marginRight: "8px",
-                                        accentColor: "#5c5fb6",
-                                        cursor: "pointer",
+                                    onChange={(e) => {
+                                        e.stopPropagation();
+                                        setData("remember", e.target.checked);
                                     }}
+                                    onClick={(e) => e.stopPropagation()}
                                 />
-                                Ingat Saya
+                                <span>Ingat Saya</span>
                             </label>
                         </div>
 

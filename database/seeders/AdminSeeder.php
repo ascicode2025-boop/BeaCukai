@@ -22,6 +22,8 @@ class AdminSeeder extends Seeder
                 'email' => 'admin@beacukai.go.id',
                 'password' => Hash::make('admin123'),
                 'role' => 'super_admin',
+                'unit_kerja' => 'Super Admin',
+                'telepon' => '021-1234567',
             ]
         );
 

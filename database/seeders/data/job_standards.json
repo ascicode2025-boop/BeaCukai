@@ -1,0 +1,42 @@
+[
+  {
+    "job_code": "MGR001",
+    "job_title": "Manager",
+    "d": 8,
+    "i": 7,
+    "s": 5,
+    "c": 6
+  },
+  {
+    "job_code": "DEV001",
+    "job_title": "Software Developer",
+    "d": 5,
+    "i": 4,
+    "s": 7,
+    "c": 8
+  },
+  {
+    "job_code": "SALES001",
+    "job_title": "Sales Executive",
+    "d": 6,
+    "i": 8,
+    "s": 4,
+    "c": 5
+  },
+  {
+    "job_code": "HR001",
+    "job_title": "Human Resources Officer",
+    "d": 4,
+    "i": 6,
+    "s": 7,
+    "c": 7
+  },
+  {
+    "job_code": "ANALYST001",
+    "job_title": "Business Analyst",
+    "d": 5,
+    "i": 6,
+    "s": 6,
+    "c": 8
+  }
+]

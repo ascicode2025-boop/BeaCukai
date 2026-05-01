@@ -1,62 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../../css/KelolaAkun.css";
 import NavbarLoginAdmin from "../../components/NavbarLoginAdmin";
 import Footer from "../../components/Footer";
 import { Search } from "react-bootstrap-icons";
+import { useForm, usePage } from "@inertiajs/react";
 
 const KelolaAkun = () => {
+    const { props } = usePage();
+    const { post, processing } = useForm();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedAkun, setSelectedAkun] = useState(null);
     const [showDetail, setShowDetail] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
-    // Dummy akun data
-    const akunData = [
-        {
-            id: 1,
-            no: 1,
-            nama: "Fulan",
-            nip: "19880101",
-            email: "fulan@mail.com",
-            role: "Peserta",
-            status: "Aktif",
-        },
-        {
-            id: 2,
-            no: 2,
-            nama: "Fulani",
-            nip: "19890202",
-            email: "fulani@mail.com",
-            role: "Peserta",
-            status: "Aktif",
-        },
-        {
-            id: 3,
-            no: 3,
-            nama: "Fulana",
-            nip: "19900303",
-            email: "fulana@mail.com",
-            role: "Admin",
-            status: "Aktif",
-        },
-        {
-            id: 4,
-            no: 4,
-            nama: "Fulano",
-            nip: "19910404",
-            email: "fulano@mail.com",
-            role: "Peserta",
-            status: "Nonaktif",
-        },
-    ];
+    const normalizeText = (value) =>
+        (value ?? "").toString().toLowerCase();
+
+    const formatRole = (role) => {
+        if (role === "super_admin") return "Super Admin";
+        if (role === "admin") return "Admin";
+        return "Peserta";
+    };
+
+    const mapAccount = (akun) => ({
+        id: akun.id,
+        nama: akun.name,
+        nip: akun.nip,
+        email: akun.email,
+        role: formatRole(akun.role),
+        role_key: akun.role,
+        unit_kerja: akun.unit_kerja,
+        telepon: akun.telepon,
+        is_active: Boolean(akun.is_active),
+        created_at: akun.created_at,
+    });
+
+    const [akunData, setAkunData] = useState(() =>
+        (props.accounts || []).map(mapAccount),
+    );
+
+    useEffect(() => {
+        setAkunData((props.accounts || []).map(mapAccount));
+    }, [props.accounts]);
 
     // Filter data berdasarkan search term
     const filteredData = akunData.filter(
         (akun) =>
-            akun.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            akun.nip.includes(searchTerm) ||
-            akun.email.toLowerCase().includes(searchTerm.toLowerCase()),
+            normalizeText(akun.nama).includes(normalizeText(searchTerm)) ||
+            normalizeText(akun.nip).includes(normalizeText(searchTerm)) ||
+            normalizeText(akun.email).includes(normalizeText(searchTerm)) ||
+            normalizeText(akun.role).includes(normalizeText(searchTerm)),
     );
 
     const handleLihat = (akun) => {
@@ -69,9 +63,31 @@ const KelolaAkun = () => {
         setSelectedAkun(null);
     };
 
-    const handleNonaktif = (akun) => {
-        setSuccessMessage(`Berhasil Nonaktifkan Akun ${akun.nama}`);
-        setShowSuccess(true);
+    const handleToggleStatus = (akun) => {
+        post(`/admin/kelola-akun/${akun.id}/toggle-status`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                const nextActive = !akun.is_active;
+                setAkunData((prev) =>
+                    prev.map((item) =>
+                        item.id === akun.id
+                            ? { ...item, is_active: nextActive }
+                            : item,
+                    ),
+                );
+                setSelectedAkun((prev) =>
+                    prev && prev.id === akun.id
+                        ? { ...prev, is_active: nextActive }
+                        : prev,
+                );
+                setSuccessMessage(
+                    `Berhasil ${
+                        nextActive ? "mengaktifkan" : "menonaktifkan"
+                    } akun ${akun.nama}.`,
+                );
+                setShowSuccess(true);
+            },
+        });
     };
 
     const handleCloseSuccess = () => {
@@ -102,7 +118,7 @@ const KelolaAkun = () => {
                     >
                         <input
                             type="text"
-                            placeholder="Search nama/NIP"
+                            placeholder="Search nama/NIP/email/role"
                             className="search-input"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -126,9 +142,9 @@ const KelolaAkun = () => {
                             </thead>
                             <tbody>
                                 {filteredData.length > 0 ? (
-                                    filteredData.map((akun) => (
+                                    filteredData.map((akun, index) => (
                                         <tr key={akun.id}>
-                                            <td>{akun.no}</td>
+                                            <td>{index + 1}</td>
                                             <td className="nama-cell">
                                                 {akun.nama}
                                             </td>
@@ -140,11 +156,19 @@ const KelolaAkun = () => {
                                                 {akun.role}
                                             </td>
                                             <td className="status-cell">
-                                                <span
-                                                    className={`status-badge ${akun.status.toLowerCase()}`}
-                                                >
-                                                    {akun.status}
-                                                </span>
+                                                {(() => {
+                                                    const statusLabel =
+                                                        akun.is_active
+                                                            ? "Aktif"
+                                                            : "Nonaktif";
+                                                    return (
+                                                        <span
+                                                            className={`status-badge ${statusLabel.toLowerCase()}`}
+                                                        >
+                                                            {statusLabel}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </td>
                                             <td className="aksi-cell">
                                                 <button
@@ -158,10 +182,13 @@ const KelolaAkun = () => {
                                                 <button
                                                     className="btn-nonaktif"
                                                     onClick={() =>
-                                                        handleNonaktif(akun)
+                                                        handleToggleStatus(akun)
                                                     }
+                                                    disabled={processing}
                                                 >
-                                                    Non aktif
+                                                    {akun.is_active
+                                                        ? "Nonaktifkan"
+                                                        : "Aktifkan"}
                                                 </button>
                                             </td>
                                         </tr>
@@ -216,9 +243,7 @@ const KelolaAkun = () => {
                                         i
                                     </text>
                                 </svg>
-                                <h2 className="modal-title">
-                                    Detail Akun Peserta
-                                </h2>
+                                <h2 className="modal-title">Detail Akun</h2>
                             </div>
 
                             <div className="modal-body">
@@ -249,25 +274,42 @@ const KelolaAkun = () => {
                                             Unit Kerja :
                                         </span>
                                         <span className="detail-value">
-                                            {selectedAkun.role}
+                                            {selectedAkun.unit_kerja || "-"}
                                         </span>
                                     </div>
                                     <div className="detail-row">
                                         <span className="detail-label">
-                                            Status Tes :
+                                            Status Akun :
                                         </span>
                                         <span
-                                            className={`detail-value status-value ${selectedAkun.status.toLowerCase()}`}
+                                            className={`detail-value status-value ${
+                                                selectedAkun.is_active
+                                                    ? "aktif"
+                                                    : "nonaktif"
+                                            }`}
                                         >
-                                            {selectedAkun.status}
+                                            {selectedAkun.is_active
+                                                ? "Aktif"
+                                                : "Nonaktif"}
                                         </span>
                                     </div>
                                     <div className="detail-row">
                                         <span className="detail-label">
-                                            Tanggal Tes :
+                                            Tanggal Daftar :
                                         </span>
                                         <span className="detail-value">
-                                            01 Januari 2026
+                                            {selectedAkun.created_at
+                                                ? new Date(
+                                                      selectedAkun.created_at,
+                                                  ).toLocaleDateString(
+                                                      "id-ID",
+                                                      {
+                                                          day: "2-digit",
+                                                          month: "long",
+                                                          year: "numeric",
+                                                      },
+                                                  )
+                                                : "-"}
                                         </span>
                                     </div>
                                 </div>
@@ -327,14 +369,14 @@ const KelolaAkun = () => {
                                     />
                                 </svg>
                                 <h2 className="success-title">
-                                    Berhasil Nonaktifkan Akun
+                                    {successMessage ||
+                                        "Berhasil memperbarui akun"}
                                 </h2>
                             </div>
 
                             <div className="modal-body">
                                 <p className="modal-description">
-                                    Lorem Ipsum comes from sections 1.10.32 and
-                                    1.10.33 of "de Finibus Bonorum et
+                                    Perubahan status akun telah disimpan.
                                 </p>
                             </div>
 

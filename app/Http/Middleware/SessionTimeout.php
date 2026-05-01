@@ -23,6 +23,15 @@ class SessionTimeout
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
+            $user = Auth::user();
+            if ($user && $user->is_active === false) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect('/login')->with('warning', 'Akun Anda sedang dinonaktifkan. Silakan hubungi admin.');
+            }
+
             $lastActivity = session('last_activity_time');
 
             if ($lastActivity && (time() - $lastActivity > $this->timeout)) {

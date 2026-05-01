@@ -1,68 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage, Link } from "@inertiajs/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "@inertiajs/react";
 
 export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showErrorPopup, setShowErrorPopup] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successEmail, setSuccessEmail] = useState("");
     const { props } = usePage();
     const initialErrors = props?.errors || {};
+    const flashMessage = props?.flash || {};
 
     const { data, setData, post, processing, errors } = useForm({
         name: "",
         nip: "",
         email: "",
+        unit_kerja: "",
+        telepon: "",
         password: "",
         password_confirmation: "",
     });
 
-    // Combine errors dari props dan form
     const allErrors = { ...initialErrors, ...errors };
 
-    // Fungsi untuk menampilkan pop up error
     const showError = (message) => {
         setErrorMessage(message);
         setShowErrorPopup(true);
         setTimeout(() => setShowErrorPopup(false), 4000);
     };
 
-    // Tampilkan error dari backend (setelah submit)
     useEffect(() => {
         if (Object.keys(allErrors).length > 0) {
             let message = "";
-
-            // Ambil error message (bisa string atau array)
             const getErrorMsg = (err) => (Array.isArray(err) ? err[0] : err);
 
-            if (allErrors.name) {
-                message = getErrorMsg(allErrors.name);
-            } else if (allErrors.nip) {
-                message = getErrorMsg(allErrors.nip);
-            } else if (allErrors.email) {
-                message = getErrorMsg(allErrors.email);
-            } else if (allErrors.password) {
-                message = getErrorMsg(allErrors.password);
-            } else if (allErrors.password_confirmation) {
-                message = getErrorMsg(allErrors.password_confirmation);
-            } else {
-                message = "Terjadi kesalahan";
-            }
+            if (allErrors.name) message = getErrorMsg(allErrors.name);
+            else if (allErrors.nip) message = getErrorMsg(allErrors.nip);
+            else if (allErrors.email) message = getErrorMsg(allErrors.email);
+            else if (allErrors.unit_kerja) message = getErrorMsg(allErrors.unit_kerja);
+            else if (allErrors.telepon) message = getErrorMsg(allErrors.telepon);
+            else if (allErrors.password) message = getErrorMsg(allErrors.password);
+            else if (allErrors.password_confirmation) message = getErrorMsg(allErrors.password_confirmation);
+            else message = "Terjadi kesalahan";
 
             showError(message);
         }
-    }, [JSON.stringify(allErrors)]); // Gunakan stringify untuk mencegah infinite loop
+    }, [JSON.stringify(allErrors)]);
+
+    // Check flash messages for success
+    useEffect(() => {
+        if (flashMessage.success && flashMessage.email) {
+            setSuccessEmail(flashMessage.email);
+            setShowSuccessModal(true);
+        }
+    }, [flashMessage]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Cek field kosong SEBELUM submit
         if (
             !data.name ||
             !data.nip ||
             !data.email ||
+            !data.unit_kerja ||
+            !data.telepon ||
             !data.password ||
             !data.password_confirmation
         ) {
@@ -70,19 +73,16 @@ export default function RegisterPage() {
             return;
         }
 
-        // Validasi NIP hanya angka
         if (!/^\d+$/.test(data.nip)) {
             showError("🔢 NIP hanya boleh berisi angka");
             return;
         }
 
-        // Validasi email harus ada @
         if (!data.email.includes("@")) {
             showError("📧 Email harus mengandung @");
             return;
         }
 
-        // Cek password confirmation
         if (data.password !== data.password_confirmation) {
             showError("🔐 Konfirmasi password tidak cocok");
             return;
@@ -93,44 +93,33 @@ export default function RegisterPage() {
 
     return (
         <div className="register-wrapper">
-            {/* Pop Up Error Validasi */}
             {showErrorPopup && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        zIndex: 9999,
-                        background: "#ff4d4d",
-                        color: "white",
-                        padding: "14px 28px",
-                        borderRadius: "10px",
-                        fontWeight: "bold",
-                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-                        maxWidth: "500px",
-                        width: "calc(100% - 40px)",
-                        animation: "slideDown 0.3s ease-out",
-                        fontSize: "14px",
-                    }}
-                >
-                    {errorMessage}
+                <div className="error-popup">{errorMessage}</div>
+            )}
+
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="success-modal-overlay" onClick={() => setShowSuccessModal(false)}>
+                    <div className="success-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="success-icon">✓</div>
+                        <h3>Registrasi Berhasil!</h3>
+                        <p className="success-message">Akun Anda telah berhasil dibuat.</p>
+                        <div className="email-box">
+                            <label>Email Terdaftar:</label>
+                            <div className="email-display">{successEmail}</div>
+                        </div>
+                        <p className="info-text">
+                            Email notifikasi dengan kredensial login telah dikirim ke email Anda.
+                        </p>
+                        <Link href="/login" className="success-btn">
+                            Ke Halaman Login
+                        </Link>
+                    </div>
                 </div>
             )}
 
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;700;800;900&display=swap');
-
-                @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateX(-50%) translateY(-20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(-50%) translateY(0);
-                    }
-                }
 
                 * {
                     margin: 0;
@@ -139,403 +128,382 @@ export default function RegisterPage() {
                     font-family: 'Oxanium', sans-serif;
                 }
 
-                body{
-                   background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
-                    color: #1a1a1a;
-                    overflow-x: hidden;
-                }
-
                 .register-wrapper {
                     min-height: 100vh;
-                    background: linear-gradient(135deg, #f3f4ff 0%, #e8e9ff 50%, #dfdfff 100%);
+                    background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    position: relative;
-                    overflow: hidden;
                     padding: 40px 20px;
                 }
 
-                /* Background Circles - Using Images */
-                .bg-circle {
-                    position: absolute;
-                    z-index: 1;
-                    pointer-events: none;
-                }
-
-                .circle-1 {
-                    width: 450px;
-                    height: 450px;
-                    top: -100px;
+                .error-popup {
+                    position: fixed;
+                    top: 20px;
                     left: 50%;
-                    transform: translateX(-20%);
+                    transform: translateX(-50%);
+                    background: #ff4d4d;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 10px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    z-index: 9999;
                 }
 
-                .circle-2 {
-                    width: 350px;
-                    height: 350px;
-                    bottom: -50px;
-                    left: 5%;
+                /* Success Modal */
+                .success-modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
                 }
 
+                .success-modal {
+                    background: white;
+                    border-radius: 20px;
+                    padding: 40px;
+                    text-align: center;
+                    max-width: 400px;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                    animation: slideIn 0.3s ease-out;
+                }
 
+                @keyframes slideIn {
+                    from {
+                        transform: translateY(-30px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+
+                .success-icon {
+                    width: 80px;
+                    height: 80px;
+                    background: linear-gradient(135deg, #4A569D 0%, #FFCA08 100%);
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 40px;
+                    font-weight: bold;
+                    margin: 0 auto 20px;
+                }
+
+                .success-modal h3 {
+                    color: #2b3168;
+                    font-size: 24px;
+                    font-weight: 800;
+                    margin-bottom: 10px;
+                }
+
+                .success-message {
+                    color: #666;
+                    font-size: 14px;
+                    margin-bottom: 20px;
+                }
+
+                .email-box {
+                    background: #f0f0f0;
+                    border-left: 4px solid #FFCA08;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                    text-align: left;
+                }
+
+                .email-box label {
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 800;
+                    color: #2b3168;
+                    margin-bottom: 5px;
+                }
+
+                .email-display {
+                    font-size: 14px;
+                    color: #333;
+                    word-break: break-all;
+                    font-weight: 600;
+                }
+
+                .info-text {
+                    color: #666;
+                    font-size: 12px;
+                    margin: 15px 0;
+                    line-height: 1.5;
+                }
+
+                .success-btn {
+                    display: inline-block;
+                    background: #FFCA08;
+                    color: white;
+                    padding: 10px 40px;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-weight: 800;
+                    font-size: 14px;
+                    margin-top: 15px;
+                    transition: background 0.3s;
+                }
+
+                .success-btn:hover {
+                    background: #FFB700;
+                }
 
                 .register-card {
-                    width: 950px;
+                    width: 1000px;
                     background: white;
-                    border: 1px solid rgba(0,0,0,0.1);
-                    border-top-left-radius: 20px;
-                    border-bottom-left-radius: 20px;
-                    border-top-right-radius: 20px;
-                    border-bottom-right-radius: 20px;
+                    border-radius: 25px;
                     display: flex;
                     overflow: hidden;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-                    position: relative;
-                    z-index: 5;
-                    margin-top: 2rem;
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
                 }
 
+                /* LEFT */
                 .register-left {
                     flex: 1;
-                    background: linear-gradient(180deg, #5c5fb6 0%, #2d3269 100%);
+                    background: linear-gradient(180deg, #4A569D 0%, #2d3269 100%);
+                    position: relative;
+                    min-height: 630px;
+
                     display: flex;
                     align-items: flex-end;
                     justify-content: center;
-                    padding: 30px;
-                    position: relative;
+
                 }
 
+                /* 🔥 FIX FINAL GAMBAR */
                 .character-img {
-                    width: 100%;
-                    max-width: 320px;
-                    position: relative;
-                    z-index: 2;
+                    position: absolute;
+                    bottom: -92px; /* turun */
+                    left: 50%;
+                    transform: translateX(-50%);
+                    height: 105%; /* biar tetap penuh */
                     object-fit: contain;
-                    margin-bottom: -30px;
                 }
 
+                /* RIGHT */
                 .register-right {
-                    flex: 1.2;
-                    padding: 25px 50px;
+                    flex: 1;
+                    padding: 40px 50px;
                     display: flex;
                     flex-direction: column;
-                    align-items: center;
-                    justify-content: flex-start;
-                    background: white;
-                    overflow-y: auto;
+                    justify-content: center;
                 }
 
                 .register-right h2 {
-                    font-weight: 800;
                     font-size: 24px;
-                    color: #2d3269;
-                    margin-bottom: 18px;
+                    font-weight: 800;
+                    color: #2b3168;
+                    margin-bottom: 25px;
+                    text-align: center;
                     letter-spacing: 1px;
-                    margin-top: 10px;
-                }
-
-                .form-container {
-                  width: 100%;
-                  max-width: 100%;
-                  padding: 0 10px;
-
                 }
 
                 .form-group-custom {
                     display: flex;
-                    flex-direction: row;
                     align-items: center;
-                    width: 100%;
-                    margin-bottom: 20px;
-                    gap: 15px;
+                    margin-bottom: 16px;
                 }
 
                 .label-custom {
-                    width: 100px;
-                    font-weight: 800;
+                    width: 130px;
                     font-size: 14px;
-                    color: #2d3269;
-                    text-align: left;
-                    flex-shrink: 0;
+                    font-weight: 800;
+                    color: #2b3168;
+                }
+
+                .input-wrapper {
+                    flex: 1;
+                    position: relative;
                 }
 
                 .input-capsule {
                     width: 100%;
-                    background: #e0e0e0;
-                    border: 1px solid #ccc;
-                    border-radius: 50px;
-                    padding: 12px 20px;
-                    font-size: 14px;
+                    height: 36px;
+                    border-radius: 20px;
+                    padding: 8px 16px;
+                    font-size: 13px;
                     font-weight: 600;
-                    color: #333;
-                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+                    background: #e6e6e6;
+                    border: none;
                     outline: none;
-                    transition: all 0.3s ease;
+                    box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
                 }
 
                 .input-capsule:focus {
-                    background: #f5f5f5;
-                    border-color: #5c5fb6;
-                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(92, 95, 182, 0.2);
+                    border: 1px solid #4A569D;
+                    background: #f2f2f2;
                 }
 
-                .input-capsule::placeholder {
-                    color: #999;
+                .toggle-password {
+                    position: absolute;
+                    right: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    color: #2b3168;
+                    font-size: 14px;
                 }
 
                 .signup-btn-container {
-                    width: 100%;
                     display: flex;
                     justify-content: center;
-                    margin-top: 12px;
+                    margin-top: 20px;
                 }
 
                 .signup-btn {
-                    background: linear-gradient(90deg, #ffcc00 0%, #ffdb4d 100%);
+                    background: #FFCA08;
                     color: white;
                     border: none;
-                    padding: 10px 30px;
-                    border-radius: 50px;
-                    font-weight: 900;
+                    padding: 14px 50px;
+                    border-radius: 25px;
                     font-size: 14px;
+                    font-weight: 800;
                     cursor: pointer;
-                    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+                    min-width: 160px;
+                    min-height: 44px;
                     transition: all 0.3s ease;
-                    width: 100%;
+                    pointer-events: auto;
+                    position: relative;
+                    z-index: 100;
                 }
 
                 .signup-btn:hover {
+                    background: #FFB700;
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
-                    filter: brightness(1.05);
+                    box-shadow: 0 5px 15px rgba(255, 202, 8, 0.3);
+                }
+
+                .signup-btn:active {
+                    transform: translateY(0);
                 }
 
                 .footer-text {
-                    margin-top: 15px;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: #444;
+                    margin-top: 20px;
+                    font-size: 13px;
                     display: flex;
-                    align-items: center;
                     justify-content: center;
+                    align-items: center;
                     gap: 8px;
-                    flex-wrap: wrap;
                 }
 
                 .regist-here-link {
-                    background: #ffcc00;
+                    background: #FFCA08;
                     color: white;
-                    border: none;
-                    padding: 5px 15px;
-                    border-radius: 50px;
-                    font-weight: 800;
-                    font-size: 11px;
+                    padding: 6px 18px;
+                    border-radius: 20px;
+                    font-size: 12px;
                     text-decoration: none;
-                    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.2);
                 }
 
                 @media (max-width: 768px) {
                     .register-card {
                         flex-direction: column;
                         width: 100%;
-                        max-width: 400px;
                     }
+
                     .register-left {
-                        display: none;
+                        min-height: 300px;
                     }
-                    .register-right {
-                        padding: 20px;
+
+                    .character-img {
+                        position: relative;
+                        height: 250px;
+                        bottom: 0;
                     }
-                    .register-right h2 {
-                        font-size: 20px;
-                        margin-bottom: 15px;
-                    }
-                    .form-container {
-                        max-width: 100%;
-                    }
+
                     .form-group-custom {
                         flex-direction: column;
                         align-items: flex-start;
                     }
+
                     .label-custom {
                         width: 100%;
-                        font-size: 12px;
-                    }
-                    .input-capsule {
-                        padding: 7px 12px;
-                        font-size: 13px;
-                    }
-                    .signup-btn {
-                        font-size: 13px;
+                        margin-bottom: 5px;
                     }
                 }
             `}</style>
 
-            {/* Background Decorations - Removed (replaced with CSS gradient) */}
-
             <div className="register-card">
                 <div className="register-left">
-                    {/* Placeholder for Character Illustration */}
-                    <img
-                        src="/assets/register1.png"
-                        alt="Characters"
-                        style={{
-                            width: "766px",
-                            height: "498px",
-                            position: "absolute",
-                            top: "110px",
-                            marginLeft: "30px",
-                        }}
-                    />
+                    <img src="/assets/register1.png" alt="Characters" className="character-img" />
                 </div>
+
                 <div className="register-right">
                     <h2>SIGN UP HERE</h2>
-                    <form className="form-container" onSubmit={handleSubmit}>
-                        <div className="form-group-custom">
-                            <label className="label-custom">Nama</label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
-                                <input
-                                    type="text"
-                                    className="input-capsule"
-                                    style={{ width: "100%" }}
-                                    value={data.name}
-                                    onChange={(e) =>
-                                        setData("name", e.target.value)
-                                    }
-                                    placeholder="Masukkan nama"
-                                />
+
+                    <form onSubmit={handleSubmit}>
+                        {[
+                            ["Nama", "name", "text"],
+                            ["NIP", "nip", "text"],
+                            ["Email", "email", "email"],
+                            ["Unit Kerja", "unit_kerja", "text"],
+                            ["Telepon", "telepon", "text"],
+                        ].map(([label, key, type]) => (
+                            <div className="form-group-custom" key={key}>
+                                <label className="label-custom">{label}</label>
+                                <div className="input-wrapper">
+                                    <input
+                                        type={type}
+                                        className="input-capsule"
+                                        value={data[key]}
+                                        onChange={(e) => setData(key, e.target.value)}
+                                        placeholder={`Masukkan ${label.toLowerCase()}`}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-group-custom">
-                            <label className="label-custom">NIP</label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
-                                <input
-                                    type="text"
-                                    className="input-capsule"
-                                    style={{ width: "100%" }}
-                                    value={data.nip}
-                                    onChange={(e) =>
-                                        setData("nip", e.target.value)
-                                    }
-                                    placeholder="Masukkan NIP"
-                                />
-                            </div>
-                        </div>
-                        <div className="form-group-custom">
-                            <label className="label-custom">Email</label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
-                                <input
-                                    type="email"
-                                    className="input-capsule"
-                                    style={{ width: "100%" }}
-                                    value={data.email}
-                                    onChange={(e) =>
-                                        setData("email", e.target.value)
-                                    }
-                                    placeholder="Masukkan email"
-                                />
-                            </div>
-                        </div>
+                        ))}
+
                         <div className="form-group-custom">
                             <label className="label-custom">Password</label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
+                            <div className="input-wrapper">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     className="input-capsule"
-                                    style={{ width: "100%" }}
                                     value={data.password}
-                                    onChange={(e) =>
-                                        setData("password", e.target.value)
-                                    }
+                                    onChange={(e) => setData("password", e.target.value)}
                                     placeholder="Masukkan password"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setShowPassword(!showPassword)
-                                    }
-                                    style={{
-                                        position: "absolute",
-                                        right: "15px",
-                                        top: "50%",
-                                        transform: "translateY(-50%)",
-                                        background: "none",
-                                        border: "none",
-                                        fontSize: "12px",
-                                        cursor: "pointer",
-                                        color: "#2d3269",
-                                    }}
-                                >
-                                    <i
-                                        className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
-                                    ></i>
+                                <button type="button" className="toggle-password"
+                                    onClick={() => setShowPassword(!showPassword)}>
+                                    <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                                 </button>
                             </div>
                         </div>
+
                         <div className="form-group-custom">
-                            <label className="label-custom">
-                                Confirm Password
-                            </label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
+                            <label className="label-custom">Confirm Password</label>
+                            <div className="input-wrapper">
                                 <input
-                                    type={
-                                        showConfirmPassword
-                                            ? "text"
-                                            : "password"
-                                    }
+                                    type={showConfirmPassword ? "text" : "password"}
                                     className="input-capsule"
-                                    style={{ width: "100%" }}
                                     value={data.password_confirmation}
-                                    onChange={(e) =>
-                                        setData(
-                                            "password_confirmation",
-                                            e.target.value,
-                                        )
-                                    }
+                                    onChange={(e) => setData("password_confirmation", e.target.value)}
                                     placeholder="Konfirmasi password"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setShowConfirmPassword(
-                                            !showConfirmPassword,
-                                        )
-                                    }
-                                    style={{
-                                        position: "absolute",
-                                        right: "15px",
-                                        top: "50%",
-                                        transform: "translateY(-50%)",
-                                        background: "none",
-                                        border: "none",
-                                        fontSize: "12px",
-                                        cursor: "pointer",
-                                        color: "#2d3269",
-                                    }}
-                                >
-                                    <i
-                                        className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}
-                                    ></i>
+                                <button type="button" className="toggle-password"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                    <i className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                                 </button>
                             </div>
                         </div>
+
                         <div className="signup-btn-container">
-                            <button
-                                className="signup-btn"
-                                disabled={processing}
-                                type="submit"
-                            >
+                            <button className="signup-btn" disabled={processing}>
                                 Sign Up
                             </button>
                         </div>

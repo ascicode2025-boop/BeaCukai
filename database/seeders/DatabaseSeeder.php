@@ -19,7 +19,12 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Test User',
+            'nip' => '111111111',
             'email' => 'test@example.com',
         ]);
+
+        // Jalankan AdminSeeder
+        $this->call(AdminSeeder::class);
+        $this->call(JobStandardSeeder::class);
     }
 }

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { PencilFill, CheckCircleFill } from "react-bootstrap-icons";
+import React, { useState, useEffect, useRef } from "react";
+import { PencilFill } from "react-bootstrap-icons";
 import { useForm } from "@inertiajs/react";
-import NavbarLogin from "../../components/NavbarLogin";
+
+const MAX_PROFILE_PHOTO_SIZE = 7 * 1024 * 1024; // 7MB
+const PROFILE_PHOTO_SIZE = 512;
 
 const Profile = ({ user = {} }) => {
     const { data, setData, post, processing, errors } = useForm({
@@ -10,12 +12,23 @@ const Profile = ({ user = {} }) => {
         email: user.email || "",
         unit_kerja: user.unit_kerja || "",
         nomor_telepon: user.telepon || "",
+        profile_photo: null,
+        remove_profile_photo: false,
         password: "",
-        confirm_password: "",
+        password_confirmation: "",
     });
 
     const [focusedField, setFocusedField] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [profilePreview, setProfilePreview] = useState(
+        user.profile_photo_url || null,
+    );
+    const [photoClientError, setPhotoClientError] = useState("");
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        setProfilePreview(user.profile_photo_url || null);
+    }, [user.profile_photo_url]);
 
     // Auto-close modal after 3 seconds
     useEffect(() => {
@@ -30,8 +43,11 @@ const Profile = ({ user = {} }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         post("/profile/update", {
+            forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => {
                 setShowSuccessModal(true);
+                setPhotoClientError("");
                 // Reset form setelah modal ditutup (3 detik)
                 setTimeout(() => {
                     setData({
@@ -40,12 +56,150 @@ const Profile = ({ user = {} }) => {
                         email: user.email || "",
                         unit_kerja: user.unit_kerja || "",
                         nomor_telepon: user.telepon || "",
+                        profile_photo: null,
+                        remove_profile_photo: false,
                         password: "",
-                        confirm_password: "",
+                        password_confirmation: "",
                     });
                 }, 3500); // Reset setelah modal ditutup
             },
         });
+    };
+
+    const canvasToBlob = (canvas, quality = 0.9) =>
+        new Promise((resolve, reject) => {
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) {
+                        reject(new Error("Gagal memproses gambar."));
+                        return;
+                    }
+                    resolve(blob);
+                },
+                "image/jpeg",
+                quality,
+            );
+        });
+
+    const cropAndResizeImage = async (file) => {
+        const imageUrl = URL.createObjectURL(file);
+
+        try {
+            const image = await new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error("File gambar tidak valid."));
+                img.src = imageUrl;
+            });
+
+            const sourceWidth = image.width;
+            const sourceHeight = image.height;
+            const side = Math.min(sourceWidth, sourceHeight);
+            const sx = (sourceWidth - side) / 2;
+            const sy = (sourceHeight - side) / 2;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = PROFILE_PHOTO_SIZE;
+            canvas.height = PROFILE_PHOTO_SIZE;
+
+            const context = canvas.getContext("2d");
+            if (!context) {
+                throw new Error("Browser tidak mendukung pemrosesan gambar.");
+            }
+
+            context.drawImage(
+                image,
+                sx,
+                sy,
+                side,
+                side,
+                0,
+                0,
+                PROFILE_PHOTO_SIZE,
+                PROFILE_PHOTO_SIZE,
+            );
+
+            let quality = 0.9;
+            let blob = await canvasToBlob(canvas, quality);
+
+            while (blob.size > MAX_PROFILE_PHOTO_SIZE && quality > 0.5) {
+                quality -= 0.1;
+                blob = await canvasToBlob(canvas, quality);
+            }
+
+            if (blob.size > MAX_PROFILE_PHOTO_SIZE) {
+                throw new Error(
+                    "Ukuran foto setelah diproses masih melebihi 7MB.",
+                );
+            }
+
+            const previewUrl = canvas.toDataURL("image/jpeg", quality);
+
+            return { blob, previewUrl };
+        } finally {
+            URL.revokeObjectURL(imageUrl);
+        }
+    };
+
+    const openPhotoPicker = () => {
+        setPhotoClientError("");
+        fileInputRef.current?.click();
+    };
+
+    const removeProfilePhoto = () => {
+        setPhotoClientError("");
+        setProfilePreview(null);
+        setData("profile_photo", null);
+        setData("remove_profile_photo", true);
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const handlePhotoChange = async (e) => {
+        const file = e.target.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            setPhotoClientError("Format gambar harus JPG, PNG, atau WEBP.");
+            return;
+        }
+
+        if (file.size > MAX_PROFILE_PHOTO_SIZE) {
+            setPhotoClientError("Ukuran gambar maksimal 7MB.");
+            return;
+        }
+
+        try {
+            const { blob, previewUrl } = await cropAndResizeImage(file);
+            const normalizedFileName = `${file.name.split(".")[0]}-avatar.jpg`;
+            const processedFile = new File([blob], normalizedFileName, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+            });
+
+            setPhotoClientError("");
+            setProfilePreview(previewUrl);
+            setData("profile_photo", processedFile);
+            setData("remove_profile_photo", false);
+        } catch (error) {
+            setPhotoClientError(
+                error instanceof Error
+                    ? error.message
+                    : "Gagal memproses gambar profil.",
+            );
+        }
     };
 
     // Style Konstan untuk Input dengan hover dan focus effects
@@ -629,18 +783,27 @@ const Profile = ({ user = {} }) => {
                                             "0 8px 24px rgba(85, 88, 212, 0.15), inset 0 1px 3px rgba(255,255,255,0.5)",
                                         transition: "all 0.3s ease",
                                         border: "4px solid #EFF6FF",
+                                        overflow: "hidden",
                                     }}
                                 >
-                                    👤
+                                    {profilePreview ? (
+                                        <img
+                                            src={profilePreview}
+                                            alt="Foto Profil"
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover",
+                                            }}
+                                        />
+                                    ) : (
+                                        "👤"
+                                    )}
                                 </div>
                                 {/* Edit Photo Button */}
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        alert(
-                                            "Fitur upload foto akan segera tersedia",
-                                        )
-                                    }
+                                    onClick={openPhotoPicker}
                                     style={{
                                         position: "absolute",
                                         bottom: "-5px",
@@ -675,6 +838,48 @@ const Profile = ({ user = {} }) => {
                                 >
                                     <PencilFill color="white" size={16} />
                                 </button>
+
+                                {/* Delete Photo Button */}
+                                {profilePreview && (
+                                    <button
+                                        type="button"
+                                        onClick={removeProfilePhoto}
+                                        style={{
+                                            position: "absolute",
+                                            bottom: "-5px",
+                                            left: "-5px",
+                                            background:
+                                                "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                                            width: "40px",
+                                            height: "40px",
+                                            borderRadius: "50%",
+                                            border: "3px solid white",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            transition: "all 0.3s ease",
+                                            boxShadow:
+                                                "0 4px 12px rgba(220, 38, 38, 0.3)",
+                                            padding: 0,
+                                            fontSize: "18px",
+                                        }}
+                                        onMouseOver={(e) => {
+                                            e.currentTarget.style.transform =
+                                                "scale(1.15)";
+                                            e.currentTarget.style.boxShadow =
+                                                "0 6px 16px rgba(220, 38, 38, 0.4)";
+                                        }}
+                                        onMouseOut={(e) => {
+                                            e.currentTarget.style.transform =
+                                                "scale(1)";
+                                            e.currentTarget.style.boxShadow =
+                                                "0 4px 12px rgba(220, 38, 38, 0.3)";
+                                        }}
+                                    >
+                                        ✕
+                                    </button>
+                                )}
                             </div>
 
                             {/* Profile Info - Vertikal */}
@@ -723,6 +928,40 @@ const Profile = ({ user = {} }) => {
                         </div>
 
                         <form onSubmit={handleSubmit}>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/png,image/jpeg,image/jpg,image/webp"
+                                onChange={handlePhotoChange}
+                                style={{ display: "none" }}
+                            />
+
+                            {errors.profile_photo && (
+                                <div
+                                    style={{
+                                        color: "#DC2626",
+                                        fontSize: "11px",
+                                        marginBottom: "12px",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    ⚠ {errors.profile_photo}
+                                </div>
+                            )}
+
+                            {photoClientError && (
+                                <div
+                                    style={{
+                                        color: "#DC2626",
+                                        fontSize: "11px",
+                                        marginBottom: "12px",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    ⚠ {photoClientError}
+                                </div>
+                            )}
+
                             {/* Nama */}
                             <div className="form-field" style={rowStyle}>
                                 <label style={labelStyle}>Nama Lengkap</label>
@@ -796,11 +1035,8 @@ const Profile = ({ user = {} }) => {
                                         focusedField === "email",
                                     )}
                                     value={data.email}
-                                    onChange={(e) =>
-                                        setData("email", e.target.value)
-                                    }
-                                    onFocus={() => setFocusedField("email")}
-                                    onBlur={() => setFocusedField(null)}
+                                    disabled
+                                    readOnly
                                     placeholder="Contoh: budi@beacukai.go.id"
                                 />
                                 {errors.email && (
@@ -923,22 +1159,22 @@ const Profile = ({ user = {} }) => {
                                 <input
                                     type="password"
                                     style={createInputStyle(
-                                        focusedField === "confirm_password",
+                                        focusedField === "password_confirmation",
                                     )}
-                                    value={data.confirm_password}
+                                    value={data.password_confirmation}
                                     onChange={(e) =>
                                         setData(
-                                            "confirm_password",
+                                            "password_confirmation",
                                             e.target.value,
                                         )
                                     }
                                     onFocus={() =>
-                                        setFocusedField("confirm_password")
+                                        setFocusedField("password_confirmation")
                                     }
                                     onBlur={() => setFocusedField(null)}
                                     placeholder="Ulangi password baru Anda"
                                 />
-                                {errors.confirm_password && (
+                                {errors.password_confirmation && (
                                     <span
                                         style={{
                                             color: "#DC2626",
@@ -948,7 +1184,7 @@ const Profile = ({ user = {} }) => {
                                             fontWeight: 600,
                                         }}
                                     >
-                                        ⚠ {errors.confirm_password}
+                                        ⚠ {errors.password_confirmation}
                                     </span>
                                 )}
                             </div>
@@ -1087,12 +1323,27 @@ const Profile = ({ user = {} }) => {
                                     color: "#5558d4",
                                     boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
                                     transition: "all 0.3s ease",
+                                    overflow: "hidden",
                                 }}
                             >
-                                👤
+                                {profilePreview ? (
+                                    <img
+                                        src={profilePreview}
+                                        alt="Foto Profil"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                ) : (
+                                    "👤"
+                                )}
                             </div>
                             {/* Ikon Edit di Avatar */}
-                            <div
+                            <button
+                                type="button"
+                                onClick={openPhotoPicker}
                                 className="edit-icon"
                                 style={{
                                     position: "absolute",
@@ -1111,6 +1362,7 @@ const Profile = ({ user = {} }) => {
                                     transition: "all 0.3s ease",
                                     boxShadow:
                                         "0 4px 12px rgba(85, 88, 212, 0.3)",
+                                    padding: 0,
                                 }}
                                 onMouseOver={(e) => {
                                     e.currentTarget.style.transform =
@@ -1126,7 +1378,50 @@ const Profile = ({ user = {} }) => {
                                 }}
                             >
                                 <PencilFill color="white" size={20} />
-                            </div>
+                            </button>
+
+                            {/* Delete Photo Button */}
+                            {profilePreview && (
+                                <button
+                                    type="button"
+                                    onClick={removeProfilePhoto}
+                                    className="delete-icon"
+                                    style={{
+                                        position: "absolute",
+                                        bottom: "5px",
+                                        left: "5px",
+                                        background:
+                                            "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                                        width: "45px",
+                                        height: "45px",
+                                        borderRadius: "50%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        border: "3px solid white",
+                                        cursor: "pointer",
+                                        transition: "all 0.3s ease",
+                                        boxShadow:
+                                            "0 4px 12px rgba(220, 38, 38, 0.3)",
+                                        padding: 0,
+                                        fontSize: "22px",
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.transform =
+                                            "scale(1.1) rotate(-10deg)";
+                                        e.currentTarget.style.boxShadow =
+                                            "0 6px 16px rgba(220, 38, 38, 0.4)";
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.transform =
+                                            "scale(1) rotate(0deg)";
+                                        e.currentTarget.style.boxShadow =
+                                            "0 4px 12px rgba(220, 38, 38, 0.3)";
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            )}
                         </div>
 
                         <h2

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, usePage, useForm } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
+import axios from "axios";
 
 export default function LupaSandi() {
     const [showPassword, setShowPassword] = useState(false);
@@ -10,18 +11,18 @@ export default function LupaSandi() {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
-    const lastSuccessRef = useRef(null);
-    const { props } = usePage();
-    const initialErrors = props?.errors || {};
+    const [processing, setProcessing] = useState(false);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const [data, setFormData] = useState({
         email: "",
         verification_code: "",
         password: "",
         password_confirmation: "",
     });
 
-    const allErrors = { ...initialErrors, ...errors };
+    const setData = (key, value) => {
+        setFormData((prev) => ({ ...prev, [key]: value }));
+    };
 
     const showError = (message) => {
         setErrorMessage(message);
@@ -35,49 +36,21 @@ export default function LupaSandi() {
         setTimeout(() => setShowSuccessPopup(false), 4000);
     };
 
-    // Monitor success messages dari session
-    useEffect(() => {
-        if (props?.success && lastSuccessRef.current !== props.success) {
-            lastSuccessRef.current = props.success;
-            setSuccessMessage(props.success);
-            setShowSuccessPopup(true);
-
-            // Auto-advance step setelah berhasil
-            const timer = setTimeout(() => {
-                setStep((prevStep) => {
-                    if (prevStep === 3) {
-                        // Step 3 selesai, redirect ke login
-                        setTimeout(() => {
-                            window.location.href = "/login";
-                        }, 500);
-                        return 3;
-                    }
-                    return prevStep + 1;
-                });
-                setShowSuccessPopup(false);
-            }, 1500);
-
-            return () => clearTimeout(timer);
+    const extractErrorMessage = (error, fallbackMessage) => {
+        const serverErrors = error?.response?.data?.errors;
+        if (serverErrors && typeof serverErrors === "object") {
+            const firstValue = Object.values(serverErrors)[0];
+            const message = Array.isArray(firstValue) ? firstValue[0] : firstValue;
+            if (message) return message;
         }
-    }, [props?.success]);
 
-    useEffect(() => {
-        if (Object.keys(allErrors).length > 0) {
-            const getErrorMsg = (err) => (Array.isArray(err) ? err[0] : err);
+        const serverMessage = error?.response?.data?.message;
+        if (serverMessage) return serverMessage;
 
-            if (allErrors.email) {
-                showError(getErrorMsg(allErrors.email));
-            } else if (allErrors.verification_code) {
-                showError(getErrorMsg(allErrors.verification_code));
-            } else if (allErrors.password) {
-                showError(getErrorMsg(allErrors.password));
-            } else {
-                showError("Terjadi kesalahan");
-            }
-        }
-    }, [JSON.stringify(allErrors)]);
+        return fallbackMessage;
+    };
 
-    const handleSendCode = (e) => {
+    const handleSendCode = async (e) => {
         e.preventDefault();
 
         if (!data.email) {
@@ -86,34 +59,89 @@ export default function LupaSandi() {
         }
 
         if (!data.email.includes("@")) {
-            showError("📧 Email harus mengandung @");
+            showError("📧 Format email tidak valid (harus mengandung @)");
             return;
         }
 
-        post("/forgot-password/send-code");
+        if (!data.email.includes(".")) {
+            showError("📧 Format email tidak valid");
+            return;
+        }
+
+        setProcessing(true);
+        try {
+            await axios.post(
+                "/forgot-password/send-code",
+                { email: data.email },
+                { headers: { Accept: "application/json" } },
+            );
+
+            setShowErrorPopup(false);
+            setErrorMessage("");
+            showSuccess("Kode OTP telah dikirim ke email Anda.");
+            setStep(2);
+        } catch (error) {
+            showError(`❌ ${extractErrorMessage(error, "Gagal mengirim OTP")}`);
+        } finally {
+            setProcessing(false);
+        }
     };
 
-    const handleVerifyCode = (e) => {
+    const handleVerifyCode = async (e) => {
         e.preventDefault();
+
+        if (!data.email) {
+            showError("⚠️ Email hilang. Silakan mulai dari awal");
+            return;
+        }
 
         if (!data.verification_code) {
             showError("⚠️ Kode verifikasi harus diisi");
             return;
         }
 
-        post("/forgot-password/verify-code");
-    };
-
-    const handleResetPassword = (e) => {
-        e.preventDefault();
-
-        if (!data.password || !data.password_confirmation) {
-            showError("⚠️ Semua field harus diisi");
+        if (data.verification_code.length !== 6) {
+            showError("⚠️ Kode OTP harus tepat 6 digit");
             return;
         }
 
-        if (data.password !== data.password_confirmation) {
-            showError("🔐 Konfirmasi password tidak cocok");
+        if (!/^\d{6}$/.test(data.verification_code)) {
+            showError("⚠️ Kode OTP hanya boleh berisi angka");
+            return;
+        }
+
+        console.log("Verifying OTP:", {
+            email: data.email,
+            otp: data.verification_code,
+        });
+
+        setProcessing(true);
+        try {
+            await axios.post(
+                "/forgot-password/verify-code",
+                {
+                    email: data.email,
+                    verification_code: data.verification_code,
+                },
+                { headers: { Accept: "application/json" } },
+            );
+
+            setShowErrorPopup(false);
+            setErrorMessage("");
+            showSuccess("OTP berhasil diverifikasi. Silakan masukkan password baru.");
+            setStep(3);
+        } catch (error) {
+            showError(`❌ ${extractErrorMessage(error, "Kode OTP tidak valid")}`);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+
+        if (!data.password || !data.password_confirmation) {
+            showError("⚠️ Semua field password harus diisi");
             return;
         }
 
@@ -122,7 +150,33 @@ export default function LupaSandi() {
             return;
         }
 
-        post("/forgot-password/reset");
+        if (data.password !== data.password_confirmation) {
+            showError("🔐 Konfirmasi password tidak cocok dengan password");
+            return;
+        }
+
+        console.log("Resetting password...");
+
+        setProcessing(true);
+        try {
+            await axios.post(
+                "/forgot-password/reset",
+                {
+                    password: data.password,
+                    password_confirmation: data.password_confirmation,
+                },
+                { headers: { Accept: "application/json" } },
+            );
+
+            showSuccess("Password berhasil direset. Silakan login dengan password baru.");
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1800);
+        } catch (error) {
+            showError(`❌ ${extractErrorMessage(error, "Gagal mereset password")}`);
+        } finally {
+            setProcessing(false);
+        }
     };
 
     return (
@@ -488,6 +542,26 @@ export default function LupaSandi() {
                         {/* Step 2: OTP Verification */}
                         {step === 2 && (
                             <>
+                                {/* Display email being verified */}
+                                <div
+                                    style={{
+                                        background: "#f0f4ff",
+                                        padding: "12px 16px",
+                                        borderRadius: "8px",
+                                        marginBottom: "20px",
+                                        fontSize: "13px",
+                                        textAlign: "center",
+                                        borderLeft: "4px solid #5c5fb6",
+                                    }}
+                                >
+                                    <strong style={{ color: "#2d3269" }}>
+                                        Email:
+                                    </strong>{" "}
+                                    <span style={{ color: "#666" }}>
+                                        {data.email}
+                                    </span>
+                                </div>
+
                                 <div className="form-group-custom">
                                     <label className="label-custom">
                                         Kode OTP
@@ -502,22 +576,41 @@ export default function LupaSandi() {
                                             type="text"
                                             className="input-capsule"
                                             style={{ width: "100%" }}
-                                            placeholder="Masukkan kode OTP"
+                                            placeholder="Masukkan kode OTP 6 digit"
                                             value={data.verification_code}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "verification_code",
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Hanya allow angka
+                                                if (/^\d{0,6}$/.test(value)) {
+                                                    setData(
+                                                        "verification_code",
+                                                        value,
+                                                    );
+                                                }
+                                            }}
+                                            maxLength="6"
+                                            pattern="\d{6}"
+                                            inputMode="numeric"
                                         />
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontSize: "12px",
+                                            color: "#999",
+                                            marginTop: "6px",
+                                        }}
+                                    >
+                                        {data.verification_code.length}/6 digit
                                     </div>
                                 </div>
 
                                 <button
                                     type="submit"
                                     className="signin-btn"
-                                    disabled={processing}
+                                    disabled={
+                                        processing ||
+                                        data.verification_code.length < 6
+                                    }
                                 >
                                     {processing
                                         ? "Memverifikasi..."

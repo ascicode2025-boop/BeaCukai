@@ -6,6 +6,21 @@ export default function LandingPage() {
     const [activeNav, setActiveNav] = useState("SIGN IN");
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showTestQuestion, setShowTestQuestion] = useState(false);
+    const [currentQuestion, setCurrentQuestion] = useState(1);
+    const [testAnswers, setTestAnswers] = useState({
+        1: { M: null, L: null },
+        2: { M: null, L: null },
+        3: { M: null, L: null },
+        4: { M: null, L: null },
+        5: { M: null, L: null },
+    });
+    const [testErrors, setTestErrors] = useState({
+        1: "",
+        2: "",
+        3: "",
+        4: "",
+        5: "",
+    });
 
     const scrollToSection = (id, navName) => {
         setActiveNav(navName);
@@ -14,6 +29,130 @@ export default function LandingPage() {
         if (element) {
             element.scrollIntoView({ behavior: "smooth" });
         }
+    };
+
+    // Sample questions data for landing page example
+    const exampleQuestionsData = {
+        1: {
+            characteristics: [
+                "Mudah bergaul, menyenangkan",
+                "Mudah percaya orang lain",
+                "Suka berpetualang, pengambil risiko",
+                "Penuh toleransi, menghormati orang lain",
+            ],
+        },
+        2: {
+            characteristics: [
+                "Berbicara lembut, pendiam/penyendiri",
+                "Optimis, berpikir positif, memiliki visi/tujuan",
+                "Pusat perhatian, mudah bersosialisasi",
+                "Pendamai, pembawa keharmonisan",
+            ],
+        },
+        3: {
+            characteristics: [
+                "Memberikan dorongan kepada orang lain",
+                "Berusaha untuk selalu sempurna",
+                "Menjadi bagian dari sebuah kelompok",
+                "Ingin menetapkan tujuan",
+            ],
+        },
+        4: {
+            characteristics: [
+                "Mudah menjadi frustrasi",
+                "Memendam perasaan, tertutup",
+                "Menyampaikan pendapatnya, terbuka",
+                "Berani menghadapi pihak oposisi",
+            ],
+        },
+        5: {
+            characteristics: [
+                "Penuh semangat, banyak bicara",
+                "Bertindak cepat, tegas",
+                "Mencoba untuk menjaga kedamaian",
+                "Mencoba untuk mengikuti peraturan",
+            ],
+        },
+    };
+
+    const handleAnswerChange = (index, column, value) => {
+        const currentAnswer = testAnswers[currentQuestion][column];
+
+        // If clicking the same value again, deselect it
+        if (currentAnswer === value) {
+            setTestAnswers((prev) => ({
+                ...prev,
+                [currentQuestion]: {
+                    ...prev[currentQuestion],
+                    [column]: null,
+                },
+            }));
+            setTestErrors((prev) => ({
+                ...prev,
+                [currentQuestion]: "",
+            }));
+            return;
+        }
+
+        // Allow selection and update
+        const newAnswers = {
+            ...testAnswers[currentQuestion],
+            [column]: value,
+        };
+
+        setTestAnswers((prev) => ({
+            ...prev,
+            [currentQuestion]: newAnswers,
+        }));
+
+        // Check if both M and L are the same
+        if (
+            newAnswers.M !== null &&
+            newAnswers.L !== null &&
+            newAnswers.M === newAnswers.L
+        ) {
+            setTestErrors((prev) => ({
+                ...prev,
+                [currentQuestion]:
+                    "❌ Pilihan Mirip (M) dan Tidak Mirip (L) tidak boleh sama!",
+            }));
+        } else {
+            setTestErrors((prev) => ({
+                ...prev,
+                [currentQuestion]: "",
+            }));
+        }
+    };
+
+    const handleNextQuestion = () => {
+        if (currentQuestion < 5) {
+            setCurrentQuestion(currentQuestion + 1);
+        }
+    };
+
+    const handlePreviousQuestion = () => {
+        if (currentQuestion > 1) {
+            setCurrentQuestion(currentQuestion - 1);
+        }
+    };
+
+    const handleCloseTest = () => {
+        setShowTestQuestion(false);
+        setCurrentQuestion(1);
+        setTestAnswers({
+            1: { M: null, L: null },
+            2: { M: null, L: null },
+            3: { M: null, L: null },
+            4: { M: null, L: null },
+            5: { M: null, L: null },
+        });
+        setTestErrors({
+            1: "",
+            2: "",
+            3: "",
+            4: "",
+            5: "",
+        });
     };
 
     return (
@@ -498,6 +637,68 @@ export default function LandingPage() {
           border: 2.5px solid #666;
           cursor: pointer;
           transition: all 0.2s;
+        }
+
+        .table-cell-checkbox.checked {
+          background-color: #FFD966;
+          border-color: #FFD966;
+          box-shadow: 0 0 0 2px rgba(255, 217, 102, 0.3);
+        }
+
+        .test-error-message {
+          color: #DC2626;
+          font-size: 13px;
+          margin-top: 15px;
+          padding: 10px;
+          background-color: #FEE2E2;
+          border-left: 3px solid #DC2626;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+
+        .test-navigation {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 25px;
+          gap: 15px;
+        }
+
+        .test-nav-btn {
+          padding: 10px 25px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+          background-color: #2d3269;
+          color: white;
+        }
+
+        .test-nav-btn:hover:not(:disabled) {
+          background-color: #1f2347;
+          transform: translateY(-1px);
+        }
+
+        .test-nav-btn:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+
+        .test-nav-btn.back {
+          background-color: #A0A0E5;
+        }
+
+        .test-nav-btn.back:hover:not(:disabled) {
+          background-color: #8080c5;
+        }
+
+        .test-question-counter {
+          font-size: 13px;
+          font-weight: 700;
+          color: #2d3269;
         }
 
         .table-cell-description {
@@ -1727,7 +1928,7 @@ export default function LandingPage() {
                     <div className="test-question-wrapper">
                         {/* Back Button */}
                         <button
-                            onClick={() => setShowTestQuestion(false)}
+                            onClick={handleCloseTest}
                             className="back-button"
                         >
                             <svg
@@ -1749,7 +1950,7 @@ export default function LandingPage() {
 
                         {/* Title & Instructions */}
                         <div className="test-question-header">
-                            <h3>Soal ke-N</h3>
+                            <h3>Soal ke-{currentQuestion}</h3>
 
                             <div className="instructions">
                                 <div className="instructions-item">
@@ -1762,7 +1963,7 @@ export default function LandingPage() {
                                     <strong>2.</strong> Kemudiam, pilih satu
                                     karakteristik yang lain yang paling tidak
                                     cocok dengan diri anda dan beri tanda silang
-                                    (X) di kolom J.
+                                    (X) di kolom L.
                                 </div>
                             </div>
                         </div>
@@ -1772,7 +1973,7 @@ export default function LandingPage() {
                             {/* Header Row */}
                             <div className="table-header">
                                 <div className="table-header-cell">M</div>
-                                <div className="table-header-cell">J</div>
+                                <div className="table-header-cell">L</div>
                                 <div
                                     className="table-header-cell"
                                     style={{
@@ -1785,12 +1986,7 @@ export default function LandingPage() {
                             </div>
 
                             {/* Data Rows */}
-                            {[
-                                "Bahagia, Tanpa beban",
-                                "Tenang, Pendiam",
-                                "Menyenangkan, Baik hati",
-                                "Tak gentar, Berani",
-                            ].map((item, idx) => (
+                            {exampleQuestionsData[currentQuestion]?.characteristics.map((item, idx) => (
                                 <div
                                     key={idx}
                                     className="table-row"
@@ -1801,12 +1997,18 @@ export default function LandingPage() {
                                 >
                                     {/* M Column */}
                                     <div className="table-cell">
-                                        <div className="table-cell-checkbox"></div>
+                                        <div
+                                            className={`table-cell-checkbox ${testAnswers[currentQuestion].M === idx ? "checked" : ""}`}
+                                            onClick={() => handleAnswerChange(idx, "M", idx)}
+                                        ></div>
                                     </div>
 
-                                    {/* J Column */}
+                                    {/* L Column */}
                                     <div className="table-cell">
-                                        <div className="table-cell-checkbox"></div>
+                                        <div
+                                            className={`table-cell-checkbox ${testAnswers[currentQuestion].L === idx ? "checked" : ""}`}
+                                            onClick={() => handleAnswerChange(idx, "L", idx)}
+                                        ></div>
                                     </div>
 
                                     {/* Description Column */}
@@ -1815,6 +2017,34 @@ export default function LandingPage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Error Message */}
+                        {testErrors[currentQuestion] && (
+                            <div className="test-error-message">
+                                {testErrors[currentQuestion]}
+                            </div>
+                        )}
+
+                        {/* Navigation */}
+                        <div className="test-navigation">
+                            <button
+                                className="test-nav-btn back"
+                                onClick={handlePreviousQuestion}
+                                disabled={currentQuestion === 1}
+                            >
+                                ← Sebelumnya
+                            </button>
+                            <div className="test-question-counter">
+                                Soal {currentQuestion} dari 5
+                            </div>
+                            <button
+                                className="test-nav-btn"
+                                onClick={handleNextQuestion}
+                                disabled={currentQuestion === 5}
+                            >
+                                Selanjutnya →
+                            </button>
                         </div>
                     </div>
                 )}
