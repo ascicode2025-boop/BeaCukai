@@ -20,7 +20,7 @@ class DashboardController extends Controller
     public function index()
     {
         $admin = Auth::user();
-        
+
         // Debug: cek apa admin sudah login dengan benar
         $adminName = $admin ? ($admin->name ?? $admin->username ?? 'Admin') : 'Admin';
 
