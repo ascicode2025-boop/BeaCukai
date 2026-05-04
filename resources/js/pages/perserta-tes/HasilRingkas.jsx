@@ -66,7 +66,8 @@ const HasilRingkas = () => {
             const offset = ((g1Norm + g2Norm + g3Norm) / 3 - 0.5) * 0.22;
 
             acc[trait] = BASE_WAVE[trait].map((v, idx) => {
-                const edgeBoost = idx === 0 || idx === 12 ? (g3Norm - 0.5) * 0.08 : 0;
+                const edgeBoost =
+                    idx === 0 || idx === 12 ? (g3Norm - 0.5) * 0.08 : 0;
                 return Math.max(0, Math.min(5, v + offset + edgeBoost));
             });
 
@@ -94,7 +95,8 @@ const HasilRingkas = () => {
                 ? `Profil Anda paling menonjol pada ${formatTraitBadge(primaryTrait)} dan didukung ${formatTraitBadge(secondaryTrait)}. Selisih keduanya ${secondaryDiff} poin pada Graph 3, menunjukkan kombinasi gaya yang cukup ${secondaryDiff <= 2 ? "seimbang" : "tegas"} sesuai pola jawaban Anda.`
                 : "";
 
-        const longSummary = `${apiData.report?.summary || ""} ${traitNarrative}`.trim();
+        const longSummary =
+            `${apiData.report?.summary || ""} ${traitNarrative}`.trim();
 
         return {
             graph1,
@@ -158,198 +160,274 @@ const HasilRingkas = () => {
 
     return (
         <>
-            <NavbarLogin />
-            <div className="hasil-ringkas-page">
-                <div className="ringkas-bg-circle ringkas-bg-circle-top" />
-                <div className="ringkas-bg-circle ringkas-bg-circle-bottom" />
+            <NavbarLogin>
+                <div className="hasil-ringkas-page">
+                    <section className="hasil-ringkas-header">
+                        <h1>Hasil DISC Self-Assessment</h1>
+                        <p>
+                            Laporan ini memberikan analisis mendalam tentang
+                            gaya kepribadian dan perilaku kerja berdasarkan
+                            metodologi DISC.
+                        </p>
+                    </section>
 
-                <section className="hasil-ringkas-header">
-                    <h1>Hasil DISC Self-Assessment</h1>
-                    <p>
-                        Laporan ini memberikan analisis mendalam tentang gaya
-                        kepribadian dan perilaku kerja berdasarkan metodologi DISC.
-                    </p>
-                </section>
-
-                <section className="hasil-ringkas-info-cards">
-                    <div className="hr-card">
-                        <span>Nama Peserta</span>
-                        <strong>{user?.name || "-"}</strong>
-                    </div>
-                    <div className="hr-card">
-                        <span>Jabatan</span>
-                        <strong>{user?.unit_kerja || "-"}</strong>
-                    </div>
-                    <div className="hr-card">
-                        <span>Tanggal Tes</span>
-                        <strong>
-                            {new Date().toLocaleDateString("id-ID", {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                            })}
-                        </strong>
-                    </div>
-                </section>
-
-                <section className="hasil-ringkas-chart-card">
-                    <div className="chart-header-row">
-                        <h2>Distribusi Median DISC</h2>
-                        <div className="chart-legend">
-                            {Object.entries(TRAITS).map(([key, trait]) => (
-                                <span key={key}>
-                                    <i style={{ backgroundColor: trait.color }} />
-                                    {trait.name} ({key})
-                                </span>
-                            ))}
+                    <section className="hasil-ringkas-info-cards">
+                        <div className="hr-card">
+                            <span>Nama Peserta</span>
+                            <strong>{user?.name || "-"}</strong>
                         </div>
-                    </div>
-
-                    <svg viewBox="0 0 920 360" className="ringkas-chart-svg" role="img" aria-label="Distribusi Median DISC">
-                        <defs>
-                            <linearGradient id="discBg" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#a8b2c9" />
-                                <stop offset="100%" stopColor="#173f93" />
-                            </linearGradient>
-                        </defs>
-
-                        <rect x="20" y="20" width="880" height="320" rx="10" fill="url(#discBg)" />
-
-                        {[0, 1, 2, 3, 4, 5].map((tick) => {
-                            const y = yToPx(tick);
-                            return (
-                                <g key={`y-${tick}`}>
-                                    <line
-                                        x1={chart.left}
-                                        y1={y}
-                                        x2={chart.right}
-                                        y2={y}
-                                        stroke="#e2e8f0"
-                                        strokeWidth="1"
-                                        opacity="0.35"
-                                    />
-                                    <text x={chart.left - 18} y={y + 4} textAnchor="end" fill="#fff">
-                                        {tick}k
-                                    </text>
-                                </g>
-                            );
-                        })}
-
-                        {[0, 6, 12].map((idx, labelIndex) => (
-                            <g key={`x-${idx}`}>
-                                <line x1={xToPx(idx)} y1={chart.top} x2={xToPx(idx)} y2={chart.bottom} stroke="#cbd5e1" opacity="0.22" />
-                                <text x={xToPx(idx)} y="322" textAnchor="middle" fill="#e2e8f0">
-                                    {`Graph ${labelIndex + 1}`}
-                                </text>
-                            </g>
-                        ))}
-
-                        <line x1={chart.left} y1={chart.top} x2={chart.left} y2={chart.bottom} stroke="#cbd5e1" opacity="0.35" />
-                        <line x1={chart.left} y1={chart.bottom} x2={chart.right} y2={chart.bottom} stroke="#cbd5e1" opacity="0.35" />
-
-                        {TRAIT_ORDER.map((trait) => (
-                            <g key={trait}>
-                                <path
-                                            d={buildPath(summary.waveData[trait])}
-                                    fill="none"
-                                    stroke={TRAITS[trait].color}
-                                    strokeWidth="3"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                                        {summary.waveData[trait].map((value, idx) => {
-                                    return (
-                                        <circle
-                                            key={`${trait}-${idx}`}
-                                                    cx={xToPx(idx)}
-                                                    cy={yToPx(value)}
-                                                    r={idx % 6 === 0 || idx === 12 ? "4" : "0"}
-                                            fill={TRAITS[trait].color}
-                                            stroke="#fff"
-                                            strokeWidth="1.5"
-                                        />
-                                    );
+                        <div className="hr-card">
+                            <span>Jabatan</span>
+                            <strong>{user?.unit_kerja || "-"}</strong>
+                        </div>
+                        <div className="hr-card">
+                            <span>Tanggal Tes</span>
+                            <strong>
+                                {new Date().toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
                                 })}
-                            </g>
-                        ))}
-
-                        {Array.from({ length: 13 }, (_, i) => (
-                            <text key={`x-label-${i}`} x={xToPx(i)} y="334" textAnchor="middle" fill="#dbeafe" fontSize="9">
-                                {i + 1}
-                            </text>
-                        ))}
-                    </svg>
-                </section>
-
-                <section className="hasil-ringkas-bottom-grid">
-                    <div className="ringkas-main-type ringkas-summary-card">
-                        <p className="summary-label">Tipe Kepribadian Utama :</p>
-                        <div className="trait-badges">
-                            <span className="trait-badge trait-badge-primary">
-                                {formatTraitBadge(summary.primaryTrait)}
-                            </span>
-                            <span className="trait-badge trait-badge-secondary">
-                                {formatTraitBadge(summary.secondaryTrait)}
-                            </span>
+                            </strong>
                         </div>
-                        <p className="summary-text">{summary.longSummary || "-"}</p>
-                    </div>
+                    </section>
 
-                    <div className="ringkas-jpm-card">
-                        <h4>JPM</h4>
-                        <span className="jpm-value">{summary.jpm}%</span>
-                        <div className="jpm-meter-wrap">
-                            <div className="jpm-meter-scale">
-                                {[100, 80, 60, 40, 20, 0].map((label) => (
-                                    <span key={label}>{label}%</span>
+                    <section className="hasil-ringkas-chart-card">
+                        <div className="chart-header-row">
+                            <h2>Distribusi Median DISC</h2>
+                            <div className="chart-legend">
+                                {Object.entries(TRAITS).map(([key, trait]) => (
+                                    <span key={key}>
+                                        <i
+                                            style={{
+                                                backgroundColor: trait.color,
+                                            }}
+                                        />
+                                        {trait.name} ({key})
+                                    </span>
                                 ))}
                             </div>
-                            <div className="jpm-meter">
-                                <div
-                                    className="jpm-fill"
-                                    style={{ height: `${summary.jpm}%` }}
+                        </div>
+
+                        <svg
+                            viewBox="0 0 920 360"
+                            className="ringkas-chart-svg"
+                            role="img"
+                            aria-label="Distribusi Median DISC"
+                        >
+                            <defs>
+                                <linearGradient
+                                    id="discBg"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
                                 >
-                                    <span>{summary.jpm}%</span>
+                                    <stop offset="0%" stopColor="#a8b2c9" />
+                                    <stop offset="100%" stopColor="#173f93" />
+                                </linearGradient>
+                            </defs>
+
+                            <rect
+                                x="20"
+                                y="20"
+                                width="880"
+                                height="320"
+                                rx="10"
+                                fill="url(#discBg)"
+                            />
+
+                            {[0, 1, 2, 3, 4, 5].map((tick) => {
+                                const y = yToPx(tick);
+                                return (
+                                    <g key={`y-${tick}`}>
+                                        <line
+                                            x1={chart.left}
+                                            y1={y}
+                                            x2={chart.right}
+                                            y2={y}
+                                            stroke="#e2e8f0"
+                                            strokeWidth="1"
+                                            opacity="0.35"
+                                        />
+                                        <text
+                                            x={chart.left - 18}
+                                            y={y + 4}
+                                            textAnchor="end"
+                                            fill="#fff"
+                                        >
+                                            {tick}k
+                                        </text>
+                                    </g>
+                                );
+                            })}
+
+                            {[0, 6, 12].map((idx, labelIndex) => (
+                                <g key={`x-${idx}`}>
+                                    <line
+                                        x1={xToPx(idx)}
+                                        y1={chart.top}
+                                        x2={xToPx(idx)}
+                                        y2={chart.bottom}
+                                        stroke="#cbd5e1"
+                                        opacity="0.22"
+                                    />
+                                    <text
+                                        x={xToPx(idx)}
+                                        y="322"
+                                        textAnchor="middle"
+                                        fill="#e2e8f0"
+                                    >
+                                        {`Graph ${labelIndex + 1}`}
+                                    </text>
+                                </g>
+                            ))}
+
+                            <line
+                                x1={chart.left}
+                                y1={chart.top}
+                                x2={chart.left}
+                                y2={chart.bottom}
+                                stroke="#cbd5e1"
+                                opacity="0.35"
+                            />
+                            <line
+                                x1={chart.left}
+                                y1={chart.bottom}
+                                x2={chart.right}
+                                y2={chart.bottom}
+                                stroke="#cbd5e1"
+                                opacity="0.35"
+                            />
+
+                            {TRAIT_ORDER.map((trait) => (
+                                <g key={trait}>
+                                    <path
+                                        d={buildPath(summary.waveData[trait])}
+                                        fill="none"
+                                        stroke={TRAITS[trait].color}
+                                        strokeWidth="3"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                    {summary.waveData[trait].map(
+                                        (value, idx) => {
+                                            return (
+                                                <circle
+                                                    key={`${trait}-${idx}`}
+                                                    cx={xToPx(idx)}
+                                                    cy={yToPx(value)}
+                                                    r={
+                                                        idx % 6 === 0 ||
+                                                        idx === 12
+                                                            ? "4"
+                                                            : "0"
+                                                    }
+                                                    fill={TRAITS[trait].color}
+                                                    stroke="#fff"
+                                                    strokeWidth="1.5"
+                                                />
+                                            );
+                                        },
+                                    )}
+                                </g>
+                            ))}
+
+                            {Array.from({ length: 13 }, (_, i) => (
+                                <text
+                                    key={`x-label-${i}`}
+                                    x={xToPx(i)}
+                                    y="334"
+                                    textAnchor="middle"
+                                    fill="#dbeafe"
+                                    fontSize="9"
+                                >
+                                    {i + 1}
+                                </text>
+                            ))}
+                        </svg>
+                    </section>
+
+                    <section className="hasil-ringkas-bottom-grid">
+                        <div className="ringkas-main-type ringkas-summary-card">
+                            <p className="summary-label">
+                                Tipe Kepribadian Utama :
+                            </p>
+                            <div className="trait-badges">
+                                <span className="trait-badge trait-badge-primary">
+                                    {formatTraitBadge(summary.primaryTrait)}
+                                </span>
+                                <span className="trait-badge trait-badge-secondary">
+                                    {formatTraitBadge(summary.secondaryTrait)}
+                                </span>
+                            </div>
+                            <p className="summary-text">
+                                {summary.longSummary || "-"}
+                            </p>
+                        </div>
+
+                        <div className="ringkas-jpm-card">
+                            <h4>JPM</h4>
+                            <span className="jpm-value">{summary.jpm}%</span>
+                            <div className="jpm-meter-wrap">
+                                <div className="jpm-meter-scale">
+                                    {[100, 80, 60, 40, 20, 0].map((label) => (
+                                        <span key={label}>{label}%</span>
+                                    ))}
+                                </div>
+                                <div className="jpm-meter">
+                                    <div
+                                        className="jpm-fill"
+                                        style={{ height: `${summary.jpm}%` }}
+                                    >
+                                        <span>{summary.jpm}%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <section className="hasil-ringkas-bottom-grid cards-only">
-                    <div className="ringkas-list-box">
-                        <h4>Karakteristik</h4>
-                        <ul>
-                            {(summary.report?.workCharacteristics || []).slice(0, 4).map((item) => (
-                                <li key={item}>{item}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="ringkas-list-box">
-                        <h4>Kekuatan</h4>
-                        <ul>
-                            {(summary.report?.strengths || []).slice(0, 4).map((item) => (
-                                <li key={item}>{item}</li>
-                            ))}
-                        </ul>
-                    </div>
+                    <section className="hasil-ringkas-bottom-grid cards-only">
+                        <div className="ringkas-list-box">
+                            <h4>Karakteristik</h4>
+                            <ul>
+                                {(summary.report?.workCharacteristics || [])
+                                    .slice(0, 4)
+                                    .map((item) => (
+                                        <li key={item}>{item}</li>
+                                    ))}
+                            </ul>
+                        </div>
+                        <div className="ringkas-list-box">
+                            <h4>Kekuatan</h4>
+                            <ul>
+                                {(summary.report?.strengths || [])
+                                    .slice(0, 4)
+                                    .map((item) => (
+                                        <li key={item}>{item}</li>
+                                    ))}
+                            </ul>
+                        </div>
 
-                    <div className="ringkas-list-box">
-                        <h4>Area Pengembangan</h4>
-                        <ul>
-                            {(summary.report?.weaknesses || []).slice(0, 4).map((item) => (
-                                <li key={item}>{item}</li>
-                            ))}
-                        </ul>
-                    </div>
-                </section>
+                        <div className="ringkas-list-box">
+                            <h4>Area Pengembangan</h4>
+                            <ul>
+                                {(summary.report?.weaknesses || [])
+                                    .slice(0, 4)
+                                    .map((item) => (
+                                        <li key={item}>{item}</li>
+                                    ))}
+                            </ul>
+                        </div>
+                    </section>
 
-                <section className="hasil-ringkas-actions">
-                    <button onClick={handleDownloadNow}>
-                        Download sebagai PDF
-                    </button>
-                </section>
-            </div>
+                    <section className="hasil-ringkas-actions">
+                        <button onClick={handleDownloadNow}>
+                            Download sebagai PDF
+                        </button>
+                    </section>
+                </div>
+            </NavbarLogin>
             <Footer />
         </>
     );

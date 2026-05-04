@@ -39,10 +39,14 @@ export default function RegisterPage() {
             if (allErrors.name) message = getErrorMsg(allErrors.name);
             else if (allErrors.nip) message = getErrorMsg(allErrors.nip);
             else if (allErrors.email) message = getErrorMsg(allErrors.email);
-            else if (allErrors.unit_kerja) message = getErrorMsg(allErrors.unit_kerja);
-            else if (allErrors.telepon) message = getErrorMsg(allErrors.telepon);
-            else if (allErrors.password) message = getErrorMsg(allErrors.password);
-            else if (allErrors.password_confirmation) message = getErrorMsg(allErrors.password_confirmation);
+            else if (allErrors.unit_kerja)
+                message = getErrorMsg(allErrors.unit_kerja);
+            else if (allErrors.telepon)
+                message = getErrorMsg(allErrors.telepon);
+            else if (allErrors.password)
+                message = getErrorMsg(allErrors.password);
+            else if (allErrors.password_confirmation)
+                message = getErrorMsg(allErrors.password_confirmation);
             else message = "Terjadi kesalahan";
 
             showError(message);
@@ -99,17 +103,26 @@ export default function RegisterPage() {
 
             {/* Success Modal */}
             {showSuccessModal && (
-                <div className="success-modal-overlay" onClick={() => setShowSuccessModal(false)}>
-                    <div className="success-modal" onClick={(e) => e.stopPropagation()}>
+                <div
+                    className="success-modal-overlay"
+                    onClick={() => setShowSuccessModal(false)}
+                >
+                    <div
+                        className="success-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="success-icon">✓</div>
                         <h3>Registrasi Berhasil!</h3>
-                        <p className="success-message">Akun Anda telah berhasil dibuat.</p>
+                        <p className="success-message">
+                            Akun Anda telah berhasil dibuat.
+                        </p>
                         <div className="email-box">
                             <label>Email Terdaftar:</label>
                             <div className="email-display">{successEmail}</div>
                         </div>
                         <p className="info-text">
-                            Email notifikasi dengan kredensial login telah dikirim ke email Anda.
+                            Email notifikasi dengan kredensial login telah
+                            dikirim ke email Anda.
                         </p>
                         <Link href="/login" className="success-btn">
                             Ke Halaman Login
@@ -262,7 +275,7 @@ export default function RegisterPage() {
                 }
 
                 .register-card {
-                    width: 1000px;
+                    width: 950px;
                     background: white;
                     border-radius: 25px;
                     display: flex;
@@ -275,7 +288,7 @@ export default function RegisterPage() {
                     flex: 1;
                     background: linear-gradient(180deg, #4A569D 0%, #2d3269 100%);
                     position: relative;
-                    min-height: 630px;
+                    min-height: 600px;
 
                     display: flex;
                     align-items: flex-end;
@@ -296,7 +309,7 @@ export default function RegisterPage() {
                 /* RIGHT */
                 .register-right {
                     flex: 1;
-                    padding: 40px 50px;
+                    padding: 30px 50px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -306,7 +319,7 @@ export default function RegisterPage() {
                     font-size: 24px;
                     font-weight: 800;
                     color: #2b3168;
-                    margin-bottom: 25px;
+                    margin-bottom: 40px;
                     text-align: center;
                     letter-spacing: 1px;
                 }
@@ -366,26 +379,25 @@ export default function RegisterPage() {
                 }
 
                 .signup-btn {
-                    background: #FFCA08;
+                    background: #333366;
                     color: white;
                     border: none;
-                    padding: 14px 50px;
-                    border-radius: 25px;
+                    padding: 10px 30px;
+                    border-radius: 50px;
+                    font-weight: 700;
+                    font-family: 'Oxanium', sans-serif;
                     font-size: 14px;
-                    font-weight: 800;
                     cursor: pointer;
-                    min-width: 160px;
-                    min-height: 44px;
+                    margin-top: 10px;
+                    width: 100%;
+                    box-shadow: 0 4px 15px rgba(51, 51, 102, 0.4);
                     transition: all 0.3s ease;
-                    pointer-events: auto;
-                    position: relative;
-                    z-index: 100;
                 }
 
                 .signup-btn:hover {
-                    background: #FFB700;
                     transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(255, 202, 8, 0.3);
+                    box-shadow: 0 6px 20px rgba(51, 51, 102, 0.5);
+                    filter: brightness(1.1);
                 }
 
                 .signup-btn:active {
@@ -398,16 +410,18 @@ export default function RegisterPage() {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    gap: 8px;
+                    gap: 1px;
                 }
 
                 .regist-here-link {
-                    background: #FFCA08;
-                    color: white;
-                    padding: 6px 18px;
+                    background: none;
+                    color: #000000;
+                    padding: 6px 0px;
                     border-radius: 20px;
                     font-size: 12px;
-                    text-decoration: none;
+                    font-weight: 700;
+                    font-family: 'Oxanium', sans-serif;
+                    text-decoration: underline;
                 }
 
                 @media (max-width: 768px) {
@@ -417,7 +431,16 @@ export default function RegisterPage() {
                     }
 
                     .register-left {
-                        min-height: 300px;
+                        display: none;
+                    }
+
+                    .register-right {
+                        padding: 30px 20px;
+                    }
+
+                    .register-right h2 {
+                        font-size: 20px;
+                        margin-bottom: 30px;
                     }
 
                     .character-img {
@@ -429,22 +452,58 @@ export default function RegisterPage() {
                     .form-group-custom {
                         flex-direction: column;
                         align-items: flex-start;
+                        margin-bottom: 14px;
                     }
 
                     .label-custom {
                         width: 100%;
-                        margin-bottom: 5px;
+                        margin-bottom: 6px;
+                        font-size: 13px;
+                    }
+
+                    .input-wrapper {
+                        width: 100%;
+                    }
+
+                    .input-capsule {
+                        width: 100%;
+                        height: 34px;
+                        font-size: 12px;
+                    }
+
+                    .signup-btn {
+                        font-size: 13px;
+                        padding: 8px 20px;
+                    }
+
+                    .footer-text {
+                        font-size: 12px;
+                    }
+
+                    .regist-here-link {
+                        font-size: 11px;
                     }
                 }
             `}</style>
 
             <div className="register-card">
                 <div className="register-left">
-                    <img src="/assets/register1.png" alt="Characters" className="character-img" />
+                    <img
+                        src="/assets/register1.png"
+                        alt="Characters"
+                        style={{
+                            width: "800px",
+                            height: "550px",
+                            position: "absolute",
+                            top: "139px",
+                            marginLeft: "35px",
+                            objectFit: "contain",
+                        }}
+                    />
                 </div>
 
                 <div className="register-right">
-                    <h2>SIGN UP HERE</h2>
+                    <h2>DAFTAR DISINI</h2>
 
                     <form onSubmit={handleSubmit}>
                         {[
@@ -461,7 +520,9 @@ export default function RegisterPage() {
                                         type={type}
                                         className="input-capsule"
                                         value={data[key]}
-                                        onChange={(e) => setData(key, e.target.value)}
+                                        onChange={(e) =>
+                                            setData(key, e.target.value)
+                                        }
                                         placeholder={`Masukkan ${label.toLowerCase()}`}
                                     />
                                 </div>
@@ -475,44 +536,76 @@ export default function RegisterPage() {
                                     type={showPassword ? "text" : "password"}
                                     className="input-capsule"
                                     value={data.password}
-                                    onChange={(e) => setData("password", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
                                     placeholder="Masukkan password"
                                 />
-                                <button type="button" className="toggle-password"
-                                    onClick={() => setShowPassword(!showPassword)}>
-                                    <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() =>
+                                        setShowPassword(!showPassword)
+                                    }
+                                >
+                                    <i
+                                        className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+                                    ></i>
                                 </button>
                             </div>
                         </div>
 
                         <div className="form-group-custom">
-                            <label className="label-custom">Confirm Password</label>
+                            <label className="label-custom">
+                                Konfirmasi Password
+                            </label>
                             <div className="input-wrapper">
                                 <input
-                                    type={showConfirmPassword ? "text" : "password"}
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
                                     className="input-capsule"
                                     value={data.password_confirmation}
-                                    onChange={(e) => setData("password_confirmation", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "password_confirmation",
+                                            e.target.value,
+                                        )
+                                    }
                                     placeholder="Konfirmasi password"
                                 />
-                                <button type="button" className="toggle-password"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                                    <i className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() =>
+                                        setShowConfirmPassword(
+                                            !showConfirmPassword,
+                                        )
+                                    }
+                                >
+                                    <i
+                                        className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}
+                                    ></i>
                                 </button>
                             </div>
                         </div>
 
                         <div className="signup-btn-container">
-                            <button className="signup-btn" disabled={processing}>
-                                Sign Up
+                            <button
+                                className="signup-btn"
+                                disabled={processing}
+                            >
+                                Daftar
                             </button>
                         </div>
                     </form>
 
                     <div className="footer-text">
-                        <span>Already have an account?</span>
+                        <span>Sudah Punya Akun?</span>
                         <Link href="/login" className="regist-here-link">
-                            Login
+                            Masuk
                         </Link>
                     </div>
                 </div>

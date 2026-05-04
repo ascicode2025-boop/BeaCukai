@@ -240,7 +240,11 @@ const Dashboard = () => {
                                                     boxShadow:
                                                         "0 4px 12px rgba(45, 50, 105, 0.25)",
                                                     zIndex: 1,
-                                                    position: "relative",
+                                                    position: "absolute",
+                                                    top: "55%",
+                                                    left: "55%",
+                                                    transform:
+                                                        "translate(-50%, -50%)",
                                                 }}
                                             >
                                                 {step.number}
@@ -391,6 +395,7 @@ const Dashboard = () => {
                     >
                         <div className="custom-card p-3 p-md-4 shadow-sm">
                             <div
+                                className="history-card-flex"
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
@@ -532,9 +537,8 @@ const Dashboard = () => {
                                             margin: "0 0 12px 0",
                                         }}
                                     >
-                                        The first line of Lorem Ipsum, "Lorem
-                                        ipsum dolor sit amet..", comes from a
-                                        line in section.
+                                        Lihat kembali hasil tes yang pernah kamu
+                                        kerjakan.
                                     </p>
                                     <button
                                         className="btn"

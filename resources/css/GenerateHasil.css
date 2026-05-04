@@ -30,9 +30,11 @@
 .button-group {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 15px;
     flex-wrap: wrap;
-    margin-bottom: 50px;
+    margin: 0 auto 50px auto;
+    max-width: 600px;
 }
 
 .btn {

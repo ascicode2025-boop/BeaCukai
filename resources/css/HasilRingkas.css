@@ -1,7 +1,7 @@
 .hasil-ringkas-page {
     min-height: 100vh;
-    background: linear-gradient(180deg, #f6f8ff 0%, #e5eaff 100%);
-    padding: 28px 22px 36px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
+    padding: 50px 0 60px;
     font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
     overflow: hidden;
@@ -29,66 +29,88 @@
 }
 
 .hasil-ringkas-header {
-    text-align: left;
-    max-width: 1140px;
-    margin: 0 auto 16px;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto 48px;
     position: relative;
     z-index: 1;
+    padding: 0 24px;
 }
 
 .hasil-ringkas-header h1 {
-    font-size: 42px;
-    margin: 0 0 8px;
-    color: #1a3f82;
-    font-weight: 800;
+    font-size: 48px;
+    margin: 0 0 12px;
+    color: #0f1729;
+    font-weight: 900;
+    letter-spacing: -0.5px;
 }
 
 .hasil-ringkas-header p {
     margin: 0;
-    color: #4e678f;
-    font-size: 13px;
+    color: #5a6b7f;
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 500;
 }
 
 .hasil-ringkas-info-cards {
-    max-width: 1140px;
-    margin: 0 auto 14px;
+    max-width: 1200px;
+    margin: 0 auto 36px;
+    padding: 0 24px;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 20px;
     position: relative;
     z-index: 1;
 }
 
 .hr-card {
-    background: #fff;
-    border: 1px solid #dae4f8;
-    border-bottom: 5px solid #facc15;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+    border: 2px solid #e0e8f8;
+    border-left: 5px solid #facc15;
     border-radius: 16px;
-    padding: 10px 14px;
-    box-shadow: 0 4px 10px rgba(18, 39, 84, 0.14);
-    min-height: 70px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.hr-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+    border-left-color: #fbbf24;
 }
 
 .hr-card span {
     display: block;
-    color: #64748b;
-    font-size: 11px;
-    margin-bottom: 6px;
+    color: #7a8ba3;
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .hr-card strong {
-    color: #1f3b79;
-    font-size: 13px;
-    font-weight: 800;
+    color: #0f1729;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
 }
 
 .hasil-ringkas-chart-card {
-    max-width: 1140px;
-    margin: 0 auto 14px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
-    padding: 8px 8px 10px;
+    max-width: 1200px;
+    margin: 0 auto 36px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+    border: 2px solid #e0e8f8;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    padding: 28px;
+    margin-left: 24px;
+    margin-right: 24px;
     position: relative;
     z-index: 1;
 }
@@ -97,36 +119,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 24px;
     flex-wrap: wrap;
-    margin-bottom: 4px;
-    padding: 2px 8px 0;
+    margin-bottom: 24px;
+    padding: 0 0 16px;
+    border-bottom: 2px solid #eef2f9;
 }
 
 .chart-header-row h2 {
     margin: 0;
-    color: #1f3b79;
-    font-size: 13px;
-    font-weight: 800;
+    color: #0f1729;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
 }
 
 .chart-legend {
     display: flex;
-    gap: 12px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
 .chart-legend span {
-    font-size: 10px;
-    color: #60708a;
+    font-size: 13px;
+    color: #5a6b7f;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
+    font-weight: 600;
 }
 
 .chart-legend i {
-    width: 14px;
-    height: 3px;
+    width: 18px;
+    height: 4px;
     border-radius: 999px;
     display: inline-block;
 }
@@ -134,115 +159,142 @@
 .ringkas-chart-svg {
     width: 100%;
     height: auto;
-    background: linear-gradient(180deg, #f1f5f9 0%, #dbeafe 100%);
-    border-radius: 8px;
+    background: linear-gradient(135deg, #ecf1ff 0%, #f5f8ff 100%);
+    border-radius: 12px;
+    min-height: 320px;
+    border: 1px solid #e0e8f8;
 }
 
 .ringkas-chart-svg text {
-    font-size: 10px;
-    fill: #e2e8f0;
-    font-weight: 500;
+    font-size: 12px;
+    fill: #dbeafe;
+    font-weight: 600;
 }
 
 .hasil-ringkas-bottom-grid {
-    max-width: 1140px;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 24px;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 12px;
+    gap: 20px;
     position: relative;
     z-index: 1;
 }
 
 .cards-only {
-    margin-top: 2px;
+    margin-top: 0;
     grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 .ringkas-main-type,
 .ringkas-list-box {
-    background: #f4f6fb;
-    border-radius: 10px;
-    border: 1px solid #dae4f8;
-    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.08);
-    padding: 10px 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+    border-radius: 16px;
+    border: 2px solid #e0e8f8;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.ringkas-main-type:hover,
+.ringkas-list-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+    border-color: #d0daf0;
 }
 
 .ringkas-summary-card {
     border-top: 5px solid #facc15;
-    min-height: 148px;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    min-height: 180px;
 }
 
 .summary-label {
-    margin: 0 0 10px;
-    color: #475569;
-    font-size: 13px;
-    font-weight: 700;
+    margin: 0 0 16px;
+    color: #0f1729;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: -0.2px;
 }
 
 .trait-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 6px;
+    gap: 14px;
+    margin-bottom: 16px;
 }
 
 .trait-badge {
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-weight: 800;
-    font-size: 20px;
-    line-height: 1.1;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1.3;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 .trait-badge-primary {
-    color: #f6b900;
-    background: #fef3c7;
+    color: #7c2d12;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fcd34d;
 }
 
 .trait-badge-secondary {
-    color: #6d63d8;
-    background: #e0e7ff;
+    color: #3730a3;
+    background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+    border: 2px solid #c7d2fe;
 }
 
 .summary-text {
     margin: 0;
-    color: #425166;
-    font-size: 10px;
-    line-height: 1.4;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.7;
 }
 
 .ringkas-jpm-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #dae4f8;
-    box-shadow: 0 4px 14px rgba(30, 41, 59, 0.1);
-    padding: 8px 10px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbff 100%);
+    border-radius: 16px;
+    border: 2px solid #e0e8f8;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+    padding: 24px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 180px;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.ringkas-jpm-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+    border-color: #d0daf0;
 }
 
 .ringkas-jpm-card h4 {
-    margin: 0;
-    color: #23396e;
-    font-size: 14px;
+    margin: 0 0 12px;
+    color: #0f1729;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: -0.2px;
 }
 
 .jpm-value {
-    color: #111827;
-    font-size: 12px;
-    font-weight: 800;
-    margin-bottom: 8px;
+    color: #16a34a;
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 14px;
+    letter-spacing: -1px;
 }
 
 .jpm-meter-wrap {
     width: 100%;
     display: grid;
-    grid-template-columns: 34px 1fr;
-    gap: 6px;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
     align-items: end;
 }
 
@@ -250,24 +302,21 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 160px;
-    font-size: 9px;
-    color: #4b5563;
+    height: 140px;
+    font-size: 10px;
+    color: #7a8ba3;
     text-align: right;
-    padding-bottom: 2px;
+    padding-bottom: 4px;
+    font-weight: 600;
 }
 
 .jpm-meter {
     position: relative;
-    height: 160px;
-    border: 2px solid #374151;
-    background: repeating-linear-gradient(
-        to top,
-        #f3f4f6 0,
-        #f3f4f6 31px,
-        #d1d5db 32px
-    );
+    height: 140px;
+    border: 2px solid #e0e8f8;
+    background: linear-gradient(to top, #f0fdf4 0%, #f7fee7 50%, #fef3c7 100%);
     overflow: hidden;
+    border-radius: 8px;
 }
 
 .jpm-fill {
@@ -275,34 +324,43 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(180deg, #16a34a 0%, #22c55e 100%);
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #052e16;
-    font-weight: 800;
-    font-size: 10px;
+    color: #fff;
+    font-weight: 900;
+    font-size: 11px;
+    border-radius: 6px;
+    opacity: 0.9;
 }
 
 .ringkas-list-box h4 {
-    margin: 0 0 10px;
-    color: #1f3b79;
-    font-size: 13px;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 6px;
+    margin: 0 0 14px;
+    color: #0f1729;
+    font-size: 15px;
+    font-weight: 900;
+    border-bottom: 3px solid #facc15;
+    padding-bottom: 10px;
+    letter-spacing: -0.2px;
 }
 
 .ringkas-list-box ul {
     margin: 0;
-    padding-left: 18px;
-    color: #425166;
-    font-size: 11px;
-    line-height: 1.5;
+    padding-left: 22px;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.ringkas-list-box li {
+    margin-bottom: 8px;
 }
 
 .hasil-ringkas-actions {
-    max-width: 1140px;
-    margin: 14px auto 0;
+    max-width: 1200px;
+    margin: 36px auto 0;
+    padding: 0 24px;
     display: flex;
     justify-content: center;
     position: relative;
@@ -311,14 +369,25 @@
 
 .hasil-ringkas-actions button {
     border: none;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #facc15 0%, #fde68a 100%);
-    color: #1e2a66;
-    padding: 8px 22px;
-    font-weight: 700;
-    font-size: 13px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #facc15 0%, #fbbf24 50%, #fde68a 100%);
+    color: #7c2d12;
+    padding: 14px 36px;
+    font-weight: 900;
+    font-size: 15px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.35);
+    box-shadow: 0 6px 16px rgba(250, 204, 21, 0.25);
+    transition: all 0.3s ease;
+    letter-spacing: -0.2px;
+}
+
+.hasil-ringkas-actions button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(250, 204, 21, 0.35);
+}
+
+.hasil-ringkas-actions button:active {
+    transform: translateY(-1px);
 }
 
 .hasil-ringkas-loading {
@@ -329,41 +398,109 @@
 }
 
 @media (max-width: 900px) {
-    .hasil-ringkas-info-cards,
+    .hasil-ringkas-page {
+        padding: 36px 0 24px;
+    }
+
+    .hasil-ringkas-header {
+        margin-bottom: 36px;
+        padding: 0 16px;
+    }
+
+    .hasil-ringkas-header h1 {
+        font-size: 32px;
+    }
+
+    .hasil-ringkas-header p {
+        font-size: 13px;
+    }
+
+    .hasil-ringkas-info-cards {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 30px;
+        padding: 0 16px;
+    }
+
     .hasil-ringkas-bottom-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 0 16px;
     }
 
     .cards-only {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
-    .hasil-ringkas-header h1 {
-        font-size: 26px;
+    .chart-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 18px;
     }
 
-    .chart-header-row h2 {
-        font-size: 22px;
+    .chart-legend {
+        gap: 14px;
     }
 
-    .chart-legend span,
-    .ringkas-chart-svg text,
-    .summary-label,
-    .summary-text,
-    .ringkas-list-box ul,
-    .jpm-meter-scale,
-    .jpm-fill {
-        font-size: 12px;
+    .hr-card {
+        padding: 18px 16px;
+        min-height: 85px;
     }
 
-    .ringkas-jpm-card h4,
-    .jpm-value,
-    .ringkas-list-box h4 {
-        font-size: 20px;
+    .hasil-ringkas-chart-card {
+        padding: 20px;
+        margin-bottom: 28px;
+        margin-left: 16px;
+        margin-right: 16px;
     }
 
-    .jpm-meter-scale,
+    .ringkas-main-type,
+    .ringkas-list-box,
+    .ringkas-jpm-card {
+        padding: 18px 16px;
+    }
+
+    .ringkas-jpm-card {
+        min-height: 160px;
+    }
+
+    .ringkas-jpm-card h4 {
+        font-size: 14px;
+    }
+
+    .jpm-value {
+        font-size: 28px;
+    }
+
+    .jpm-meter-scale {
+        height: 120px;
+        font-size: 9px;
+    }
+
     .jpm-meter {
-        height: 180px;
+        height: 120px;
+    }
+
+    .ringkas-list-box h4 {
+        font-size: 14px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+    }
+
+    .ringkas-list-box ul {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .hasil-ringkas-actions {
+        margin-top: 28px;
+        padding: 0 16px;
+    }
+
+    .hasil-ringkas-actions button {
+        padding: 12px 32px;
+        font-size: 14px;
     }
 }

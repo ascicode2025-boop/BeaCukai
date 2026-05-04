@@ -173,6 +173,17 @@ export default function LandingPage() {
           overflow-x: hidden;
         }
 
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
         /* Absolute Navbar & Logo (Tetap di atas halaman, tidak mengikuti scroll) */
         .header-fixed-container {
           position: absolute;
@@ -305,19 +316,29 @@ export default function LandingPage() {
         .regist-here-btn {
           background: linear-gradient(90deg, rgba(253, 203, 2, 0.79) 26.44%, rgba(0, 35, 102, 0.79) 100%);
           color: white;
-          padding: 0;
+          padding: 12px 40px;
           border: none;
           border-radius: 25px;
           font-weight: 800;
-          font-size: 18px;
+          font-size: 16px;
+          letter-spacing: 0.5px;
           cursor: pointer;
-          box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
-          transition: transform 0.3s;
-          height: 45px;
-          width: 197px;
-          display: flex;
+          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+          transition: all 0.3s ease;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        .regist-here-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 28px rgba(245, 158, 11, 0.4);
+        }
+
+        .regist-here-btn:active {
+          transform: translateY(-1px);
         }
 
         .regist-here-btn:hover {
@@ -536,57 +557,68 @@ export default function LandingPage() {
         /* Back Button Styles */
         .back-button {
           position: absolute;
-          top: 8px;
-          left: 20px;
-          width: 45px;
-          height: 45px;
-          background: none;
+          top: 15px;
+          left: 25px;
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, #5558d4 0%, #7c3aed 100%);
           border: none;
           cursor: pointer;
           padding: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: transform 0.2s ease;
+          transition: all 0.3s ease;
+          border-radius: 50%;
+          box-shadow: 0 4px 12px rgba(85, 88, 212, 0.3);
         }
 
         .back-button:hover {
-          transform: scale(1.05);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(85, 88, 212, 0.4);
+        }
+
+        .back-button:active {
+          transform: translateY(0);
         }
 
         .back-button svg {
-          width: 100%;
-          height: 100%;
+          width: 60%;
+          height: 60%;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
         }
 
         /* Test Question Display Styles */
         .test-question-wrapper {
           position: relative;
           background: white;
-          border-radius: 20px;
+          border-radius: 12px;
           padding: 30px;
           color: #1a1a1a;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .test-question-header {
-          margin-top: 30px;
-          margin-bottom: 25px;
-          background: linear-gradient(135deg, #4a3f83 0%, #6b5fa8 100%);
+          margin-top: 0;
+          margin-bottom: 20px;
+          background: linear-gradient(135deg, #5558d4 0%, #7c3aed 100%);
           color: white;
-          padding: 20px 25px;
-          border-radius: 14px;
+          padding: 20px 25px 20px 75px;
+          border-radius: 12px;
         }
 
         .test-question-header h3 {
-          font-size: 16px;
-          font-weight: 900;
-          margin: 0 0 12px 0;
-          text-align: center;
+          font-size: 18px;
+          font-weight: 800;
+          margin: 0 0 10px 0;
+          text-align: left;
+          letter-spacing: -0.3px;
         }
 
         .test-question-header .instructions {
           font-size: 13px;
-          line-height: 1.7;
+          line-height: 1.6;
+          opacity: 0.95;
         }
 
         .instructions-item {
@@ -594,66 +626,103 @@ export default function LandingPage() {
         }
 
         .test-question-table {
-          margin-top: 25px;
-          border: 1px solid #ddd;
+          margin-top: 20px;
           border-radius: 12px;
           overflow: hidden;
         }
 
         .table-header {
           display: grid;
-          grid-template-columns: 80px 80px 1fr;
-          background: #d4d4d4;
-          font-weight: 800;
-          font-size: 14px;
-          color: #2d3269;
+          grid-template-columns: 100px 100px 1fr;
+          background: #E8E8E8;
+          font-weight: 700;
+          font-size: 12px;
+          color: #333366;
+          border: 1px solid #E5E7EB;
+          border-bottom: none;
         }
 
         .table-header-cell {
-          padding: 15px;
+          padding: 15px 10px;
           text-align: center;
-          border-right: 1px solid #ccc;
+          border-right: 1px solid #D1D5DB;
+        }
+
+        .table-header-cell:last-child {
+          border-right: none;
+          text-align: left;
         }
 
         .table-row {
           display: grid;
-          grid-template-columns: 80px 80px 1fr;
-          border-top: 1px solid #e0e0e0;
+          grid-template-columns: 100px 100px 1fr;
+          border: 1px solid #E5E7EB;
+          border-top: none;
+          transition: all 0.2s ease;
+        }
+
+        .table-row:hover {
+          background-color: #F3F4F6;
+        }
+
+        .table-row:nth-child(even) {
+          background-color: #F9FAFB;
+        }
+
+        .table-row:nth-child(even):hover {
+          background-color: #F3F4F6;
         }
 
         .table-cell {
-          padding: 15px;
+          padding: 15px 10px;
           text-align: center;
-          border-right: 1px solid #e0e0e0;
+          border-right: 1px solid #E5E7EB;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+
+        .table-cell:last-child {
+          border-right: none;
+        }
+
+        .table-cell-checkbox {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 2px solid #9CA3AF;
+          cursor: pointer;
+          transition: all 0.2s;
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
-        .table-cell-checkbox {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          border: 2.5px solid #666;
-          cursor: pointer;
-          transition: all 0.2s;
+        .table-cell-checkbox.checked {
+          background-color: #333366;
+          border-color: #333366;
+          box-shadow: none;
         }
 
-        .table-cell-checkbox.checked {
-          background-color: #FFD966;
-          border-color: #FFD966;
-          box-shadow: 0 0 0 2px rgba(255, 217, 102, 0.3);
+        .table-cell-checkbox.checked::after {
+          content: '';
+          width: 6px;
+          height: 6px;
+          background: white;
+          border-radius: 50%;
         }
 
         .test-error-message {
           color: #DC2626;
           font-size: 13px;
-          margin-top: 15px;
-          padding: 10px;
+          margin-top: 12px;
+          padding: 12px 15px;
           background-color: #FEE2E2;
-          border-left: 3px solid #DC2626;
-          border-radius: 4px;
+          border: 1px solid #FECACA;
+          border-radius: 8px;
           font-weight: 600;
+          animation: slideInUp 0.3s ease-out;
         }
 
         .test-navigation {
@@ -665,14 +734,14 @@ export default function LandingPage() {
         }
 
         .test-nav-btn {
-          padding: 10px 25px;
+          padding: 12px 25px;
           border: none;
           border-radius: 8px;
           font-weight: 700;
           font-size: 13px;
           cursor: pointer;
           transition: all 0.2s;
-          background-color: #2d3269;
+          background-color: #333366;
           color: white;
         }
 
@@ -698,15 +767,15 @@ export default function LandingPage() {
         .test-question-counter {
           font-size: 13px;
           font-weight: 700;
-          color: #2d3269;
+          color: #333366;
         }
 
         .table-cell-description {
-          padding: 15px;
+          padding: 15px 20px;
           text-align: left;
           font-size: 13px;
           font-weight: 600;
-          color: #2d3269;
+          color: #333366;
           display: flex;
           align-items: center;
         }
@@ -963,10 +1032,10 @@ export default function LandingPage() {
           }
 
           .back-button {
-            width: 40px;
-            height: 40px;
-            top: 6px;
-            left: 15px;
+            width: 45px;
+            height: 45px;
+            top: 12px;
+            left: 20px;
           }
 
           .test-question-wrapper {
@@ -974,7 +1043,7 @@ export default function LandingPage() {
           }
 
           .test-question-header {
-            padding: 15px 20px;
+            padding: 15px 20px 15px 65px;
             margin-bottom: 20px;
           }
 
@@ -1153,10 +1222,10 @@ export default function LandingPage() {
           }
 
           .back-button {
-            width: 38px;
-            height: 38px;
-            top: 5px;
-            left: 12px;
+            width: 44px;
+            height: 44px;
+            top: 12px;
+            left: 18px;
           }
 
           .test-question-wrapper {
@@ -1164,7 +1233,7 @@ export default function LandingPage() {
           }
 
           .test-question-header {
-            padding: 15px 20px;
+            padding: 15px 20px 15px 60px;
             margin-bottom: 20px;
           }
 
@@ -1418,10 +1487,10 @@ export default function LandingPage() {
           }
 
           .back-button {
-            width: 35px;
-            height: 35px;
-            top: 5px;
-            left: 12px;
+            width: 42px;
+            height: 42px;
+            top: 12px;
+            left: 16px;
           }
 
           .test-question-wrapper {
@@ -1429,7 +1498,7 @@ export default function LandingPage() {
           }
 
           .test-question-header {
-            padding: 12px 15px;
+            padding: 12px 15px 12px 55px;
             margin-bottom: 15px;
           }
 
@@ -1659,10 +1728,10 @@ export default function LandingPage() {
           }
 
           .back-button {
-            width: 32px;
-            height: 32px;
-            top: 4px;
-            left: 10px;
+            width: 40px;
+            height: 40px;
+            top: 10px;
+            left: 14px;
           }
 
           .test-question-wrapper {
@@ -1670,7 +1739,7 @@ export default function LandingPage() {
           }
 
           .test-question-header {
-            padding: 10px 12px;
+            padding: 10px 12px 10px 50px;
             margin-bottom: 12px;
           }
 
@@ -1736,13 +1805,13 @@ export default function LandingPage() {
                         className={`nav-link-item ${activeNav === "TEST" ? "active" : ""}`}
                         onClick={() => scrollToSection("about", "TEST")}
                     >
-                        TEST
+                        CONTOH TES
                     </button>
                     <button
                         className={`nav-link-item ${activeNav === "ABOUT US" ? "active" : ""}`}
                         onClick={() => scrollToSection("footer", "ABOUT US")}
                     >
-                        ABOUT US
+                        TENTANG KAMI
                     </button>
                     <Link
                         href="/login"
@@ -1750,7 +1819,7 @@ export default function LandingPage() {
                         style={{ textDecoration: "none" }}
                         onClick={() => setActiveNav("SIGN IN")}
                     >
-                        SIGN IN
+                        MASUK
                     </Link>
                 </div>
                 <button
@@ -1788,13 +1857,13 @@ export default function LandingPage() {
                     className={`nav-link-item ${activeNav === "TEST" ? "active" : ""}`}
                     onClick={() => scrollToSection("about", "TEST")}
                 >
-                    TEST
+                    CONTOH TES
                 </button>
                 <button
                     className={`nav-link-item ${activeNav === "ABOUT US" ? "active" : ""}`}
                     onClick={() => scrollToSection("footer", "ABOUT US")}
                 >
-                    ABOUT US
+                    TENTANG KAMI
                 </button>
                 <Link
                     href="/login"
@@ -1802,7 +1871,7 @@ export default function LandingPage() {
                     style={{ textDecoration: "none" }}
                     onClick={() => setActiveNav("SIGN IN")}
                 >
-                    SIGN IN
+                    MASUK
                 </Link>
             </nav>
 
@@ -1826,12 +1895,8 @@ export default function LandingPage() {
                         mengelompokkan perilaku seseorang ke dalam empat tipe
                         (D, I, S, C) untuk memahami gaya kerja dan komunikasi.
                     </p>
-                    <Link
-                        href="/register"
-                        className="regist-here-btn"
-                        style={{ textDecoration: "none" }}
-                    >
-                        REGIST HERE!
+                    <Link href="/register" className="regist-here-btn">
+                        Daftar Sekarang
                     </Link>
                 </div>
             </section>
@@ -1974,32 +2039,27 @@ export default function LandingPage() {
                             <div className="table-header">
                                 <div className="table-header-cell">M</div>
                                 <div className="table-header-cell">L</div>
-                                <div
-                                    className="table-header-cell"
-                                    style={{
-                                        textAlign: "left",
-                                        borderRight: "none",
-                                    }}
-                                >
-                                    Gambaran diri
+                                <div className="table-header-cell">
+                                    karakteristik
                                 </div>
                             </div>
 
                             {/* Data Rows */}
-                            {exampleQuestionsData[currentQuestion]?.characteristics.map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    className="table-row"
-                                    style={{
-                                        background:
-                                            idx % 2 === 0 ? "#f9f9f9" : "white",
-                                    }}
-                                >
+                            {exampleQuestionsData[
+                                currentQuestion
+                            ]?.characteristics.map((item, idx) => (
+                                <div key={idx} className="table-row">
                                     {/* M Column */}
                                     <div className="table-cell">
                                         <div
                                             className={`table-cell-checkbox ${testAnswers[currentQuestion].M === idx ? "checked" : ""}`}
-                                            onClick={() => handleAnswerChange(idx, "M", idx)}
+                                            onClick={() =>
+                                                handleAnswerChange(
+                                                    idx,
+                                                    "M",
+                                                    idx,
+                                                )
+                                            }
                                         ></div>
                                     </div>
 
@@ -2007,7 +2067,13 @@ export default function LandingPage() {
                                     <div className="table-cell">
                                         <div
                                             className={`table-cell-checkbox ${testAnswers[currentQuestion].L === idx ? "checked" : ""}`}
-                                            onClick={() => handleAnswerChange(idx, "L", idx)}
+                                            onClick={() =>
+                                                handleAnswerChange(
+                                                    idx,
+                                                    "L",
+                                                    idx,
+                                                )
+                                            }
                                         ></div>
                                     </div>
 
@@ -2053,11 +2119,13 @@ export default function LandingPage() {
             {/* Footer Section */}
             <footer className="footer-section" id="footer">
                 <div className="footer-left">
-                    <h3>CONTACTS</h3>
+                    <h3>TENTANG KAMI</h3>
                     <p>
-                        It has survived not only five centuries, but also the
-                        leap into electronic typesetting, remaining essentially
-                        unchanged.
+                        BeaCukai DISC Self-Assessment adalah platform inovatif
+                        yang membantu Anda memahami profil kepribadian dan
+                        potensi diri melalui tes DISC yang komprehensif. Kami
+                        berkomitmen untuk memberikan hasil analisis yang akurat
+                        dan actionable untuk pengembangan karir Anda.
                     </p>
                     <div className="footer-socials">
                         <i className="fab fa-instagram"></i>

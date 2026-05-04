@@ -40,7 +40,9 @@ export default function LupaSandi() {
         const serverErrors = error?.response?.data?.errors;
         if (serverErrors && typeof serverErrors === "object") {
             const firstValue = Object.values(serverErrors)[0];
-            const message = Array.isArray(firstValue) ? firstValue[0] : firstValue;
+            const message = Array.isArray(firstValue)
+                ? firstValue[0]
+                : firstValue;
             if (message) return message;
         }
 
@@ -128,10 +130,14 @@ export default function LupaSandi() {
 
             setShowErrorPopup(false);
             setErrorMessage("");
-            showSuccess("OTP berhasil diverifikasi. Silakan masukkan password baru.");
+            showSuccess(
+                "OTP berhasil diverifikasi. Silakan masukkan password baru.",
+            );
             setStep(3);
         } catch (error) {
-            showError(`❌ ${extractErrorMessage(error, "Kode OTP tidak valid")}`);
+            showError(
+                `❌ ${extractErrorMessage(error, "Kode OTP tidak valid")}`,
+            );
         } finally {
             setProcessing(false);
         }
@@ -168,12 +174,16 @@ export default function LupaSandi() {
                 { headers: { Accept: "application/json" } },
             );
 
-            showSuccess("Password berhasil direset. Silakan login dengan password baru.");
+            showSuccess(
+                "Password berhasil direset. Silakan login dengan password baru.",
+            );
             setTimeout(() => {
                 window.location.href = "/login";
             }, 1800);
         } catch (error) {
-            showError(`❌ ${extractErrorMessage(error, "Gagal mereset password")}`);
+            showError(
+                `❌ ${extractErrorMessage(error, "Gagal mereset password")}`,
+            );
         } finally {
             setProcessing(false);
         }
@@ -283,7 +293,7 @@ export default function LupaSandi() {
                     left: 5%;
                 }
 
-                .login-card {
+                .forgot-password-card {
                     width: 950px;
                     background: white;
                     border: 1px solid rgba(0,0,0,0.1);
@@ -427,7 +437,7 @@ export default function LupaSandi() {
                 }
 
                 @media (max-width: 768px) {
-                    .login-card {
+                    .forgot-password-card {
                         flex-direction: column;
                         width: 100%;
                         max-width: 400px;
@@ -461,7 +471,7 @@ export default function LupaSandi() {
 
             {/* Background Decorations - Removed (replaced with CSS gradient) */}
 
-            <div className="login-card">
+            <div className="forgot-password-card">
                 <div className="login-left">
                     <img
                         src="/assets/register1.png"
@@ -470,7 +480,12 @@ export default function LupaSandi() {
                             width: "766px",
                             height: "498px",
                             position: "absolute",
-                            top: "5px",
+                            top:
+                                step === 1
+                                    ? "1px"
+                                    : step === 2
+                                      ? "50px"
+                                      : "40px",
                             marginLeft: "-240px",
                         }}
                     />

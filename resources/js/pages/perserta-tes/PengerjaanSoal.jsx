@@ -75,7 +75,10 @@ const PengerjaanSoal = () => {
         ],
         2: [
             { id: "2A", text: "Berbicara lembut, pendiam/penyendiri" },
-            { id: "2B", text: "Optimis, berpikir positif, memiliki visi/tujuan" },
+            {
+                id: "2B",
+                text: "Optimis, berpikir positif, memiliki visi/tujuan",
+            },
             { id: "2C", text: "Pusat perhatian, mudah bersosialisasi" },
             { id: "2D", text: "Pendamai, pembawa keharmonisan" },
         ],
@@ -117,7 +120,10 @@ const PengerjaanSoal = () => {
         ],
         9: [
             { id: "9A", text: "Hasil adalah segalanya" },
-            { id: "9B", text: "Lakukan dengan benar, ketepatan adalah penting" },
+            {
+                id: "9B",
+                text: "Lakukan dengan benar, ketepatan adalah penting",
+            },
             { id: "9C", text: "Buatlah sesuatu menjadi menyenangkan" },
             { id: "9D", text: "Mari lakukan bersama-sama" },
         ],
@@ -125,7 +131,10 @@ const PengerjaanSoal = () => {
             { id: "10A", text: "Tidak tergantung orang lain" },
             { id: "10B", text: "Akan membeli mengikuti dorongan hati" },
             { id: "10C", text: "Akan menunggu dengan sabar" },
-            { id: "10D", text: "Akan mengeluarkan uang untuk hal yang diinginkan" },
+            {
+                id: "10D",
+                text: "Akan mengeluarkan uang untuk hal yang diinginkan",
+            },
         ],
         11: [
             { id: "11A", text: "Ramah, mudah berteman" },
@@ -155,7 +164,10 @@ const PengerjaanSoal = () => {
             { id: "15A", text: "Menghabiskan waktu dengan orang lain" },
             { id: "15B", text: "Merencanakan masa depan, penuh persiapan" },
             { id: "15C", text: "Mencari tantangan baru" },
-            { id: "15D", text: "Menerima penghargaan untuk tujuan yang tercapai" },
+            {
+                id: "15D",
+                text: "Menerima penghargaan untuk tujuan yang tercapai",
+            },
         ],
         16: [
             { id: "16A", text: "Peraturan perlu diuji" },
@@ -233,15 +245,18 @@ const PengerjaanSoal = () => {
     const handleSubmit = async () => {
         try {
             // Mengirim data ke API Laravel
-            const response = await axios.post('/api/submit-disc', {
-                answers: answers
+            const response = await axios.post("/api/submit-disc", {
+                answers: answers,
             });
 
-            if (response.data.status === 'success') {
+            if (response.data.status === "success") {
                 console.log("Hasil DISC dari backend:", response.data);
 
                 // Simpan hasil perhitungan (JSON dari Laravel) ke localStorage
-                localStorage.setItem('discResultData', JSON.stringify(response.data.data));
+                localStorage.setItem(
+                    "discResultData",
+                    JSON.stringify(response.data.data),
+                );
 
                 // Arahkan user ke halaman ringkasan terlebih dahulu sebelum laporan PDF
                 window.location.href = "/perserta-tes/hasil-ringkas";
@@ -984,7 +999,7 @@ const PengerjaanSoal = () => {
                                 boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                             }}
                         >
-                            {/* Column Headers */}
+                            {/* Column Headers - Table Style */}
                             <div
                                 style={{
                                     display: "grid",
@@ -994,55 +1009,75 @@ const PengerjaanSoal = () => {
                                             : window.innerWidth <= 768
                                               ? "70px 70px 1fr"
                                               : "100px 100px 1fr",
-                                    gap:
-                                        window.innerWidth <= 480
-                                            ? "10px"
-                                            : window.innerWidth <= 768
-                                              ? "12px"
-                                              : "15px",
-                                    marginBottom: "20px",
-                                    paddingBottom: "15px",
-                                    borderBottom: "2px solid #E5E7EB",
+                                    gap: "0",
+                                    marginBottom: "0",
+                                    paddingBottom: "0",
+                                    borderBottom: "none",
+                                    backgroundColor: "#F9FAFB",
+                                    borderRadius: "8px 8px 0 0",
+                                    overflow: "hidden",
                                 }}
                             >
+                                {/* M Header */}
                                 <div
                                     style={{
-                                        background: "#FFD966",
-                                        padding: "10px",
-                                        borderRadius: "8px",
+                                        background: "#E8E8E8",
+                                        padding:
+                                            window.innerWidth <= 480
+                                                ? "12px 8px"
+                                                : "15px 10px",
                                         textAlign: "center",
                                         fontWeight: 700,
-                                        color: "#374151",
-                                        fontSize: "12px",
+                                        color: "#333366",
+                                        fontSize:
+                                            window.innerWidth <= 480
+                                                ? "11px"
+                                                : "12px",
+                                        borderRight: "1px solid #D1D5DB",
                                     }}
                                 >
-                                    M (Most)
+                                    M
                                 </div>
+
+                                {/* L Header */}
                                 <div
                                     style={{
-                                        background: "#FF6B6B",
-                                        padding: "10px",
-                                        borderRadius: "8px",
+                                        background: "#E8E8E8",
+                                        padding:
+                                            window.innerWidth <= 480
+                                                ? "12px 8px"
+                                                : "15px 10px",
                                         textAlign: "center",
                                         fontWeight: 700,
-                                        color: "white",
-                                        fontSize: "12px",
+                                        color: "#333366",
+                                        fontSize:
+                                            window.innerWidth <= 480
+                                                ? "11px"
+                                                : "12px",
+                                        borderRight: "1px solid #D1D5DB",
                                     }}
                                 >
-                                    L (Least)
+                                    L
                                 </div>
+
+                                {/* Gambaran diri Header */}
                                 <div
                                     style={{
-                                        background: "#D1D5DB",
-                                        padding: "10px",
-                                        borderRadius: "8px",
-                                        textAlign: "center",
+                                        background: "#E8E8E8",
+                                        padding:
+                                            window.innerWidth <= 480
+                                                ? "12px 12px"
+                                                : "15px 20px",
+                                        textAlign: "left",
                                         fontWeight: 700,
-                                        color: "#374151",
-                                        fontSize: "12px",
+                                        color: "#333366",
+                                        fontSize:
+                                            window.innerWidth <= 480
+                                                ? "11px"
+                                                : "12px",
                                     }}
                                 >
-                                    Characteristics
+                                    karakteristik
                                 </div>
                             </div>
 
@@ -1065,165 +1100,209 @@ const PengerjaanSoal = () => {
                                 </div>
                             )}
 
-                            {/* Options */}
+                            {/* Options - Table Rows */}
                             <div
                                 style={{
                                     display: "flex",
                                     flexDirection: "column",
-                                    gap:
-                                        window.innerWidth <= 480
-                                            ? "10px"
-                                            : window.innerWidth <= 768
-                                              ? "10px"
-                                              : "15px",
+                                    gap: "0",
+                                    borderRadius: "0 0 8px 8px",
+                                    overflow: "hidden",
+                                    border: "1px solid #E5E7EB",
+                                    borderTop: "none",
                                 }}
                             >
-                                {currentData.map(
-                                    (item, index) => (
+                                {currentData.map((item, index) => (
+                                    <div
+                                        key={item.id}
+                                        style={{
+                                            display: "grid",
+                                            gridTemplateColumns:
+                                                window.innerWidth <= 480
+                                                    ? "50px 50px 1fr"
+                                                    : window.innerWidth <= 768
+                                                      ? "70px 70px 1fr"
+                                                      : "100px 100px 1fr",
+                                            gap: "0",
+                                            alignItems: "center",
+                                            padding: "0",
+                                            background:
+                                                index % 2 === 0
+                                                    ? "white"
+                                                    : "#F9FAFB",
+                                            borderBottom:
+                                                index < currentData.length - 1
+                                                    ? "1px solid #E5E7EB"
+                                                    : "none",
+                                            transition: "all 0.2s ease",
+                                        }}
+                                        onMouseOver={(e) => {
+                                            e.currentTarget.style.background =
+                                                "#F3F4F6";
+                                        }}
+                                        onMouseOut={(e) => {
+                                            e.currentTarget.style.background =
+                                                index % 2 === 0
+                                                    ? "white"
+                                                    : "#F9FAFB";
+                                        }}
+                                    >
+                                        {/* M (Most) Column - Radio Button */}
                                         <div
-                                            key={item.id}
                                             style={{
-                                                display:
-                                                    window.innerWidth <= 480
-                                                        ? "flex"
-                                                        : "grid",
-                                                flexDirection:
-                                                    window.innerWidth <= 480
-                                                        ? "column"
-                                                        : undefined,
-                                                gridTemplateColumns:
-                                                    window.innerWidth <= 480
-                                                        ? undefined
-                                                        : window.innerWidth <=
-                                                            768
-                                                          ? "70px 70px 1fr"
-                                                          : "100px 100px 1fr",
-                                                gap:
-                                                    window.innerWidth <= 480
-                                                        ? "8px"
-                                                        : "15px",
-                                                alignItems:
-                                                    window.innerWidth <= 480
-                                                        ? undefined
-                                                        : "center",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
                                                 padding:
                                                     window.innerWidth <= 480
-                                                        ? "12px"
-                                                        : "15px",
-                                                background: "#F9FAFB",
-                                                borderRadius: "8px",
-                                                transition: "all 0.2s ease",
-                                                flexWrap:
-                                                    window.innerWidth <= 480
-                                                        ? "wrap"
-                                                        : undefined,
+                                                        ? "12px 8px"
+                                                        : "15px 10px",
+                                                borderRight:
+                                                    "1px solid #E5E7EB",
+                                                cursor: "pointer",
                                             }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.background =
-                                                    "#F3F4F6";
-                                                e.currentTarget.style.boxShadow =
-                                                    "0 2px 8px rgba(0,0,0,0.05)";
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.background =
-                                                    "#F9FAFB";
-                                                e.currentTarget.style.boxShadow =
-                                                    "none";
-                                            }}
+                                            onClick={() =>
+                                                handleAnswerChange(
+                                                    index,
+                                                    "M",
+                                                    item.id,
+                                                )
+                                            }
                                         >
-                                            {/* M (Most) Column - Radio Button */}
                                             <div
-                                                className="radio-wrapper"
+                                                className={`custom-radio ${
+                                                    answers[currentQuestion]
+                                                        ?.M === item.id
+                                                        ? "checked"
+                                                        : ""
+                                                }`}
                                                 style={{
+                                                    width: "20px",
+                                                    height: "20px",
+                                                    border: "2px solid #9CA3AF",
+                                                    borderRadius: "50%",
+                                                    display: "flex",
+                                                    alignItems: "center",
                                                     justifyContent: "center",
-                                                    flex:
-                                                        window.innerWidth <= 480
-                                                            ? "0 0 calc(50% - 4px)"
-                                                            : "auto",
-                                                }}
-                                                onClick={() =>
-                                                    handleAnswerChange(
-                                                        index,
-                                                        "M",
-                                                        item.id,
-                                                    )
-                                                }
-                                            >
-                                                <div
-                                                    className={`custom-radio ${
+                                                    transition: "all 0.2s ease",
+                                                    borderColor:
                                                         answers[currentQuestion]
-                                                            ?.M ===
-                                                        item.id
-                                                            ? "checked"
-                                                            : ""
-                                                    }`}
-                                                />
-                                            </div>
-
-                                            {/* L (Least) Column - Radio Button */}
-                                            <div
-                                                className="radio-wrapper"
-                                                style={{
-                                                    justifyContent: "center",
-                                                    flex:
-                                                        window.innerWidth <= 480
-                                                            ? "0 0 calc(50% - 4px)"
-                                                            : "auto",
-                                                }}
-                                                onClick={() =>
-                                                    handleAnswerChange(
-                                                        index,
-                                                        "L",
-                                                        item.id,
-                                                    )
-                                                }
-                                            >
-                                                <div
-                                                    className={`custom-radio ${
+                                                            ?.M === item.id
+                                                            ? "#333366"
+                                                            : "#9CA3AF",
+                                                    background:
                                                         answers[currentQuestion]
-                                                            ?.L ===
-                                                        item.id
-                                                            ? "checked"
-                                                            : ""
-                                                    }`}
-                                                />
-                                            </div>
-
-                                            {/* Characteristic Text */}
-                                            <div
-                                                style={{
-                                                    width:
-                                                        window.innerWidth <= 480
-                                                            ? "100%"
-                                                            : "auto",
-                                                    order:
-                                                        window.innerWidth <= 480
-                                                            ? 5
-                                                            : "auto",
+                                                            ?.M === item.id
+                                                            ? "#333366"
+                                                            : "white",
                                                 }}
                                             >
-                                                <p
-                                                    style={{
-                                                        margin: 0,
-                                                        color: "#374151",
-                                                        fontWeight: 600,
-                                                        fontSize:
-                                                            window.innerWidth <=
-                                                            480
-                                                                ? "13px"
-                                                                : "14px",
-                                                        lineHeight: "1.5",
-                                                        wordWrap: "break-word",
-                                                        overflowWrap:
-                                                            "break-word",
-                                                    }}
-                                                >
-                                                    {item.text}
-                                                </p>
+                                                {answers[currentQuestion]?.M ===
+                                                    item.id && (
+                                                    <div
+                                                        style={{
+                                                            width: "6px",
+                                                            height: "6px",
+                                                            background: "white",
+                                                            borderRadius: "50%",
+                                                        }}
+                                                    ></div>
+                                                )}
                                             </div>
                                         </div>
-                                    ),
-                                )}
+
+                                        {/* L (Least) Column - Radio Button */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                padding:
+                                                    window.innerWidth <= 480
+                                                        ? "12px 8px"
+                                                        : "15px 10px",
+                                                borderRight:
+                                                    "1px solid #E5E7EB",
+                                                cursor: "pointer",
+                                            }}
+                                            onClick={() =>
+                                                handleAnswerChange(
+                                                    index,
+                                                    "L",
+                                                    item.id,
+                                                )
+                                            }
+                                        >
+                                            <div
+                                                className={`custom-radio ${
+                                                    answers[currentQuestion]
+                                                        ?.L === item.id
+                                                        ? "checked"
+                                                        : ""
+                                                }`}
+                                                style={{
+                                                    width: "20px",
+                                                    height: "20px",
+                                                    border: "2px solid #9CA3AF",
+                                                    borderRadius: "50%",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    transition: "all 0.2s ease",
+                                                    borderColor:
+                                                        answers[currentQuestion]
+                                                            ?.L === item.id
+                                                            ? "#333366"
+                                                            : "#9CA3AF",
+                                                    background:
+                                                        answers[currentQuestion]
+                                                            ?.L === item.id
+                                                            ? "#333366"
+                                                            : "white",
+                                                }}
+                                            >
+                                                {answers[currentQuestion]?.L ===
+                                                    item.id && (
+                                                    <div
+                                                        style={{
+                                                            width: "6px",
+                                                            height: "6px",
+                                                            background: "white",
+                                                            borderRadius: "50%",
+                                                        }}
+                                                    ></div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Characteristic Text */}
+                                        <div
+                                            style={{
+                                                padding:
+                                                    window.innerWidth <= 480
+                                                        ? "12px 12px"
+                                                        : "15px 20px",
+                                            }}
+                                        >
+                                            <p
+                                                style={{
+                                                    margin: 0,
+                                                    color: "#374151",
+                                                    fontWeight: 600,
+                                                    fontSize:
+                                                        window.innerWidth <= 480
+                                                            ? "13px"
+                                                            : "14px",
+                                                    lineHeight: "1.5",
+                                                    wordWrap: "break-word",
+                                                    overflowWrap: "break-word",
+                                                }}
+                                            >
+                                                {item.text}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 

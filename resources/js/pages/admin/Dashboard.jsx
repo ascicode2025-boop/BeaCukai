@@ -14,7 +14,7 @@ const AdminDashboard = () => {
         total_peserta: 0,
         total_tes_selesai: 0,
         total_admins: 0,
-        jabatan_terbanyak: 'Belum ada data',
+        jabatan_terbanyak: "Belum ada data",
         peserta_jabatan: 0,
         disc_averages: { D: 0, I: 0, S: 0, C: 0 },
         peserta_per_jabatan: [],
@@ -39,10 +39,23 @@ const AdminDashboard = () => {
 
     // Helper to format month for display
     const formatMonth = (monthStr) => {
-        if (!monthStr || monthStr === 'Tidak ada data') return 'Tidak ada data';
-        const [year, month] = monthStr.split('-');
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return monthNames[parseInt(month) - 1] + ' ' + year;
+        if (!monthStr || monthStr === "Tidak ada data") return "Tidak ada data";
+        const [year, month] = monthStr.split("-");
+        const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ];
+        return monthNames[parseInt(month) - 1] + " " + year;
     };
 
     // Calculate center text for donut charts
@@ -55,18 +68,24 @@ const AdminDashboard = () => {
     return (
         <NavbarLoginAdmin>
             <div className="admin-dashboard-container">
-{/* Header Section */}
+                {/* Header Section */}
                 <div className="admin-header-section">
-                    <h1 className="admin-header-title">Welcome, {admin.name || 'Admin'}!</h1>
-                    <p className="admin-header-description">
-                        Berikut adalah ringkasan data peserta tes DISC Bea Cukai hari ini.
-                    </p>
-                    <button
-                        className="btn-kelola-akun"
-                        onClick={handleKelolaAkun}
-                    >
-                        Kelola Akun
-                    </button>
+                    <h1 className="admin-header-title">
+                        Welcome, {admin.name || "Admin"}!
+                    </h1>
+                    <div className="admin-header-content">
+                        <p className="admin-header-description">
+                            Silahkan gunakan menu yang tersedia untuk melihat
+                            detail hasil, mengelola standar jabatan, dan
+                            memastikan proses evaluasi berjalan dengan optimal.
+                        </p>
+                        <button
+                            className="btn-kelola-akun"
+                            onClick={handleKelolaAkun}
+                        >
+                            Kelola Akun
+                        </button>
+                    </div>
                 </div>
 
                 {/* Stats Cards Grid */}
@@ -77,27 +96,35 @@ const AdminDashboard = () => {
                         onClick={handleDataPeserta}
                         style={{ cursor: "pointer" }}
                     >
-                        <div className="card-icon-wrapper">
-                            <div className="card-icon">
-                                <svg
-                                    width="52"
-                                    height="52"
-                                    viewBox="0 0 52 52"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M25.7418 0C29.1554 0 32.4292 1.35604 34.8429 3.7698C37.2567 6.18357 38.6127 9.45734 38.6127 12.8709C38.6127 16.2845 37.2567 19.5583 34.8429 21.972C32.4292 24.3858 29.1554 25.7418 25.7418 25.7418C22.3283 25.7418 19.0545 24.3858 16.6407 21.972C14.227 19.5583 12.8709 16.2845 12.8709 12.8709C12.8709 9.45734 14.227 6.18357 16.6407 3.7698C19.0545 1.35604 22.3283 0 25.7418 0ZM25.7418 6.43546C24.035 6.43546 22.3982 7.11348 21.1913 8.32036C19.9844 9.52724 19.3064 11.1641 19.3064 12.8709C19.3064 14.5777 19.9844 16.2146 21.1913 17.4215C22.3982 18.6284 24.035 19.3064 25.7418 19.3064C27.4486 19.3064 29.0855 18.6284 30.2924 17.4215C31.4993 16.2146 32.1773 14.5777 32.1773 12.8709C32.1773 11.1641 31.4993 9.52724 30.2924 8.32036C29.0855 7.11348 27.4486 6.43546 25.7418 6.43546ZM25.7418 28.9596C34.3332 28.9596 51.4837 33.2391 51.4837 41.8305V51.4837H0V41.8305C0 33.2391 17.1505 28.9596 25.7418 28.9596ZM25.7418 35.0732C16.1852 35.0732 6.11368 39.7711 6.11368 41.8305V45.37H45.37V41.8305C45.37 39.7711 35.2985 35.0732 25.7418 35.0732Z"
-                                        fill="#333366"
-                                    />
-                                </svg>
+                        <div className="card-1-layout">
+                            <div className="card-icon-wrapper">
+                                <div className="card-icon">
+                                    <svg
+                                        width="52"
+                                        height="52"
+                                        viewBox="0 0 52 52"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M25.7418 0C29.1554 0 32.4292 1.35604 34.8429 3.7698C37.2567 6.18357 38.6127 9.45734 38.6127 12.8709C38.6127 16.2845 37.2567 19.5583 34.8429 21.972C32.4292 24.3858 29.1554 25.7418 25.7418 25.7418C22.3283 25.7418 19.0545 24.3858 16.6407 21.972C14.227 19.5583 12.8709 16.2845 12.8709 12.8709C12.8709 9.45734 14.227 6.18357 16.6407 3.7698C19.0545 1.35604 22.3283 0 25.7418 0ZM25.7418 6.43546C24.035 6.43546 22.3982 7.11348 21.1913 8.32036C19.9844 9.52724 19.3064 11.1641 19.3064 12.8709C19.3064 14.5777 19.9844 16.2146 21.1913 17.4215C22.3982 18.6284 24.035 19.3064 25.7418 19.3064C27.4486 19.3064 29.0855 18.6284 30.2924 17.4215C31.4993 16.2146 32.1773 14.5777 32.1773 12.8709C32.1773 11.1641 31.4993 9.52724 30.2924 8.32036C29.0855 7.11348 27.4486 6.43546 25.7418 6.43546ZM25.7418 28.9596C34.3332 28.9596 51.4837 33.2391 51.4837 41.8305V51.4837H0V41.8305C0 33.2391 17.1505 28.9596 25.7418 28.9596ZM25.7418 35.0732C16.1852 35.0732 6.11368 39.7711 6.11368 41.8305V45.37H45.37V41.8305C45.37 39.7711 35.2985 35.0732 25.7418 35.0732Z"
+                                            fill="#333366"
+                                        />
+                                    </svg>
+                                </div>
                             </div>
-                        </div>
-                        <div className="card-content">
-<div>
-                                <h3 className="card-number">
-                                    {stats.total_peserta}
-                                </h3>
+                            <div className="card-1-content">
+                                <p className="card-1-title">
+                                    Total Peserta Terdaftar 
+                                </p>
+                                <div className="card-1-stats">
+                                    <span className="card-1-label">
+                                        bulan ini:
+                                    </span>
+                                    <span className="card-1-number">
+                                        {stats.total_peserta}
+                                    </span>
+                                </div>
                                 <div
                                     className="card-badge"
                                     style={{
@@ -108,9 +135,6 @@ const AdminDashboard = () => {
                                     Data Peserta
                                 </div>
                             </div>
-                            <p className="card-label">
-                                Total Peserta Terdaftar bulan ini
-                            </p>
                         </div>
                     </div>
 
@@ -142,8 +166,8 @@ const AdminDashboard = () => {
                                 Jabatan Terbanyak
                             </h3>
                         </div>
-<p className="card-subtitle">
-                            {stats.jabatan_terbanyak} - {stats.peserta_jabatan}{" "}
+                        <p className="card-subtitle">
+                            Pemeriksa BC - {stats.peserta_jabatan}{" "}
                             peserta
                         </p>
                         <button
@@ -179,7 +203,7 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <div className="card-content">
-<h3 className="card-number">
+                            <h3 className="card-number">
                                 {stats.total_tes_selesai}
                             </h3>
                             <p className="card-label">Total Tes Selesai</p>
@@ -207,7 +231,7 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <h3 className="card-title">Rata-rata DISC</h3>
-<div className="disc-values-grid">
+                        <div className="disc-values-grid">
                             {Object.entries(stats.disc_averages).map(
                                 ([key, value]) => (
                                     <div key={key} className="disc-value-item">
@@ -227,25 +251,27 @@ const AdminDashboard = () => {
                 {/* Grafik Distribusi DISC */}
                 <GrafikDistribusiDISC />
 
-{/* Donut Charts Section */}
+                {/* Donut Charts Section */}
                 <div className="donut-charts-grid">
                     <DonutChart
                         title="Peserta per Jabatan"
-                        centerText={calculateCenterText(stats.peserta_per_jabatan)}
-                        legend={stats.peserta_per_jabatan.map(item => ({
+                        centerText={calculateCenterText(
+                            stats.peserta_per_jabatan,
+                        )}
+                        legend={stats.peserta_per_jabatan.map((item) => ({
                             value: item.value,
                             label: item.label,
-                            color: item.color
+                            color: item.color,
                         }))}
                         layout="bottom"
                     />
                     <DonutChart
                         title="Periode Tes"
                         centerText={calculateCenterText(stats.tes_per_bulan)}
-                        legend={stats.tes_per_bulan.map(item => ({
+                        legend={stats.tes_per_bulan.map((item) => ({
                             value: item.value,
                             label: formatMonth(item.label),
-                            color: item.color
+                            color: item.color,
                         }))}
                         layout="right"
                     />

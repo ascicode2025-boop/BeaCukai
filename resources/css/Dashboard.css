@@ -656,3 +656,20 @@ a {
         display: none !important;
     }
 }
+
+/* History Card Responsive */
+@media (max-width: 768px) {
+    .history-card-flex {
+        flex-wrap: wrap !important;
+        align-items: stretch !important;
+    }
+
+    .history-card-flex>div {
+        width: 100%;
+    }
+
+    /* Hide chart icon on mobile */
+    .history-card-flex>div:last-child {
+        display: none !important;
+    }
+}

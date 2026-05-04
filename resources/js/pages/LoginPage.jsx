@@ -121,7 +121,10 @@ export default function LoginPage() {
         // Simpan ke localStorage jika "Ingat Saya" di-check
         if (data.remember) {
             localStorage.setItem("remember_nip", data.nip);
-            localStorage.setItem("remember_password", encryptData(data.password));
+            localStorage.setItem(
+                "remember_password",
+                encryptData(data.password),
+            );
             console.log("✅ Credentials disimpan dengan aman");
         } else {
             // Hapus dari localStorage jika tidak di-check
@@ -290,13 +293,10 @@ export default function LoginPage() {
                 }
 
                 .login-card {
-                    width: 950px;
+                    width: 1000px;
                     background: white;
                     border: 1px solid rgba(0,0,0,0.1);
-                    border-top-left-radius: 20px;
-                    border-bottom-left-radius: 20px;
-                    border-top-right-radius: 20px;
-                    border-bottom-right-radius: 20px;
+                    border-radius: 25px;
                     display: flex;
                     overflow: hidden;
                     box-shadow: 0 20px 60px rgba(0,0,0,0.1);
@@ -307,12 +307,12 @@ export default function LoginPage() {
 
                 .login-left {
                     flex: 1;
-                    background: linear-gradient(180deg, #5c5fb6 0%, #2d3269 100%);
+                    background: linear-gradient(180deg, #6666CC 0%, #002366 100%);
                     display: flex;
                     align-items: flex-end;
                     justify-content: center;
-                    padding: 30px;
                     position: relative;
+                    min-height: 550px;
                 }
 
                 .character-img-container {
@@ -331,29 +331,26 @@ export default function LoginPage() {
                 }
 
                 .login-right {
-                    flex: 1.2;
-                    padding: 65px 50px 25px 50px;
+                    flex: 1;
+                    padding: 50px 50px 40px 50px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    justify-content: flex-start;
+                    justify-content: center;
                     background: white;
-                    overflow-y: auto;
                 }
 
                 .login-right h2 {
                     font-weight: 800;
-                    font-size: 24px;
+                    font-size: 28px;
                     color: #2d3269;
-                    margin-bottom: 18px;
+                    margin-bottom: 35px;
                     letter-spacing: 1px;
-                    margin-top: 10px;
                 }
 
                 .form-container {
                   width: 100%;
                   max-width: 100%;
-                  padding: 0 10px;
                 }
 
                 .form-group-custom {
@@ -361,8 +358,8 @@ export default function LoginPage() {
                     flex-direction: column;
                     align-items: flex-start;
                     width: 100%;
-                    margin-bottom: 20px;
-                    gap: 10px;
+                    margin-bottom: 24px;
+                    gap: 8px;
                 }
 
                 .label-custom {
@@ -377,13 +374,13 @@ export default function LoginPage() {
                 .input-capsule {
                     width: 100%;
                     background: #e0e0e0;
-                    border: 1px solid #ccc;
-                    border-radius: 50px;
-                    padding: 12px 20px;
+                    border: 1px solid #d0d0d0;
+                    border-radius: 22px;
+                    padding: 11px 20px;
                     font-size: 14px;
                     font-weight: 600;
                     color: #333;
-                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
                     outline: none;
                     transition: all 0.3s ease;
                 }
@@ -395,36 +392,39 @@ export default function LoginPage() {
                 }
 
                 .signin-btn {
-                    background: linear-gradient(90deg, #ffcc00 0%, #ffdb4d 100%);
+                    background: #333366;
                     color: white;
                     border: none;
-                    padding: 10px 30px;
-                    border-radius: 50px;
-                    font-weight: 900;
+                    padding: 11px 30px;
+                    border-radius: 22px;
+                    font-weight: 700;
+                    font-family: 'Oxanium', sans-serif;
                     font-size: 14px;
                     cursor: pointer;
-                    margin-top: 10px;
+                    margin-top: 12px;
+                    margin-bottom: 16px;
                     width: 100%;
-                    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+                    box-shadow: 0 4px 15px rgba(51, 51, 102, 0.4);
                     transition: all 0.3s ease;
+                    min-height: 42px;
                 }
 
                 .signin-btn:hover {
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
-                    filter: brightness(1.05);
+                    box-shadow: 0 6px 20px rgba(51, 51, 102, 0.5);
+                    filter: brightness(1.1);
                 }
 
                 .remember-me-container {
                     display: flex;
                     align-items: center;
                     justify-content: flex-start;
-                    margin-bottom: 15px;
-                    margin-top: 15px;
+                    margin-bottom: 20px;
+                    margin-top: 12px;
                     cursor: pointer;
                     width: 100%;
-                    padding: 8px 0;
-                    min-height: 40px;
+                    padding: 0;
+                    min-height: auto;
                     z-index: 10;
                     position: relative;
                 }
@@ -442,10 +442,10 @@ export default function LoginPage() {
                 }
 
                 .remember-me-checkbox {
-                    width: 24px;
-                    height: 24px;
-                    min-width: 24px;
-                    min-height: 24px;
+                    width: 18px;
+                    height: 18px;
+                    min-width: 18px;
+                    min-height: 18px;
                     margin-right: 12px;
                     margin-top: 0;
                     margin-bottom: 0;
@@ -463,10 +463,10 @@ export default function LoginPage() {
                     color: #ff4d4d;
                     font-size: 11px;
                     font-weight: 700;
-                    text-decoration: none;
-                    margin-top: 8px;
+                    text-decoration: underline;
                     display: block;
                     text-align: center;
+                    transition: all 0.3s ease;
                 }
 
                 .forgot-password:hover {
@@ -475,10 +475,10 @@ export default function LoginPage() {
                 }
 
                 .footer-text {
-                    margin-top: 15px;
+                    margin-top: 24px;
                     font-size: 12px;
                     font-weight: 600;
-                    color: #444;
+                    color: #555;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -487,15 +487,23 @@ export default function LoginPage() {
                 }
 
                 .regist-here-link {
-                    background: #ffcc00;
-                    color: white;
+                    background: none;
+                    color: #000000;
                     border: none;
-                    padding: 5px 15px;
-                    border-radius: 50px;
-                    font-weight: 800;
-                    font-size: 11px;
-                    text-decoration: none;
-                    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.2);
+                    padding: 0;
+                    margin-left: -6px;
+                    border-radius: 0;
+                    font-weight: 700;
+                    font-family: 'Oxanium', sans-serif;
+                    font-size: 12px;
+                    text-decoration: underline;
+                    box-shadow: none;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .regist-here-link:hover {
+                    color: #333333;
                 }
 
                 @media (max-width: 768px) {
@@ -508,11 +516,12 @@ export default function LoginPage() {
                         display: none;
                     }
                     .login-right {
-                        padding: 20px;
+                        padding: 40px 20px;
+                        padding-top: 60px;
                     }
                     .login-right h2 {
                         font-size: 20px;
-                        margin-bottom: 15px;
+                        margin-bottom: 40px;
                     }
                     .form-container {
                         max-width: 100%;
@@ -539,10 +548,10 @@ export default function LoginPage() {
                         src="/assets/register1.png"
                         alt="Characters"
                         style={{
-                            width: "766px",
-                            height: "498px",
+                            width: "850px",
+                            height: "550px",
                             position: "absolute",
-                            top: "60px",
+                            top: "74px",
                             marginLeft: "35px",
                         }}
                     />
@@ -635,20 +644,20 @@ export default function LoginPage() {
                             className="signin-btn"
                             disabled={processing}
                         >
-                            {processing ? "Loading..." : "Sign In"}
+                            {processing ? "Loading..." : "Masuk"}
                         </button>
                         <Link
                             href="/forgot-password"
                             className="forgot-password"
                         >
-                            Forgot Password
+                            Lupa Password
                         </Link>
                     </form>
 
                     <div className="footer-text">
-                        <span>Dont have an account?</span>
+                        <span>Tidak Punya Akun?</span>
                         <Link href="/register" className="regist-here-link">
-                            Regist Here
+                            Daftar Disini
                         </Link>
                     </div>
                 </div>
