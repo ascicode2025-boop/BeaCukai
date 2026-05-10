@@ -9,7 +9,9 @@ const NavbarLogin = ({ children }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const { post, processing } = useForm();
     const { props } = usePage();
-    const user = props.user || props.auth?.user;
+
+    // Get user dari auth.user yang di-share oleh middleware
+    const user = props.auth?.user || props.user || null;
     const profilePhotoUrl =
         user?.profile_photo_url ||
         (user?.profile_photo ? `/storage/${user.profile_photo}` : null);

@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import "../../../css/GenerateHasil.css";
 import NavbarLogin from "../../components/NavbarLogin";
 import Footer from "../../components/Footer";
 import SuccessModal from "../../components/SuccessModal";
 import { usePage, router } from "@inertiajs/react";
+
+const TRAITS = {
+    D: { name: "Dominance" },
+    I: { name: "Influencing" },
+    S: { name: "Steadiness" },
+    C: { name: "Conscientiousness" },
+};
+
+const TRAIT_ORDER = ["D", "I", "S", "C"];
 
 const GenerateHasil = () => {
     const { props } = usePage();
@@ -17,49 +26,58 @@ const GenerateHasil = () => {
 
     // Mengambil data dari localStorage saat halaman pertama kali dimuat
     useEffect(() => {
-        const savedData = localStorage.getItem('discResultData');
-        console.log('[DEBUG] localStorage.discResultData:', savedData ? 'exists (length=' + savedData.length + ')' : 'NOT FOUND');
+        const storageKey = user?.id
+            ? `discResultData_${user.id}`
+            : 'discResultData';
+        const historyKey = user?.id
+            ? `discResultHistory_${user.id}`
+            : 'discResultHistory';
+        const selectedKey = user?.id
+            ? `discResultSelected_${user.id}`
+            : 'discResultSelected';
 
+        const selectedId = localStorage.getItem(selectedKey);
+        const savedHistory = localStorage.getItem(historyKey);
+
+        if (savedHistory) {
+            try {
+                const parsedHistory = JSON.parse(savedHistory) || [];
+                const filteredHistory = parsedHistory.filter(
+                    (item) =>
+                        !item.user_id || !user?.id || item.user_id === user.id,
+                );
+                const picked =
+                    filteredHistory.find((item) => item.id === selectedId) ||
+                    filteredHistory.sort(
+                        (a, b) =>
+                            new Date(b.submitted_at) -
+                            new Date(a.submitted_at),
+                    )[0];
+                if (picked) {
+                    setApiData(picked);
+                    return;
+                }
+            } catch (err) {
+                console.error('Failed to parse discResultHistory:', err);
+            }
+        }
+
+        const savedData = localStorage.getItem(storageKey);
         if (savedData) {
             try {
-                setApiData(JSON.parse(savedData));
-                console.log('[DEBUG] Successfully parsed discResultData from localStorage');
+                const parsed = JSON.parse(savedData);
+                if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
+                    setApiData(null);
+                    return;
+                }
+                setApiData(parsed);
             } catch (err) {
                 console.error('Failed to parse discResultData from localStorage:', err);
-                console.log('[DEBUG] localStorage content (first 200 chars):', savedData.substring(0, 200));
-                // remove invalid data to avoid breaking the page
-                localStorage.removeItem('discResultData');
+                localStorage.removeItem(storageKey);
                 setApiData(null);
             }
-        } else {
-            console.log('[DEBUG] No discResultData in localStorage. Loading fallback demo data for testing...');
-            // Fallback demo data untuk testing
-            const demoData = {
-                graph_scores: {
-                    Graph_1: { D: 18, I: 12, S: 16, C: 14 },
-                    Graph_2: { D: 14, I: 16, S: 12, C: 18 },
-                    Graph_3: { D: 4, I: -4, S: 4, C: -4 },
-                },
-                report: {
-                    primaryType: 'D - Dominance',
-                    summary: 'Anda memiliki kepribadian yang tegas, langsung, dan berorientasi pada hasil. Tipe kepribadian D cenderung mengambil keputusan cepat dan berani mengambil risiko.',
-                    strengths: ['Kepemimpinan yang kuat', 'Berorientasi pada hasil', 'Pengambilan keputusan yang cepat', 'Confidence yang tinggi'],
-                    weaknesses: ['Terlalu langsung dalam komunikasi', 'Kurang sabar dengan detail', 'Kurang empati', 'Sering mengabaikan masukan orang lain'],
-                    workCharacteristics: ['Mengutamakan efisiensi', 'Tidak suka birokrasi', 'Kompetitif', 'Ambisius'],
-                    recommendations: ['Tingkatkan empati terhadap rekan kerja', 'Dengarkan lebih banyak sebelum membuat keputusan', 'Kelola stress dengan olahraga atau meditasi', 'Belajar menghargai proses, bukan hanya hasil'],
-                },
-                all_profiles: {
-                    D: { primaryType: 'D - Dominance', summary: 'Leader yang tegas dan berorientasi hasil', strengths: ['Kepemimpinan', 'Keputusan cepat'], weaknesses: ['Terlalu langsung', 'Kurang empati'] },
-                    I: { primaryType: 'I - Influence', summary: 'Komunikator yang antusias dan suka berinteraksi', strengths: ['Komunikasi baik', 'Networking'], weaknesses: ['Impulsif', 'Kurang terorganisir'] },
-                    S: { primaryType: 'S - Steadiness', summary: 'Orang yang stabil, loyal, dan team player', strengths: ['Kesetiaan', 'Kestabilan'], weaknesses: ['Takut perubahan', 'Kurang inisiatif'] },
-                    C: { primaryType: 'C - Conscientiousness', summary: 'Analyst yang detail dan quality-oriented', strengths: ['Detail', 'Kualitas tinggi'], weaknesses: ['Perfeksionisme', 'Lambat dalam keputusan'] },
-                },
-                sorted_traits: ['D', 'I', 'S', 'C'],
-            };
-            setApiData(demoData);
-            console.log('[DEBUG] Demo data loaded for testing');
         }
-    }, []);
+    }, [user?.id]);
 
     // Auto-download effect (moved here so hooks are called in stable order)
     useEffect(() => {
@@ -74,8 +92,79 @@ const GenerateHasil = () => {
         }
     }, [apiData]);
 
+    const formatTraitBadge = (trait) => {
+        if (!TRAITS[trait]) return "-";
+        return `${trait} - ${TRAITS[trait].name}`;
+    };
+
+    const summary = useMemo(() => {
+        if (!apiData) return null;
+
+        const graph1 = apiData.graph_scores?.Graph_1 || {
+            D: 0,
+            I: 0,
+            S: 0,
+            C: 0,
+        };
+        const graph2 = apiData.graph_scores?.Graph_2 || {
+            D: 0,
+            I: 0,
+            S: 0,
+            C: 0,
+        };
+        const graph3 = apiData.graph_scores?.Graph_3 || {
+            D: 0,
+            I: 0,
+            S: 0,
+            C: 0,
+        };
+
+        const sortedTraits =
+            apiData.sorted_traits ||
+            Object.entries(graph3)
+                .sort((a, b) => b[1] - a[1])
+                .map(([trait]) => trait);
+
+        const primaryTrait = sortedTraits[0] || "-";
+        const secondaryTrait = sortedTraits[1] || "-";
+
+        const minGraph = -8;
+        const maxGraph = 8;
+        const jpm =
+            apiData.jpm?.percentage ??
+            Math.round(
+                ((Math.max(...Object.values(graph3)) - minGraph) /
+                    (maxGraph - minGraph)) *
+                    100,
+            );
+
+        const primaryScore = graph3[primaryTrait] ?? 0;
+        const secondaryScore = graph3[secondaryTrait] ?? 0;
+        const secondaryDiff = Math.abs(primaryScore - secondaryScore);
+
+        const traitNarrative =
+            primaryTrait !== "-" && secondaryTrait !== "-"
+                ? `Profil Anda paling menonjol pada ${formatTraitBadge(primaryTrait)} dan didukung ${formatTraitBadge(secondaryTrait)}. Selisih keduanya ${secondaryDiff} poin pada Graph 3, menunjukkan kombinasi gaya yang cukup ${secondaryDiff <= 2 ? "seimbang" : "tegas"} sesuai pola jawaban Anda.`
+                : "";
+
+        const longSummary = `${apiData.report?.summary || ""} ${traitNarrative}`.trim();
+
+        return {
+            graph1,
+            graph2,
+            graph3,
+            sortedTraits,
+            primaryTrait,
+            secondaryTrait,
+            jpm,
+            longSummary,
+            report: apiData.report,
+            allProfiles: apiData.all_profiles,
+        };
+    }, [apiData]);
+
     // Tampilkan loading jika data belum selesai dimuat
-    if (!apiData) {
+    if (!apiData || !summary) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <h3>Memproses Hasil DISC Anda...</h3>
@@ -89,39 +178,46 @@ const GenerateHasil = () => {
         nip: user?.nip || "-",
         unit_kerja: user?.unit_kerja || "-",
         lokasi: "Sistem Online",
-        tanggal_tes: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        tanggal_tes: apiData?.submitted_at
+            ? new Date(apiData.submitted_at).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+              })
+            : new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
 
         // Data Grafik 3 (Change) untuk ditampilkan di chart
         personality: {
-            D: apiData.graph_scores.Graph_3.D,
-            I: apiData.graph_scores.Graph_3.I,
-            S: apiData.graph_scores.Graph_3.S,
-            C: apiData.graph_scores.Graph_3.C,
+            D: summary.graph3.D,
+            I: summary.graph3.I,
+            S: summary.graph3.S,
+            C: summary.graph3.C,
         },
 
         description: "Laporan ini memberikan analisis mendalam tentang gaya kepribadian dan perilaku kerja berdasarkan metodologi DISC.",
 
         // Data Teks Laporan dari Controller
-        primaryType: apiData.report.primaryType,
-        summary: apiData.report.summary,
-        strengths: apiData.report.strengths,
-        weaknesses: apiData.report.weaknesses,
-        workCharacteristics: apiData.report.workCharacteristics,
-        recommendations: apiData.report.recommendations,
+        primaryType: formatTraitBadge(summary.primaryTrait),
+        secondaryType: formatTraitBadge(summary.secondaryTrait),
+        summary: summary.longSummary,
+        strengths: summary.report?.strengths || [],
+        weaknesses: summary.report?.weaknesses || [],
+        workCharacteristics: summary.report?.workCharacteristics || [],
+        recommendations: summary.report?.recommendations || [],
+        jpm: summary.jpm,
 
         // Semua profil untuk ditampilkan
-        allProfiles: apiData.all_profiles,
-        sortedTraits: apiData.sorted_traits,
+        allProfiles: summary.allProfiles || {},
+        sortedTraits: summary.sortedTraits || TRAIT_ORDER,
     };
 
-    const graphScores = apiData.graph_scores || {};
-    const graph1 = graphScores.Graph_1 || { D: 0, I: 0, S: 0, C: 0 };
-    const graph2 = graphScores.Graph_2 || { D: 0, I: 0, S: 0, C: 0 };
-    const graph3 = graphScores.Graph_3 || { D: 0, I: 0, S: 0, C: 0 };
+    const graph1 = summary.graph1;
+    const graph2 = summary.graph2;
+    const graph3 = summary.graph3;
 
     const toChartY = (value) => {
-        const min = -28;
-        const max = 28;
+        const min = -8;
+        const max = 8;
         const clamped = Math.max(min, Math.min(max, value));
         const normalized = ((clamped - min) / (max - min)) * 32;
         return 150 - (normalized * 130) / 32;
@@ -190,6 +286,10 @@ const GenerateHasil = () => {
                     removeContainer: true,
                 },
                 jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' },
+                pagebreak: {
+                    mode: ['css', 'legacy'],
+                    avoid: ['.chart-item', '.profile-card', '.char-box', '.rec-item'],
+                },
             };
 
             // Return a promise that resolves with the blob
@@ -285,7 +385,7 @@ const GenerateHasil = () => {
     };
 
     const handleLihatDetail = () => {
-        alert("Fitur Lihat Detail akan segera tersedia");
+        router.visit("/perserta-tes/hasil-ringkas");
     };
 
     const handleKembali = () => {
@@ -345,7 +445,9 @@ const GenerateHasil = () => {
                                     </p>
                                 </div>
                             </div>
+                        </div>
 
+                        <div className="pdf-page">
                             {/* Overview Section */}
                             <div className="section-overview">
                                 <h2 className="section-title">
@@ -381,6 +483,27 @@ const GenerateHasil = () => {
                                 </div>
                             </div>
 
+                            {/* DISC Primary Type */}
+                            <div className="section-primary">
+                                <h2 className="section-title">
+                                    Tipe Kepribadian Utama
+                                </h2>
+                                <div className="primary-badge-group">
+                                    <span className="primary-badge">
+                                        {discResult.primaryType}
+                                    </span>
+                                    <span className="secondary-badge">
+                                        {discResult.secondaryType}
+                                    </span>
+                                </div>
+                                <p className="primary-summary">
+                                    {discResult.summary}
+                                </p>
+                                <div className="jpm-inline">JPM: {discResult.jpm}%</div>
+                            </div>
+                        </div>
+
+                        <div className="pdf-page">
                             {/* Chart Section */}
                             <div className="section-charts">
                                 <h2 className="section-title">
@@ -628,19 +751,9 @@ const GenerateHasil = () => {
                                 </div>
                             </div>
 
-                            {/* DISC Primary Type */}
-                            <div className="section-primary">
-                                <h2 className="section-title">
-                                    Tipe Kepribadian Utama
-                                </h2>
-                                <div className="primary-badge">
-                                    {discResult.primaryType}
-                                </div>
-                                <p className="primary-summary">
-                                    {discResult.summary}
-                                </p>
-                            </div>
+                        </div>
 
+                        <div className="pdf-page">
                             {/* All DISC Personality Types */}
                             <div className="section-all-profiles">
                                 <h2 className="section-title">
@@ -659,6 +772,8 @@ const GenerateHasil = () => {
                                             return colors[t] || "#6b7280";
                                         };
 
+                                        if (!profile) return null;
+
                                         return (
                                             <div key={trait} className="profile-card">
                                                 <div className="profile-header" style={{ borderLeft: `4px solid ${getTraitColor(trait)}` }}>
@@ -670,7 +785,7 @@ const GenerateHasil = () => {
                                                     <div className="profile-section">
                                                         <h4>Kekuatan:</h4>
                                                         <ul>
-                                                            {profile.strengths.map((s, idx) => (
+                                                            {(profile.strengths || []).map((s, idx) => (
                                                                 <li key={idx}>• {s}</li>
                                                             ))}
                                                         </ul>
@@ -679,7 +794,7 @@ const GenerateHasil = () => {
                                                     <div className="profile-section">
                                                         <h4>Area Pengembangan:</h4>
                                                         <ul>
-                                                            {profile.weaknesses.map((w, idx) => (
+                                                            {(profile.weaknesses || []).map((w, idx) => (
                                                                 <li key={idx}>• {w}</li>
                                                             ))}
                                                         </ul>
@@ -690,7 +805,9 @@ const GenerateHasil = () => {
                                     })}
                                 </div>
                             </div>
+                        </div>
 
+                        <div className="pdf-page">
                             {/* Characteristics Table */}
                             <div className="section-characteristics">
                                 <h2 className="section-title">Karakteristik</h2>

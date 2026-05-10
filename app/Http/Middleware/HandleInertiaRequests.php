@@ -37,6 +37,22 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+'auth' => [
+                // NOTE:
+                // Admin memakai guard "admin" (model App\\Models\\Admin), sedangkan `$request->user()`
+                // hanya mengambil dari guard default (biasanya "web").
+                // Maka kita ambil dari kedua guard agar navbar admin bisa dapat data user.
+                'user' => (function () use ($request) {
+                    $webUser = $request->user(); // guard default: "web"
+                    if ($webUser) {
+                        return $webUser->toArray();
+                    }
+
+                    // ambil dari guard admin
+                    $adminUser = \Illuminate\Support\Facades\Auth::guard('admin')->user();
+                    return $adminUser ? $adminUser->toArray() : null;
+                })(),
+            ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

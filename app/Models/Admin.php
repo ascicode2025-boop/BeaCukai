@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class Admin extends Authenticatable
 {
     use HasFactory, Notifiable;
+
 
     /**
      * The table associated with the model.
@@ -60,6 +62,11 @@ class Admin extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
+
     /**
      * Check if admin is super admin
      *
@@ -79,4 +86,14 @@ class Admin extends Authenticatable
     {
         return $this->is_active === true;
     }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        if (!$this->profile_photo) {
+            return null;
+        }
+
+        return Storage::url($this->profile_photo);
+    }
 }
+

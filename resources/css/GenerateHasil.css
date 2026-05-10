@@ -107,30 +107,46 @@
     padding: 0;
 }
 
+.pdf-content-wrapper * {
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
 .pdf-page {
-    padding: 30px;
+    padding: 40px;
     line-height: 1.6;
     color: #1e1b4b;
     font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #ffffff;
     position: relative;
+    page-break-before: always;
+    break-before: page;
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: auto;
+    break-inside: auto;
+}
+
+.pdf-page:first-child {
+    page-break-before: auto;
+    break-before: auto;
 }
 
 /* ============ COVER SECTION ============ */
 .report-cover {
     text-align: center;
-    padding: 0;
+    padding: 60px 40px;
     border-bottom: none;
     margin: 0;
     position: relative;
     background: #ffffff;
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    page-break-after: always;
-    break-after: page;
+    page-break-inside: avoid;
 }
 
 .report-cover::before {
@@ -211,7 +227,8 @@
 .section-characteristics,
 .section-recommendations {
     margin-bottom: 25px;
-    page-break-inside: avoid;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .section-title {
@@ -237,15 +254,15 @@
 }
 
 .overview-text {
-    font-size: 12px;
+    font-size: 11px;
     color: #4b5563;
-    line-height: 1.6;
+    line-height: 1.5;
     margin: 0;
 }
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-top: 15px;
 }
@@ -333,14 +350,15 @@
 /* ============ CHARTS SECTION ============ */
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 20px;
     page-break-inside: avoid;
+    margin-bottom: 25px;
 }
 
 .chart-item {
     background: linear-gradient(135deg, #f5f3ff 0%, #f0ecff 100%);
-    padding: 15px 10px;
+    padding: 20px;
     border-radius: 8px;
     text-align: center;
     border: 2px solid #e9d5ff;
@@ -349,8 +367,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
+    min-height: auto;
     page-break-inside: avoid;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .chart-item:hover {
@@ -368,7 +388,8 @@
 .chart-svg {
     width: 100%;
     height: auto;
-    max-width: 200px;
+    max-width: 100%;
+    max-height: 200px;
     filter: drop-shadow(0 4px 8px rgba(88, 80, 236, 0.1));
     animation: chartFadeIn 0.6s ease-out;
 }
@@ -459,6 +480,13 @@
     page-break-inside: avoid;
 }
 
+.primary-badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
 .primary-badge {
     display: inline-block;
     background: linear-gradient(135deg, #5850ec 0%, #7c3aed 100%);
@@ -473,24 +501,47 @@
     letter-spacing: 0.5px;
 }
 
-.primary-summary {
+.secondary-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #facc15 0%, #fbbf24 100%);
+    color: #1e1b4b;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 700;
     font-size: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.primary-summary {
+    font-size: 11px;
     color: #4b5563;
-    line-height: 1.6;
+    line-height: 1.5;
     margin: 0;
+}
+
+.jpm-inline {
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e1b4b;
 }
 
 /* ============ ALL PROFILES SECTION ============ */
 .section-all-profiles {
     margin: 30px 0;
-    page-break-inside: avoid;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .profiles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
     gap: 15px;
-    page-break-inside: avoid;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .profile-card {
@@ -500,7 +551,8 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     border: 1px solid #e2e8f0;
-    page-break-inside: avoid;
+    page-break-inside: auto;
+    break-inside: auto;
 }
 
 .profile-card:hover {
@@ -526,6 +578,7 @@
     padding: 15px;
     font-size: 11px;
     color: #4b5563;
+    line-height: 1.5;
 }
 
 .profile-summary {
@@ -554,7 +607,7 @@
 }
 
 .profile-section li {
-    font-size: 11px;
+    font-size: 10.5px;
     color: #4b5563;
     line-height: 1.4;
     margin: 3px 0;
@@ -563,8 +616,8 @@
 /* ============ CHARACTERISTICS SECTION ============ */
 .characteristics-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 15px;
     page-break-inside: avoid;
 }
 
@@ -601,11 +654,11 @@
 }
 
 .char-list li {
-    font-size: 11px;
+    font-size: 10.5px;
     color: #4b5563;
     padding: 6px 0;
     padding-left: 18px;
-    line-height: 1.5;
+    line-height: 1.4;
     position: relative;
     border-bottom: 1px solid #e2e8f0;
 }
@@ -628,7 +681,7 @@
 /* ============ RECOMMENDATIONS SECTION ============ */
 .recommendations-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
     page-break-inside: avoid;
 }
@@ -665,9 +718,9 @@
 }
 
 .rec-text {
-    font-size: 11px;
+    font-size: 10.5px;
     color: #4b5563;
-    line-height: 1.5;
+    line-height: 1.4;
     margin: 0;
 }
 
@@ -793,9 +846,9 @@
     .report-cover {
         page-break-after: always !important;
         break-after: page !important;
-        padding: 0 !important;
+        padding: 60px 40px !important;
         margin: 0 !important;
-        min-height: 100vh !important;
+        min-height: auto !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
@@ -861,7 +914,7 @@
     }
 
     .info-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: 1fr !important;
         gap: 10px !important;
         margin-top: 15px !important;
     }

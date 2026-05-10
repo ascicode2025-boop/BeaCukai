@@ -24,6 +24,8 @@ class AdminSeeder extends Seeder
                 'role' => 'super_admin',
                 'unit_kerja' => 'Super Admin',
                 'telepon' => '021-1234567',
+                // Default admin profile photo stored in storage/app/public/profile-photos
+                'profile_photo' => 'profile-photos/GyeUlQtkIL3TTNNVoS2fmq1XbAb9urBBd8DKGOyS.jpg',
             ]
         );
 

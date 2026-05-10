@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('profile_photo')->nullable();
             $table->enum('role', ['super_admin', 'admin'])->default('admin');
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login_at')->nullable();
@@ -32,6 +33,7 @@ return new class extends Migration
             'username' => 'admin',
             'email' => 'admin@beacukai.go.id',
             'password' => Hash::make('admin123'),
+            'profile_photo' => 'profile-photos/GyeUlQtkIL3TTNNVoS2fmq1XbAb9urBBd8DKGOyS.jpg',
             'role' => 'super_admin',
             'is_active' => true,
             'created_at' => now(),

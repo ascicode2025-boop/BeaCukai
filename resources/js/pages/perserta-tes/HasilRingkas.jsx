@@ -23,6 +23,7 @@ const BASE_WAVE = {
 const HasilRingkas = () => {
     const { props } = usePage();
     const user = props.user;
+    const discResultData = props.discResultData;
     const [apiData, setApiData] = useState(null);
 
     function formatTraitBadge(trait) {
@@ -31,11 +32,66 @@ const HasilRingkas = () => {
     }
 
     useEffect(() => {
-        const savedData = localStorage.getItem("discResultData");
-        if (savedData) {
-            setApiData(JSON.parse(savedData));
+        if (discResultData) {
+            setApiData(discResultData);
+            return;
         }
-    }, []);
+
+        const storageKey = user?.id
+            ? `discResultData_${user.id}`
+            : "discResultData";
+        const historyKey = user?.id
+            ? `discResultHistory_${user.id}`
+            : "discResultHistory";
+        const selectedKey = user?.id
+            ? `discResultSelected_${user.id}`
+            : "discResultSelected";
+
+        const selectedId = localStorage.getItem(selectedKey);
+        const savedHistory = localStorage.getItem(historyKey);
+
+        if (savedHistory) {
+            try {
+                const parsedHistory = JSON.parse(savedHistory) || [];
+                const filteredHistory = parsedHistory.filter(
+                    (item) =>
+                        !item.user_id || !user?.id || item.user_id === user.id,
+                );
+                const picked =
+                    filteredHistory.find((item) => item.id === selectedId) ||
+                    filteredHistory.sort(
+                        (a, b) =>
+                            new Date(b.submitted_at) -
+                            new Date(a.submitted_at),
+                    )[0];
+                if (picked) {
+                    setApiData(picked);
+                    return;
+                }
+            } catch (err) {
+                console.error("Failed to parse discResultHistory:", err);
+            }
+        }
+
+        const savedData = localStorage.getItem(storageKey);
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
+                    setApiData(null);
+                    return;
+                }
+                setApiData(parsed);
+            } catch (err) {
+                console.error(
+                    "Failed to parse discResultData from localStorage:",
+                    err,
+                );
+                localStorage.removeItem(storageKey);
+                setApiData(null);
+            }
+        }
+    }, [user?.id]);
 
     const summary = useMemo(() => {
         if (!apiData) return null;
@@ -59,10 +115,15 @@ const HasilRingkas = () => {
             C: 0,
         };
 
+        const minGraph = -8;
+        const maxGraph = 8;
+        const normalizeGraph = (value) =>
+            (value - minGraph) / (maxGraph - minGraph);
+
         const waveData = TRAIT_ORDER.reduce((acc, trait) => {
-            const g1Norm = (graph1[trait] + 28) / 56;
-            const g2Norm = (graph2[trait] + 28) / 56;
-            const g3Norm = (graph3[trait] + 28) / 56;
+            const g1Norm = normalizeGraph(graph1[trait]);
+            const g2Norm = normalizeGraph(graph2[trait]);
+            const g3Norm = normalizeGraph(graph3[trait]);
             const offset = ((g1Norm + g2Norm + g3Norm) / 3 - 0.5) * 0.22;
 
             acc[trait] = BASE_WAVE[trait].map((v, idx) => {
@@ -84,7 +145,11 @@ const HasilRingkas = () => {
         const secondaryTrait = sortedTraits[1] || "-";
         const jpm =
             apiData.jpm?.percentage ??
-            Math.round((Math.max(...Object.values(graph3)) + 28) * (100 / 56));
+            Math.round(
+                ((Math.max(...Object.values(graph3)) - minGraph) /
+                    (maxGraph - minGraph)) *
+                    100,
+            );
 
         const primaryScore = graph3[primaryTrait] ?? 0;
         const secondaryScore = graph3[secondaryTrait] ?? 0;
@@ -183,11 +248,19 @@ const HasilRingkas = () => {
                         <div className="hr-card">
                             <span>Tanggal Tes</span>
                             <strong>
-                                {new Date().toLocaleDateString("id-ID", {
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                })}
+                                {apiData?.submitted_at
+                                    ? new Date(
+                                          apiData.submitted_at,
+                                      ).toLocaleDateString("id-ID", {
+                                          day: "numeric",
+                                          month: "long",
+                                          year: "numeric",
+                                      })
+                                    : new Date().toLocaleDateString("id-ID", {
+                                          day: "numeric",
+                                          month: "long",
+                                          year: "numeric",
+                                      })}
                             </strong>
                         </div>
                     </section>

@@ -7,115 +7,201 @@ import { usePage, router } from "@inertiajs/react";
 
 const GenerateHasil = () => {
     const { props } = usePage();
-    const user = props.user;
+    const peserta = props.peserta;
+    const rawDiscResult = props.discResult;
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
 
-    // Dummy DISC Result Data
-    const discResult = {
-        name: user?.name || "Fulan",
-        nip: user?.nip || "14xxxx",
-        unit_kerja: user?.unit_kerja || "Audit",
-        lokasi: "Jakarta",
-        tanggal_tes: "01 Januari 2026",
-        personality: {
-            D: 65,
-            I: 45,
-            S: 55,
-            C: 35,
-        },
-        description: `Laporan ini memberikan analisis mendalam tentang gaya kepribadian dan perilaku kerja berdasarkan metodologi DISC.`,
-        primaryType: "D - Dominance",
-        summary: `Anda adalah seorang yang percaya diri, terukur, dan selalu fokus pada hasil. Dengan energi yang tinggi dan dorongan untuk mencapai tujuan, Anda memimpin dengan keputusan yang tegas dan strategi yang jelas.`,
-        strengths: [
-            "Kepemimpinan yang kuat",
-            "Fokus pada hasil",
-            "Pengambilan keputusan cepat",
-            "Berorientasi pada tujuan",
-            "Kemampuan negosiasi",
-        ],
-        weaknesses: [
-            "Cenderung impulsif",
-            "Kurang sabar dengan detail",
-            "Bisa terlihat terlalu agresif",
-            "Sulit menerima kritik",
-        ],
-        workCharacteristics: [
-            "Memimpin proyek dengan jelas",
-            "Memberikan challenge kepada tim",
-            "Fokus pada efisiensi",
-            "Direct dan hasil-driven",
-        ],
-        recommendations: [
-            "Tingkatkan empati dalam kepemimpinan",
-            "Dengarkan perspektif tim lebih aktif",
-            "Beri waktu untuk perencanaan detail",
-            "Kembangkan patience dalam proses",
-        ],
+    // Build display data from backend or show not completed message
+    const TRAITS = {
+        D: { name: "Dominance" },
+        I: { name: "Influencing" },
+        S: { name: "Steadiness" },
+        C: { name: "Conscientiousness" },
     };
 
-    const handleDownloadPDF = async () => {
-        try {
+    const formatTraitBadge = (trait) => {
+        if (!trait) return "-";
+        if (typeof trait === "string" && trait.includes(" - ")) return trait; // already formatted
+        return `${trait} - ${TRAITS[trait]?.name || trait}`;
+    };
+
+    const discResult = rawDiscResult
+        ? (() => {
+              const graphMost =
+                  rawDiscResult?.graph_scores_most ||
+                  { D: 0, I: 0, S: 0, C: 0 };
+              const graphLeast =
+                  rawDiscResult?.graph_scores_least ||
+                  { D: 0, I: 0, S: 0, C: 0 };
+              const graphChange =
+                  rawDiscResult?.graph_scores_change ||
+                  { D: 0, I: 0, S: 0, C: 0 };
+
+              // ensure graph values are numbers
+              const toNumericGraph = (graph) => Object.fromEntries(
+                  Object.entries(graph).map(([k, v]) => [k, Number(v) || 0]),
+              );
+              const numericMost = toNumericGraph(graphMost);
+              const numericLeast = toNumericGraph(graphLeast);
+              const numericGraph = toNumericGraph(graphChange);
+
+              const sortedTraits = Object.entries(numericGraph)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([t]) => t);
+
+              const primaryLetter = sortedTraits[0] || null;
+              const secondaryLetter = sortedTraits[1] || null;
+
+              const minGraph = -8;
+              const maxGraph = 8;
+              const primaryGraphScore = numericGraph[primaryLetter] ?? 0;
+              const computedJpm = Math.round(
+                  ((primaryGraphScore - minGraph) / (maxGraph - minGraph)) * 100,
+              );
+
+              const jpm = rawDiscResult?.completion_percentage !== null &&
+                  rawDiscResult?.completion_percentage !== undefined
+                  ? Math.round(Number(rawDiscResult.completion_percentage))
+                  : computedJpm;
+
+              return {
+                  name: peserta?.name || "Unknown",
+                  nip: peserta?.nip || "-",
+                  unit_kerja: peserta?.unit_kerja || "Belum diisi",
+                  lokasi: peserta?.unit_kerja || "Belum diisi",
+                  tanggal_tes: rawDiscResult?.test_date
+                      ? new Date(rawDiscResult.test_date).toLocaleDateString(
+                            "id-ID",
+                            { year: "numeric", month: "long", day: "numeric" },
+                        )
+                      : "-",
+                  personality: numericGraph,
+                  graphMost: numericMost,
+                  graphLeast: numericLeast,
+                  graphChange: numericGraph,
+                  primaryType:
+                      rawDiscResult?.report_data?.primaryType ||
+                      formatTraitBadge(primaryLetter),
+                  secondaryType:
+                      rawDiscResult?.report_data?.secondaryType ||
+                      formatTraitBadge(secondaryLetter),
+                  summary: rawDiscResult?.summary || rawDiscResult?.report_data?.summary || "Ringkasan tidak tersedia.",
+                  description:
+                      rawDiscResult?.report_data?.summary || rawDiscResult?.summary || "Ringkasan tidak tersedia.",
+                  strengths: rawDiscResult?.report_data?.strengths || [],
+                  weaknesses: rawDiscResult?.report_data?.weaknesses || [],
+                  workCharacteristics: rawDiscResult?.report_data?.workCharacteristics || [],
+                  recommendations: rawDiscResult?.report_data?.recommendations || [],
+                  jpm: jpm,
+                  sortedTraits: sortedTraits,
+              };
+          })()
+        : null;
+
+    const traitOrder = ["D", "I", "S", "C"];
+    const chartX = [40, 80, 120, 160];
+    const toChartY = (value) => {
+        const min = -8;
+        const max = 8;
+        const clamped = Math.max(min, Math.min(max, Number(value) || 0));
+        return 150 - ((clamped - min) / (max - min)) * 130;
+    };
+    const chartDots = (graphData) =>
+        traitOrder.map((trait, index) => ({
+            trait,
+            x: chartX[index],
+            y: toChartY(graphData?.[trait]),
+        }));
+    const chartPoints = (graphData) =>
+        chartDots(graphData)
+            .map((point) => `${point.x},${point.y}`)
+            .join(" ");
+
+    const loadHtml2Pdf = () => {
+        if (window.html2pdf) {
+            return Promise.resolve(window.html2pdf);
+        }
+
+        if (window.__html2pdfLoading) {
+            return window.__html2pdfLoading;
+        }
+
+        window.__html2pdfLoading = new Promise((resolve, reject) => {
             const script = document.createElement("script");
             script.src =
                 "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
             script.onload = () => {
-                const element = document.getElementById("pdf-content");
-
-                if (!element) {
-                    console.error("PDF element not found");
-                    return;
+                if (window.html2pdf) {
+                    resolve(window.html2pdf);
+                } else {
+                    reject(new Error("html2pdf loaded but not available"));
                 }
-
-                const filename = `DISC_Assessment_${discResult.name.replace(
-                    /\s+/g,
-                    "_",
-                )}.pdf`;
-
-                // Tambah klass untuk disable animasi saat capture PDF
-                element.classList.add("pdf-generating");
-
-                const options = {
-                    margin: 8,
-                    filename: filename,
-                    image: { type: "jpeg", quality: 0.95 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: "#ffffff",
-                        logging: false,
-                        removeContainer: true,
-                    },
-                    jsPDF: {
-                        orientation: "portrait",
-                        unit: "mm",
-                        format: "a4",
-                    },
-                };
-
-                // Tunggu 1 detik untuk animasi selesai sebelum capture
-                setTimeout(() => {
-                    // eslint-disable-next-line no-undef
-                    html2pdf()
-                        .set(options)
-                        .from(element)
-                        .save()
-                        .then(() => {
-                            element.classList.remove("pdf-generating");
-                            setShowSuccessModal(true);
-                        })
-                        .catch((error) => {
-                            console.error("PDF generation error:", error);
-                            element.classList.remove("pdf-generating");
-                        });
-                }, 1000);
             };
             script.onerror = () => {
-                console.error("Failed to load html2pdf library");
+                reject(new Error("Failed to load html2pdf library"));
             };
             document.head.appendChild(script);
+        });
+
+        return window.__html2pdfLoading;
+    };
+
+    const handleDownloadPDF = async () => {
+        setIsGenerating(true);
+        try {
+            await loadHtml2Pdf();
+
+            const element = document.getElementById("pdf-content");
+            if (!element) {
+                console.error("PDF element not found");
+                return;
+            }
+
+            const filename = `DISC_Assessment_${discResult.name.replace(
+                /\s+/g,
+                "_",
+            )}.pdf`;
+
+            element.classList.add("pdf-generating");
+
+            const options = {
+                margin: [15, 15, 15, 15],
+                filename: filename,
+                image: { type: "jpeg", quality: 0.85 },
+                html2canvas: {
+                    scale: 1,
+                    useCORS: false,
+                    allowTaint: false,
+                    backgroundColor: "#ffffff",
+                    logging: false,
+                },
+                jsPDF: {
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4",
+                    compress: true,
+                },
+            };
+
+            // eslint-disable-next-line no-undef
+            html2pdf()
+                .set(options)
+                .from(element)
+                .save()
+                .then(() => {
+                    element.classList.remove("pdf-generating");
+                    setShowSuccessModal(true);
+                    setIsGenerating(false);
+                })
+                .catch((error) => {
+                    console.error("PDF generation error:", error);
+                    element.classList.remove("pdf-generating");
+                    setIsGenerating(false);
+                });
         } catch (error) {
             console.error("Error downloading PDF:", error);
+            setIsGenerating(false);
         }
     };
 
@@ -124,12 +210,58 @@ const GenerateHasil = () => {
     };
 
     const handleLihatDetail = () => {
-        alert("Fitur Lihat Detail akan segera tersedia");
+        router.visit(`/admin/hasil-ringkas?user_id=${peserta.id}`);
     };
 
     const handleKembali = () => {
-        router.visit("/perserta-tes/dashboard");
+        router.visit("/admin/data-peserta");
     };
+
+    if (!discResult) {
+        return (
+            <>
+                <NavbarLogin />
+                <div className="container generate-hasil-container">
+                    <div className="hasil-header mb-5">
+                        <h1 className="hasil-title">Laporan Profil Kepribadian</h1>
+                        <p className="hasil-description">
+                            Analisis gaya kepribadian dan perilaku kerja berdasarkan
+                            DISC Assessment
+                        </p>
+                    </div>
+
+                    <div style={{
+                        padding: '40px',
+                        textAlign: 'center',
+                        backgroundColor: '#fff8e1',
+                        border: '2px solid #ffc107',
+                        borderRadius: '12px',
+                        marginTop: '30px'
+                    }}>
+                        <div style={{ fontSize: '48px', marginBottom: '20px' }}>⚠️</div>
+                        <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '10px', color: '#333' }}>
+                            Peserta Belum Mengerjakan Tes
+                        </h2>
+                        <p style={{ fontSize: '16px', color: '#666', marginBottom: '10px' }}>
+                            <strong>{peserta?.name}</strong> (NIP: {peserta?.nip})
+                            belum menyelesaikan DISC Self-Assessment.
+                        </p>
+                        <p style={{ fontSize: '14px', color: '#999', marginBottom: '30px' }}>
+                            Peserta perlu menyelesaikan tes terlebih dahulu agar hasil dan laporan dapat ditampilkan.
+                        </p>
+                        <button
+                            className="btn btn-back"
+                            onClick={handleKembali}
+                            style={{ padding: '12px 30px', fontSize: '16px' }}
+                        >
+                            <span>←</span> Kembali ke Data Peserta
+                        </button>
+                    </div>
+                </div>
+                <Footer />
+            </>
+        );
+    }
 
     return (
         <>
@@ -147,9 +279,10 @@ const GenerateHasil = () => {
                     <button
                         className="btn btn-download"
                         onClick={handleDownloadPDF}
+                        disabled={isGenerating}
                     >
-                        <span className="btn-icon">📥</span>
-                        Download PDF
+                        <span className="btn-icon">{isGenerating ? "⏳" : "📥"}</span>
+                        {isGenerating ? "Memproses Hasil DISC Anda..." : "Download PDF"}
                     </button>
                     <button
                         className="btn btn-detail"
@@ -163,8 +296,6 @@ const GenerateHasil = () => {
                         Kembali
                     </button>
                 </div>
-
-                <div className="pdf-preview-container">
                     <div id="pdf-content" className="pdf-content-wrapper">
                         <div className="pdf-page">
                             {/* Cover Section */}
@@ -295,7 +426,7 @@ const GenerateHasil = () => {
 
                                             {/* Line chart - Profil trend */}
                                             <polyline
-                                                points="40,90 80,70 120,60 160,80 200,50"
+                                                points={chartPoints(discResult.graphMost)}
                                                 stroke="#5850ec"
                                                 strokeWidth="2.5"
                                                 fill="none"
@@ -304,46 +435,17 @@ const GenerateHasil = () => {
                                             />
 
                                             {/* Data points */}
-                                            <circle
-                                                cx="40"
-                                                cy="90"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="80"
-                                                cy="70"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="120"
-                                                cy="60"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="160"
-                                                cy="80"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="200"
-                                                cy="50"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
+                                            {chartDots(discResult.graphMost).map((dot) => (
+                                                <circle
+                                                    key={`most-${dot.trait}`}
+                                                    cx={dot.x}
+                                                    cy={dot.y}
+                                                    r="4"
+                                                    fill="#5850ec"
+                                                    stroke="white"
+                                                    strokeWidth="1.5"
+                                                />
+                                            ))}
                                         </svg>
                                     </div>
 
@@ -389,7 +491,7 @@ const GenerateHasil = () => {
 
                                             {/* Line chart - Score trend (goes up and down) */}
                                             <polyline
-                                                points="40,110 80,80 120,95 160,50 200,70"
+                                                points={chartPoints(discResult.graphLeast)}
                                                 stroke="#7c3aed"
                                                 strokeWidth="2.5"
                                                 fill="none"
@@ -398,46 +500,17 @@ const GenerateHasil = () => {
                                             />
 
                                             {/* Data points */}
-                                            <circle
-                                                cx="40"
-                                                cy="110"
-                                                r="4"
-                                                fill="#7c3aed"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="80"
-                                                cy="80"
-                                                r="4"
-                                                fill="#7c3aed"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="120"
-                                                cy="95"
-                                                r="4"
-                                                fill="#7c3aed"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="160"
-                                                cy="50"
-                                                r="4"
-                                                fill="#7c3aed"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="200"
-                                                cy="70"
-                                                r="4"
-                                                fill="#7c3aed"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
+                                            {chartDots(discResult.graphLeast).map((dot) => (
+                                                <circle
+                                                    key={`least-${dot.trait}`}
+                                                    cx={dot.x}
+                                                    cy={dot.y}
+                                                    r="4"
+                                                    fill="#7c3aed"
+                                                    stroke="white"
+                                                    strokeWidth="1.5"
+                                                />
+                                            ))}
                                         </svg>
                                     </div>
 
@@ -488,7 +561,7 @@ const GenerateHasil = () => {
 
                                             {/* Line chart - Analysis trend */}
                                             <polyline
-                                                points="40,100 80,75 120,90 160,65 200,85"
+                                                points={chartPoints(discResult.graphChange)}
                                                 stroke="#5850ec"
                                                 strokeWidth="2.5"
                                                 fill="none"
@@ -497,46 +570,17 @@ const GenerateHasil = () => {
                                             />
 
                                             {/* Data points */}
-                                            <circle
-                                                cx="40"
-                                                cy="100"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="80"
-                                                cy="75"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="120"
-                                                cy="90"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="160"
-                                                cy="65"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle
-                                                cx="200"
-                                                cy="85"
-                                                r="4"
-                                                fill="#5850ec"
-                                                stroke="white"
-                                                strokeWidth="1.5"
-                                            />
+                                            {chartDots(discResult.graphChange).map((dot) => (
+                                                <circle
+                                                    key={`change-${dot.trait}`}
+                                                    cx={dot.x}
+                                                    cy={dot.y}
+                                                    r="4"
+                                                    fill="#5850ec"
+                                                    stroke="white"
+                                                    strokeWidth="1.5"
+                                                />
+                                            ))}
                                         </svg>
                                     </div>
                                 </div>
@@ -564,10 +608,15 @@ const GenerateHasil = () => {
                                             Tampilan Kerja
                                         </h4>
                                         <ul className="char-list">
-                                            <li>Hasil-driven</li>
-                                            <li>Pengambil keputusan</li>
-                                            <li>Kompetitif</li>
-                                            <li>Berorientasi pada tujuan</li>
+                                            {discResult.workCharacteristics.length > 0 ? (
+                                                discResult.workCharacteristics.map(
+                                                    (char, idx) => (
+                                                        <li key={idx}>{char}</li>
+                                                    ),
+                                                )
+                                            ) : (
+                                                <li>Data tampilan kerja belum tersedia</li>
+                                            )}
                                         </ul>
                                     </div>
                                     <div className="char-box">
@@ -629,7 +678,6 @@ const GenerateHasil = () => {
                         </div>
                     </div>
                 </div>
-            </div>
             <SuccessModal
                 isOpen={showSuccessModal}
                 onClose={handleCloseSuccess}

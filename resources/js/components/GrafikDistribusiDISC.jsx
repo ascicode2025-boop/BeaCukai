@@ -1,26 +1,63 @@
-import React from "react";
+import React, { useMemo, useRef } from "react";
 import "../../css/GrafikDistribusiDISC.css";
 
 const GrafikDistribusiDISC = ({ data }) => {
-    const handleExport = () => {
-        console.log("Export grafik");
-    };
+    const svgRef = useRef(null);
 
-    // Sample data points untuk grafik
-    const chartData = data || [
-        { x: 1, d: 1000, i: 1500, s: 1200, c: 1400 },
-        { x: 2, d: 1800, i: 2000, s: 1800, c: 1900 },
-        { x: 3, d: 2200, i: 2500, s: 2300, c: 2400 },
-        { x: 4, d: 2800, i: 3200, s: 2800, c: 3000 },
-        { x: 5, d: 3200, i: 3800, s: 3200, c: 3500 },
-        { x: 6, d: 3600, i: 4000, s: 3600, c: 3800 },
-        { x: 7, d: 3900, i: 4200, s: 3900, c: 4000 },
-        { x: 8, d: 4200, i: 4500, s: 4100, c: 4300 },
-        { x: 9, d: 4600, i: 4800, s: 4500, c: 4700 },
-        { x: 10, d: 5000, i: 5100, s: 4800, c: 5000 },
-        { x: 11, d: 5200, i: 5300, s: 5000, c: 5200 },
-        { x: 12, d: 5400, i: 5500, s: 5200, c: 5400 },
-    ];
+    const chartData = useMemo(() => {
+        const rows = Array.isArray(data) ? data : [];
+
+        return rows.map((item, index) => ({
+            x: item.x || item.label || `${index + 1}`,
+            d: Number(item.d || 0),
+            i: Number(item.i || 0),
+            s: Number(item.s || 0),
+            c: Number(item.c || 0),
+            total: Number(item.total || 0),
+        }));
+    }, [data]);
+
+    const handleExport = () => {
+        const svg = svgRef.current;
+        if (!svg) return;
+
+        const serializer = new XMLSerializer();
+        const source = serializer.serializeToString(svg);
+        const svgBlob = new Blob([source], {
+            type: "image/svg+xml;charset=utf-8",
+        });
+        const url = URL.createObjectURL(svgBlob);
+        const image = new Image();
+
+        image.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = width * 2;
+            canvas.height = height * 2;
+
+            const context = canvas.getContext("2d");
+            context.fillStyle = "#ffffff";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            URL.revokeObjectURL(url);
+
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const downloadUrl = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = downloadUrl;
+                link.download = `grafik-distribusi-disc-${new Date()
+                    .toISOString()
+                    .slice(0, 10)}.png`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+            }, "image/png");
+        };
+
+        image.src = url;
+    };
 
     const width = 900;
     const height = 400;
@@ -29,18 +66,23 @@ const GrafikDistribusiDISC = ({ data }) => {
     const plotHeight = height - padding.top - padding.bottom;
 
     // Min and Max values
-    const maxY = 5500;
+    const maxDataValue = Math.max(
+        0,
+        ...chartData.flatMap((item) => [item.d, item.i, item.s, item.c]),
+    );
+    const maxY = Math.max(5, Math.ceil(maxDataValue / 5) * 5);
     const minY = 0;
-    const maxX = chartData.length - 1;
+    const effectiveMaxY = maxY === minY ? minY + 1 : maxY;
+    const maxX = Math.max(chartData.length - 1, 1);
 
     // Convert data to SVG coordinates
     const getX = (index) => padding.left + (index / maxX) * plotWidth;
     const getY = (value) =>
-        height - padding.bottom - ((value - minY) / (maxY - minY)) * plotHeight;
+        height - padding.bottom - ((value - minY) / (effectiveMaxY - minY)) * plotHeight;
 
     // Generate smooth path using bezier curves
     const generateSmoothPath = (dataKey) => {
-        if (chartData.length < 2) return "";
+        if (chartData.length === 0) return "";
 
         const points = chartData.map((d, i) => ({
             x: getX(i),
@@ -48,6 +90,7 @@ const GrafikDistribusiDISC = ({ data }) => {
         }));
 
         let path = `M ${points[0].x} ${points[0].y}`;
+        if (points.length === 1) return path;
 
         for (let i = 1; i < points.length; i++) {
             const prev = points[i - 1];
@@ -67,6 +110,22 @@ const GrafikDistribusiDISC = ({ data }) => {
         return path;
     };
 
+    const generateAreaPath = (dataKey) => {
+        const line = generateSmoothPath(dataKey);
+        if (!line) return "";
+
+        const firstX = getX(0);
+        const lastX = getX(chartData.length - 1);
+        const baseY = height - padding.bottom;
+
+        if (chartData.length === 1) {
+            const y = getY(chartData[0][dataKey]);
+            return `M ${firstX} ${y} L ${firstX} ${baseY} L ${firstX} ${baseY} Z`;
+        }
+
+        return `${line} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
+    };
+
     // Colors for each series
     const colors = {
         d: "#00d9ff", // Cyan
@@ -79,15 +138,28 @@ const GrafikDistribusiDISC = ({ data }) => {
         d: "Dominance D",
         i: "Influence I",
         s: "Steadiness S",
-        c: "Conscientiousness C",
+        c: "Compliance C",
     };
+
+    const hasData = chartData.some((item) => item.total > 0);
+    const yTicks = Array.from(
+        { length: Math.max(6, Math.round(effectiveMaxY) + 1) },
+        (_, index) => index,
+    );
+
+    const getSeriesPoints = (dataKey) =>
+        chartData.map((d, i) => ({
+            x: getX(i),
+            y: getY(d[dataKey]),
+            value: d[dataKey],
+        }));
 
     return (
         <div className="grafik-container">
             <div className="grafik-header">
                 <h3 className="grafik-title">Grafik Distribusi DISC</h3>
                 <button className="btn-export" onClick={handleExport}>
-                    Export
+                    Export PNG
                 </button>
             </div>
 
@@ -105,6 +177,7 @@ const GrafikDistribusiDISC = ({ data }) => {
 
             <div className="grafik-wrapper">
                 <svg
+                    ref={svgRef}
                     className="grafik-svg"
                     width={width}
                     height={height}
@@ -210,7 +283,7 @@ const GrafikDistribusiDISC = ({ data }) => {
                     />
 
                     {/* Grid lines */}
-                    {[0, 1, 2, 3, 4, 5].map((i) => {
+                    {yTicks.map((i) => {
                         const y =
                             height -
                             padding.bottom -
@@ -251,7 +324,7 @@ const GrafikDistribusiDISC = ({ data }) => {
                     />
 
                     {/* Y-axis labels */}
-                    {[0, 1, 2, 3, 4, 5].map((i) => {
+                    {yTicks.map((i) => {
                         const value = (i * maxY) / 5;
                         const y =
                             height -
@@ -266,7 +339,7 @@ const GrafikDistribusiDISC = ({ data }) => {
                                     fill="#666"
                                     textAnchor="end"
                                 >
-                                    {value / 1000}k
+                                    {Math.round(value)}
                                 </text>
                             </g>
                         );
@@ -282,28 +355,41 @@ const GrafikDistribusiDISC = ({ data }) => {
                             fill="#666"
                             textAnchor="middle"
                         >
-                            {i === 0 ? "1k" : i * 1000 + (i > 1 ? "" : "k")}
+                            {d.x}
                         </text>
                     ))}
 
+                    {!hasData && (
+                        <text
+                            x={width / 2}
+                            y={height / 2}
+                            fontSize="18"
+                            fill="#64748b"
+                            textAnchor="middle"
+                            fontWeight="700"
+                        >
+                            Belum ada data tes DISC
+                        </text>
+                    )}
+
                     {/* Area paths - smooth curves */}
                     <path
-                        d={generateSmoothPath("s")}
+                        d={generateAreaPath("s")}
                         fill="url(#areaSGradient)"
                         opacity="0.6"
                     />
                     <path
-                        d={generateSmoothPath("d")}
+                        d={generateAreaPath("d")}
                         fill="url(#areaDGradient)"
                         opacity="0.6"
                     />
                     <path
-                        d={generateSmoothPath("c")}
+                        d={generateAreaPath("c")}
                         fill="url(#areaCGradient)"
                         opacity="0.6"
                     />
                     <path
-                        d={generateSmoothPath("i")}
+                        d={generateAreaPath("i")}
                         fill="url(#areaIGradient)"
                         opacity="0.6"
                     />
@@ -341,6 +427,21 @@ const GrafikDistribusiDISC = ({ data }) => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
+
+                    {/* Dots for data points to make single-value trends visible */}
+                    {['d', 'i', 's', 'c'].flatMap((key) =>
+                        getSeriesPoints(key).map((point, idx) => (
+                            <circle
+                                key={`${key}-${idx}`}
+                                cx={point.x}
+                                cy={point.y}
+                                r={4}
+                                fill={colors[key]}
+                                stroke="#ffffff"
+                                strokeWidth="1.5"
+                            />
+                        )),
+                    )}
                 </svg>
             </div>
         </div>

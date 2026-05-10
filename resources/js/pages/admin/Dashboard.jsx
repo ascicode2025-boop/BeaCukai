@@ -19,6 +19,7 @@ const AdminDashboard = () => {
         disc_averages: { D: 0, I: 0, S: 0, C: 0 },
         peserta_per_jabatan: [],
         tes_per_bulan: [],
+        disc_distribution: [],
         recent_users: [],
     };
 
@@ -115,7 +116,7 @@ const AdminDashboard = () => {
                             </div>
                             <div className="card-1-content">
                                 <p className="card-1-title">
-                                    Total Peserta Terdaftar 
+                                    Total Peserta Terdaftar
                                 </p>
                                 <div className="card-1-stats">
                                     <span className="card-1-label">
@@ -167,8 +168,10 @@ const AdminDashboard = () => {
                             </h3>
                         </div>
                         <p className="card-subtitle">
-                            Pemeriksa BC - {stats.peserta_jabatan}{" "}
-                            peserta
+                            Pemeriksa BC - {stats.peserta_jabatan} peserta
+                        </p>
+                        <p style={{ marginTop: 6, fontSize: 12, color: '#475569' }}>
+                            Standar jabatan tersimpan: {stats.total_jabatan ?? 0}
                         </p>
                         <button
                             className="btn-manage-position"
@@ -249,7 +252,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Grafik Distribusi DISC */}
-                <GrafikDistribusiDISC />
+                <GrafikDistribusiDISC data={stats.disc_distribution} />
 
                 {/* Donut Charts Section */}
                 <div className="donut-charts-grid">

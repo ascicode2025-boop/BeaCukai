@@ -273,6 +273,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
 }
 
 @media (max-width: 480px) {
@@ -323,4 +324,5 @@
         padding: 6px 12px;
         font-size: 10px;
     }
+
 }

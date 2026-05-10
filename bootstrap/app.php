@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'session.timeout' => \App\Http\Middleware\SessionTimeout::class,
         ]);
 
+        $middleware->web(append: [
+            \App\Http\Middleware\HandleInertiaRequests::class,
+        ]);
+
         // Redirect ketika auth middleware gagal (user belum login)
         $middleware->redirectGuestsTo(function (Request $request) {
             return '/login?auth_required=1';

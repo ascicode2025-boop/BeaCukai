@@ -1,13 +1,104 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../../../css/RiwayatTest.css";
 import NavbarLogin from "../../components/NavbarLogin";
 import Footer from "../../components/Footer";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 
 const RiwayatTest = () => {
+    const { props } = usePage();
+    const user = props.user;
+    const [latestResult, setLatestResult] = useState(null);
+    const [historyResults, setHistoryResults] = useState([]);
+
+    useEffect(() => {
+        const storageKey = user?.id
+            ? `discResultData_${user.id}`
+            : "discResultData";
+        const historyKey = user?.id
+            ? `discResultHistory_${user.id}`
+            : "discResultHistory";
+
+        let historyList = [];
+        const existingHistory = localStorage.getItem(historyKey);
+        if (existingHistory) {
+            try {
+                historyList = JSON.parse(existingHistory) || [];
+            } catch (error) {
+                historyList = [];
+            }
+        }
+
+        if (!historyList.length) {
+            const savedData = localStorage.getItem(storageKey);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
+                        setLatestResult(null);
+                        setHistoryResults([]);
+                        return;
+                    }
+
+                    const updated = {
+                        ...parsed,
+                        submitted_at:
+                            parsed.submitted_at || new Date().toISOString(),
+                        user_id: user?.id || parsed.user_id || null,
+                        user_email: user?.email || parsed.user_email || null,
+                    };
+                    const legacyEntry = {
+                        id: `legacy_${Date.now()}`,
+                        ...updated,
+                    };
+                    historyList = [legacyEntry];
+                    localStorage.setItem(
+                        historyKey,
+                        JSON.stringify(historyList),
+                    );
+                    localStorage.setItem(
+                        storageKey,
+                        JSON.stringify(updated),
+                    );
+                } catch (error) {
+                    console.error("Failed to parse discResultData:", error);
+                }
+            }
+        }
+
+        const normalizedHistory = historyList
+            .map((item) => ({
+                ...item,
+                submitted_at:
+                    item.submitted_at || new Date().toISOString(),
+                user_id: item.user_id || user?.id || null,
+                user_email: item.user_email || user?.email || null,
+            }))
+            .filter(
+                (item) =>
+                    !item.user_id || !user?.id || item.user_id === user.id,
+            )
+            .sort(
+                (a, b) =>
+                    new Date(b.submitted_at) - new Date(a.submitted_at),
+            );
+
+        setHistoryResults(normalizedHistory);
+        setLatestResult(normalizedHistory[0] || null);
+    }, [user?.id]);
+
     const handleLihatHasil = () => {
         router.visit("/perserta-tes/riwayat-list");
     };
+
+    const latestTestDate = latestResult?.submitted_at
+        ? new Date(latestResult.submitted_at).toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+          })
+        : "Belum mengerjakan";
+
+    const hasResult = Boolean(latestResult);
 
     return (
         <>
@@ -20,9 +111,9 @@ const RiwayatTest = () => {
                         Riwayat DISC Self-Assessment
                     </h1>
                     <p className="header-description">
-                        Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of
-                        "de Finibus Bonorum et Malorum" (The Extremes of Good
-                        and Evil) by Cicero.
+                        {hasResult
+                            ? `Pantau hasil DISC Anda dan lihat kembali tes yang sudah diselesaikan. Tes terakhir: ${latestTestDate}.`
+                            : "Anda belum mengerjakan tes DISC. Silakan mulai tes terlebih dahulu."}
                     </p>
                 </div>
 
@@ -114,7 +205,7 @@ const RiwayatTest = () => {
                             className="btn-lihat-hasil"
                             onClick={handleLihatHasil}
                         >
-                            <span className="btn-icon">👁️</span>
+
                             Lihat Hasil
                         </button>
                     </div>

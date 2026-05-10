@@ -3,58 +3,12 @@ import "../../../css/DataPeserta.css";
 import NavbarLoginAdmin from "../../components/NavbarLoginAdmin";
 import Footer from "../../components/Footer";
 import { Search } from "react-bootstrap-icons";
-import { router } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 
 const DataPeserta = () => {
     const [searchTerm, setSearchTerm] = useState("");
-
-    // Dummy peserta data
-    const pesertaData = [
-        {
-            id: 1,
-            no: 1,
-            nama: "Fulan",
-            nip: "19880101",
-            jabatan: "Pemeriksa BC",
-            tanggalTes: "13-02-2026",
-            skorDominan: "D",
-            jpm: 85,
-            status: "Cocok",
-        },
-        {
-            id: 2,
-            no: 2,
-            nama: "Fulani",
-            nip: "19890202",
-            jabatan: "Analis Kepuasan",
-            tanggalTes: "13-02-2026",
-            skorDominan: "S",
-            jpm: 78,
-            status: "Cukup Cocok",
-        },
-        {
-            id: 3,
-            no: 3,
-            nama: "Fulana",
-            nip: "19900303",
-            jabatan: "Supervisor Lapangan",
-            tanggalTes: "14-02-2026",
-            skorDominan: "C",
-            jpm: 60,
-            status: "Kurang Cocok",
-        },
-        {
-            id: 4,
-            no: 4,
-            nama: "Fulano",
-            nip: "19910404",
-            jabatan: "Pemeriksa BC",
-            tanggalTes: "14-02-2026",
-            skorDominan: "I",
-            jpm: 90,
-            status: "Sangat Cocok",
-        },
-    ];
+    const { props } = usePage();
+    const pesertaData = props.pesertaData || [];
 
     // Filter data berdasarkan search term
     const filteredData = pesertaData.filter(
@@ -64,8 +18,11 @@ const DataPeserta = () => {
     );
 
     const handleDetail = (peserta) => {
-        router.visit("/admin/hasil");
+        router.visit(`/admin/hasil?user_id=${peserta.id}`);
     };
+
+    const jpmDisplay = (value) =>
+        value === null || value === undefined || value === "-" ? "-" : `${value}%`;
 
     return (
         <NavbarLoginAdmin>
@@ -132,7 +89,7 @@ const DataPeserta = () => {
                                                 </span>
                                             </td>
                                             <td className="jpm-cell">
-                                                {peserta.jpm}%
+                                                {jpmDisplay(peserta.jpm)}
                                             </td>
                                             <td className="status-cell">
                                                 {peserta.status}
@@ -160,6 +117,7 @@ const DataPeserta = () => {
                         </table>
                     </div>
                 </div>
+
             </div>
             <Footer />
         </NavbarLoginAdmin>

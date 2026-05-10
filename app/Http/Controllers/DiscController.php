@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\DiscResult;
 
 class DiscController extends Controller
@@ -71,50 +72,50 @@ class DiscController extends Controller
 
         // 3. TABEL KONVERSI GRAFIK (diambil dari referensi CSV)
         $conversionTable = [
-            'Most' => [ // Untuk Graph 1 — values mapped for raw scores 0..18
-                'D' => [-6, -5, -4, -2, -2, -1, 0, 0, 1, 2, 3, 4, 4, 5, 5, 6, 7, 7, 7],
-                'I' => [-7, -5, -2, -1, 1, 3, 4, 5, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8],
-                'S' => [-6, -4, -4, -2, -1, 0, 1, 2, 3, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7],
-                'C' => [-6, -5, -4, -2, 0, 2, 3, 5, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8]
+            'Most' => [ // Untuk Graph 1 — values mapped for raw scores 0..20
+                'D' => [-6.0, -5.3, -4.0, -2.5, -1.7, -1.3, 0.0, 0.5, 1.0, 2.0, 3.0, 3.5, 4.0, 4.7, 5.3, 6.5, 7.0, 7.0, 7.0, 7.5, 7.5],
+                'I' => [-7.0, -4.6, -2.5, -1.3, 1.0, 3.0, 3.5, 5.3, 5.7, 6.0, 6.5, 7.0, 7.0, 7.0, 7.0, 7.0, 7.5, 7.5, 7.5, 7.5, 8.0],
+                'S' => [-5.7, -4.3, -3.5, -1.5, -0.7, 0.5, 1.0, 2.5, 3.0, 4.0, 4.6, 5.0, 5.7, 6.0, 6.5, 6.5, 7.0, 7.0, 7.0, 7.5, 7.5],
+                'C' => [-6.0, -4.7, -3.5, -1.5, 0.5, 2.0, 3.0, 5.3, 5.7, 6.0, 6.3, 6.5, 6.7, 7.0, 7.3, 7.3, 7.3, 7.5, 8.0, 8.0, 8.0]
             ],
-            'Least' => [ // Untuk Graph 2 — values mapped for raw scores 0..18
-                'D' => [8, 6, 4, 2, 2, 0, 0, -1, -2, -2, -3, -4, -4, -5, -6, -6, -6, 7, 7],
-                'I' => [7, 6, 4, 2, 0, 0, -2, -4, -4, -5, -6, -6, -7, -7, -7, -7, -7, -7, -7],
-                'S' => [8, 7, 6, 4, 2, 2, 0, -1, -2, -3, -4, -5, -6, -6, -7, -7, -7, -7, -7],
-                'C' => [8, 7, 6, 4, 2, 2, 0, 0, -1, -2, -4, -5, -6, -6, -6, -7, -7, -8, -8]
+            'Least' => [ // Untuk Graph 2 — values mapped for raw scores 0..20
+                'D' => [7.5, 6.5, 4.3, 2.5, 1.5, 0.5, 0.0, -1.3, -1.5, -2.5, -3.0, -3.5, -4.3, -5.3, -5.7, -6.0, -6.5, 6.7, 7.0, -7.3, -7.5],
+                'I' => [7.0, 6.0, 4.0, 2.5, 0.5, 0.0, -2.0, -3.5, -4.3, -5.3, -6.0, -6.5, -7.0, -7.2, -7.2, -7.2, -7.3, -7.3, -7.3, -7.5, -8.0],
+                'S' => [7.5, 7.0, 6.0, 4.0, 2.5, 1.5, 0.5, -1.3, -2.0, -3.0, -4.3, -5.3, -6.0, -6.5, -6.7, -6.7, -7.0, -7.2, -7.3, -7.5, -8.0],
+                'C' => [7.5, 7.0, 5.6, 4.0, 2.5, 1.5, 0.5, 0.0, -1.3, -2.5, -3.5, -5.3, -5.7, -6.0, -6.5, -7.0, -7.3, -7.5, -7.7, -7.9, -8.0]
             ],
             'Change' => [ // Untuk Graph 3 — full mapping (from CSV)
                 'D' => [
-                    -22 => -8, -21 => -8, -20 => -7, -19 => -7, -18 => -7, -17 => -7, -16 => -6,
-                    -15 => -6, -14 => -6, -13 => -6, -12 => -6, -11 => -5, -10 => -4, -9 => -4,
-                    -8 => -3, -7 => -3, -6 => -3, -5 => -2, -4 => -2, -3 => -1, -2 => 0, -1 => 0,
-                    0 => 0, 1 => 0, 2 => 1, 3 => 1, 4 => 1, 5 => 2, 7 => 2, 8 => 4, 9 => 4, 10 => 5,
-                    11 => 5, 12 => 5, 13 => 6, 14 => 6, 15 => 6, 16 => 6, 17 => 7, 18 => 7, 19 => 7,
-                    20 => 7, 21 => 8, 22 => 8,
+                    -22 => -8.0, -21 => -7.5, -20 => -7.0, -19 => -6.8, -18 => -6.75, -17 => -6.7, -16 => -6.5,
+                    -15 => -6.3, -14 => -6.1, -13 => -5.9, -12 => -5.7, -11 => -5.3, -10 => -4.3, -9 => -3.5,
+                    -8 => -3.25, -7 => -3.0, -6 => -2.75, -5 => -2.5, -4 => -1.5, -3 => -1.0, -2 => -0.5, -1 => -0.25,
+                    0 => 0.0, 1 => 0.5, 2 => 0.7, 3 => 1.0, 4 => 1.3, 5 => 1.5, 6 => 2.0, 7 => 2.5, 8 => 3.5, 9 => 4.0,
+                    10 => 4.7, 11 => 4.85, 12 => 5.0, 13 => 5.5, 14 => 6.0, 15 => 6.3, 16 => 6.5, 17 => 6.7, 18 => 7.0,
+                    19 => 7.3, 20 => 7.3, 21 => 7.5, 22 => 8.0,
                 ],
                 'I' => [
-                    -22 => -8, -21 => -8, -20 => -8, -19 => -8, -18 => -7, -17 => -7, -16 => -7,
-                    -15 => -7, -14 => -7, -13 => -7, -12 => -7, -11 => -7, -10 => -6, -9 => -6,
-                    -8 => -6, -7 => -5, -6 => -4, -5 => -4, -4 => -3, -3 => -2, -2 => -2, -1 => 0,
-                    0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 4, 7 => 6, 8 => 6, 9 => 7, 10 => 7,
-                    11 => 7, 12 => 7, 13 => 7, 14 => 7, 15 => 7, 16 => 7, 17 => 7, 18 => 8, 19 => 8,
-                    20 => 8, 21 => 8, 22 => 8,
+                    -22 => -8.0, -21 => -8.0, -20 => -8.0, -19 => -8.0, -18 => -7.0, -17 => -6.7, -16 => -6.7,
+                    -15 => -6.7, -14 => -6.7, -13 => -6.7, -12 => -6.7, -11 => -6.7, -10 => -6.5, -9 => -6.0,
+                    -8 => -5.7, -7 => -4.7, -6 => -4.3, -5 => -3.5, -4 => -3.0, -3 => -2.0, -2 => -1.5, -1 => 0.0,
+                    0 => 0.5, 1 => 1.0, 2 => 1.5, 3 => 3.0, 4 => 4.0, 5 => 4.3, 6 => 5.0, 7 => 5.5, 8 => 6.5, 9 => 6.7,
+                    10 => 7.0, 11 => 7.3, 12 => 7.3, 13 => 7.3, 14 => 7.3, 15 => 7.3, 16 => 7.3, 17 => 7.3, 18 => 7.5,
+                    19 => 8.0, 20 => 8.0, 21 => 8.0, 22 => 8.0,
                 ],
                 'S' => [
-                    -22 => -8, -21 => -8, -20 => -8, -19 => -8, -18 => -8, -17 => -7, -16 => -7,
-                    -15 => -7, -14 => -6, -13 => -6, -12 => -6, -11 => -6, -10 => -6, -9 => -5,
-                    -8 => -4, -7 => -4, -6 => -3, -5 => -2, -4 => -2, -3 => -1, -2 => 0, -1 => 0,
-                    0 => 1, 1 => 2, 2 => 2, 3 => 3, 4 => 4, 5 => 4, 7 => 5, 8 => 5, 9 => 6, 10 => 6,
-                    11 => 6, 12 => 6, 13 => 6, 14 => 7, 15 => 7, 16 => 7, 17 => 7, 18 => 7, 19 => 7,
-                    20 => 8, 21 => 8, 22 => 8,
+                    -22 => -8.0, -21 => -8.0, -20 => -8.0, -19 => -8.0, -18 => -7.5, -17 => -7.3, -16 => -7.3,
+                    -15 => -7.0, -14 => -6.5, -13 => -6.5, -12 => -6.5, -11 => -6.5, -10 => -6.0, -9 => -4.7,
+                    -8 => -4.3, -7 => -3.5, -6 => -3.0, -5 => -2.0, -4 => -1.5, -3 => -1.0, -2 => -0.5, -1 => 0.0,
+                    0 => 1.0, 1 => 1.5, 2 => 2.0, 3 => 3.0, 4 => 3.5, 5 => 4.0, 7 => 4.7, 8 => 5.0, 9 => 5.5, 10 => 6.0,
+                    11 => 6.2, 12 => 6.3, 13 => 6.5, 14 => 6.7, 15 => 7.0, 16 => 7.3, 17 => 7.3, 18 => 7.3, 19 => 7.3,
+                    20 => 7.5, 21 => 8.0, 22 => 8.0,
                 ],
                 'C' => [
-                    -22 => -8, -21 => -7, -20 => -7, -19 => -7, -18 => -7, -17 => -7, -16 => -7,
-                    -15 => -6, -14 => -6, -13 => -6, -12 => -6, -11 => -6, -10 => -6, -9 => -5,
-                    -8 => -4, -7 => -4, -6 => -3, -5 => -2, -4 => 0, -3 => 0, -2 => 0, -1 => 0,
-                    0 => 2, 1 => 3, 2 => 4, 3 => 4, 4 => 6, 5 => 6, 7 => 6, 8 => 6, 9 => 7, 10 => 7,
-                    11 => 7, 12 => 7, 13 => 7, 14 => 7, 15 => 7, 16 => 7, 17 => 8, 18 => 8, 19 => 8,
-                    20 => 8, 21 => 8, 22 => 8,
+                    -22 => -7.5, -21 => -7.3, -20 => -7.3, -19 => -7.0, -18 => -6.7, -17 => -6.7, -16 => -6.7,
+                    -15 => -6.5, -14 => -6.3, -13 => -6.0, -12 => -5.85, -11 => -5.85, -10 => -5.7, -9 => -4.7,
+                    -8 => -4.3, -7 => -3.5, -6 => -3.0, -5 => -2.5, -4 => -0.5, -3 => 0.0, -2 => 0.3, -1 => 0.5,
+                    0 => 1.5, 1 => 3.0, 2 => 4.0, 3 => 4.3, 4 => 5.5, 5 => 5.7, 6 => 6.0, 7 => 6.3, 8 => 6.5, 9 => 6.7,
+                    10 => 7.0, 11 => 7.3, 12 => 7.3, 13 => 7.3, 14 => 7.3, 15 => 7.3, 16 => 7.3, 17 => 7.5, 18 => 8.0,
+                    19 => 8.0, 20 => 8.0, 21 => 8.0, 22 => 8.0,
                 ],
             ]
         ];
@@ -142,17 +143,17 @@ class DiscController extends Controller
         // 6. KONVERSI KE NILAI GRAFIK (Graph 1 & 2)
         // Gunakan min() & max() untuk menjaga index tidak out of bounds
         $graph1 = [
-            'D' => $conversionTable['Most']['D'][min(max($rawMost['D'], 0), 18)],
-            'I' => $conversionTable['Most']['I'][min(max($rawMost['I'], 0), 18)],
-            'S' => $conversionTable['Most']['S'][min(max($rawMost['S'], 0), 18)],
-            'C' => $conversionTable['Most']['C'][min(max($rawMost['C'], 0), 18)]
+            'D' => $conversionTable['Most']['D'][min(max($rawMost['D'], 0), 20)],
+            'I' => $conversionTable['Most']['I'][min(max($rawMost['I'], 0), 20)],
+            'S' => $conversionTable['Most']['S'][min(max($rawMost['S'], 0), 20)],
+            'C' => $conversionTable['Most']['C'][min(max($rawMost['C'], 0), 20)]
         ];
 
         $graph2 = [
-            'D' => $conversionTable['Least']['D'][min(max($rawLeast['D'], 0), 18)],
-            'I' => $conversionTable['Least']['I'][min(max($rawLeast['I'], 0), 18)],
-            'S' => $conversionTable['Least']['S'][min(max($rawLeast['S'], 0), 18)],
-            'C' => $conversionTable['Least']['C'][min(max($rawLeast['C'], 0), 18)]
+            'D' => $conversionTable['Least']['D'][min(max($rawLeast['D'], 0), 20)],
+            'I' => $conversionTable['Least']['I'][min(max($rawLeast['I'], 0), 20)],
+            'S' => $conversionTable['Least']['S'][min(max($rawLeast['S'], 0), 20)],
+            'C' => $conversionTable['Least']['C'][min(max($rawLeast['C'], 0), 20)]
         ];
 
         // 7. GRAPH 3: CHANGE (Raw dan Converted)
@@ -307,7 +308,9 @@ class DiscController extends Controller
 
         // 9b. Nilai JPM (dinormalisasi 0-100 dari skor Graph 3 tertinggi)
         $primaryGraphScore = $graph3[$primaryTrait] ?? 0;
-        $jpmPercentage = (int) round((($primaryGraphScore + 28) / 56) * 100);
+        $minGraph = -8;
+        $maxGraph = 8;
+        $jpmPercentage = (int) round((($primaryGraphScore - $minGraph) / ($maxGraph - $minGraph)) * 100);
         $jpmPercentage = max(0, min(100, $jpmPercentage));
 
         // 10. SIMPAN KE DATABASE
@@ -323,10 +326,37 @@ class DiscController extends Controller
                 'primary_type' => $primaryTrait,
                 'personality_profile' => $primaryTrait . ' - ' . $reportData['primaryType'],
                 'summary' => $reportData['summary'],
+                'report_data' => $reportData,
                 'total_questions' => count($answers),
-                'completion_percentage' => 100,
+                'completion_percentage' => $jpmPercentage,
                 'test_date' => now(),
             ]);
+
+            if ($discResult) {
+                $answerRows = [];
+                foreach ($answers as $qNum => $choices) {
+                    $mostChoice = $choices['M'];
+                    $leastChoice = $choices['L'];
+                    $mostScore = $scoringKey[$mostChoice]['M'] ?? null;
+                    $leastScore = $scoringKey[$leastChoice]['L'] ?? null;
+
+                    $answerRows[] = [
+                        'user_id' => Auth::id(),
+                        'disc_result_id' => $discResult->id,
+                        'question_number' => (int) $qNum,
+                        'most_choice' => $mostChoice,
+                        'least_choice' => $leastChoice,
+                        'most_score' => $mostScore,
+                        'least_score' => $leastScore,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                if (!empty($answerRows)) {
+                    DB::table('disc_answers')->insert($answerRows);
+                }
+            }
         } catch (\Exception $e) {
             Log::error('Error saving DISC result: ' . $e->getMessage());
             // Continue even if save fails - don't block user

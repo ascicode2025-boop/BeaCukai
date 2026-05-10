@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../../css/Dashboard.css";
 import NavbarLogin from "../../components/NavbarLogin";
 import Footer from "../../components/Footer";
@@ -11,6 +11,90 @@ const Dashboard = () => {
     const user = props.user;
     const [showModal, setShowModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [latestResult, setLatestResult] = useState(null);
+    const [historyResults, setHistoryResults] = useState([]);
+
+    useEffect(() => {
+        const storageKey = user?.id
+            ? `discResultData_${user.id}`
+            : "discResultData";
+        const historyKey = user?.id
+            ? `discResultHistory_${user.id}`
+            : "discResultHistory";
+        const selectedKey = user?.id
+            ? `discResultSelected_${user.id}`
+            : "discResultSelected";
+
+        let historyList = [];
+        const existingHistory = localStorage.getItem(historyKey);
+        if (existingHistory) {
+            try {
+                historyList = JSON.parse(existingHistory) || [];
+            } catch (error) {
+                historyList = [];
+            }
+        }
+
+        if (!historyList.length) {
+            const savedData = localStorage.getItem(storageKey);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
+                        setLatestResult(null);
+                        setHistoryResults([]);
+                        return;
+                    }
+
+                    const updated = {
+                        ...parsed,
+                        submitted_at:
+                            parsed.submitted_at || new Date().toISOString(),
+                        user_id: user?.id || parsed.user_id || null,
+                        user_email: user?.email || parsed.user_email || null,
+                    };
+
+                    const legacyEntry = {
+                        id: `legacy_${Date.now()}`,
+                        ...updated,
+                    };
+
+                    historyList = [legacyEntry];
+                    localStorage.setItem(
+                        historyKey,
+                        JSON.stringify(historyList),
+                    );
+                    localStorage.setItem(selectedKey, legacyEntry.id);
+                    localStorage.setItem(
+                        storageKey,
+                        JSON.stringify(updated),
+                    );
+                } catch (error) {
+                    console.error("Failed to parse discResultData:", error);
+                }
+            }
+        }
+
+        const normalizedHistory = historyList
+            .map((item) => ({
+                ...item,
+                submitted_at:
+                    item.submitted_at || new Date().toISOString(),
+                user_id: item.user_id || user?.id || null,
+                user_email: item.user_email || user?.email || null,
+            }))
+            .filter(
+                (item) =>
+                    !item.user_id || !user?.id || item.user_id === user.id,
+            )
+            .sort(
+                (a, b) =>
+                    new Date(b.submitted_at) - new Date(a.submitted_at),
+            );
+
+        setHistoryResults(normalizedHistory);
+        setLatestResult(normalizedHistory[0] || null);
+    }, [user?.id]);
 
     const handleStartTest = () => {
         setShowModal(true);
@@ -26,7 +110,13 @@ const Dashboard = () => {
     };
 
     const handleShowDetail = () => {
-        setShowDetailModal(true);
+        if (latestResult?.id) {
+            const selectedKey = user?.id
+                ? `discResultSelected_${user.id}`
+                : "discResultSelected";
+            localStorage.setItem(selectedKey, latestResult.id);
+        }
+        router.visit("/perserta-tes/hasil-ringkas");
     };
 
     const handleCloseDetailModal = () => {
@@ -73,6 +163,34 @@ const Dashboard = () => {
             description: "Simpan hasil tes dalam bentuk PDF.",
         },
     ];
+
+    const latestTestDate = latestResult?.submitted_at
+        ? new Date(latestResult.submitted_at).toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+          })
+        : "Belum mengerjakan";
+
+    const hasResult = Boolean(latestResult);
+    const statusLabel = hasResult ? "✓ Sudah selesai" : "Belum mengerjakan";
+    const statusStyle = hasResult
+        ? {
+              backgroundColor: "#10b981",
+              boxShadow: "0 4px 12px rgba(16, 185, 129, 0.25)",
+          }
+        : {
+              backgroundColor: "#9ca3af",
+              boxShadow: "0 4px 12px rgba(156, 163, 175, 0.25)",
+          };
+
+    const detailData = {
+        ...user,
+        tanggal_tes: latestTestDate,
+        report: latestResult?.report,
+        graph_scores: latestResult?.graph_scores,
+        jpm: latestResult?.jpm,
+    };
 
     return (
         <>
@@ -461,12 +579,24 @@ const Dashboard = () => {
                                                     margin: "0",
                                                 }}
                                             >
-                                                Anda
+                                                {user?.name || "Anda"}
                                             </h3>
+                                            <p
+                                                style={{
+                                                    margin: "6px 0 0 0",
+                                                    fontSize:
+                                                        "clamp(10px, 2.5vw, 11px)",
+                                                    color: "#6b7280",
+                                                    fontFamily:
+                                                        "'Oxanium', sans-serif",
+                                                }}
+                                            >
+                                                Tes terakhir: {latestTestDate}
+                                            </p>
                                         </div>
                                         <span
                                             style={{
-                                                backgroundColor: "#10b981",
+                                                backgroundColor: statusStyle.backgroundColor,
                                                 color: "white",
                                                 padding:
                                                     "clamp(6px, 2vw, 8px) clamp(12px, 3vw, 16px)",
@@ -476,12 +606,11 @@ const Dashboard = () => {
                                                 fontWeight: "800",
                                                 fontFamily:
                                                     "'Oxanium', sans-serif",
-                                                boxShadow:
-                                                    "0 4px 12px rgba(16, 185, 129, 0.25)",
+                                                boxShadow: statusStyle.boxShadow,
                                                 whiteSpace: "nowrap",
                                             }}
                                         >
-                                            ✓ Sudah selesai
+                                            {statusLabel}
                                         </span>
                                     </div>
                                     <button
@@ -496,17 +625,23 @@ const Dashboard = () => {
                                                 "clamp(11px, 2.5vw, 13px)",
                                             fontWeight: "800",
                                             border: "none",
-                                            cursor: "pointer",
+                                            cursor: hasResult
+                                                ? "pointer"
+                                                : "not-allowed",
                                             fontFamily: "'Oxanium', sans-serif",
                                             textTransform: "uppercase",
                                             letterSpacing: "0.8px",
                                             boxShadow:
                                                 "0 6px 20px rgba(51, 51, 102, 0.25)",
                                             width: "100%",
+                                            opacity: hasResult ? 1 : 0.6,
                                         }}
                                         onClick={handleShowDetail}
+                                        disabled={!hasResult}
                                     >
-                                        Lihat Detail Hasil
+                                        {hasResult
+                                            ? "Lihat Detail Hasil"
+                                            : "Belum Ada Hasil"}
                                     </button>
                                 </div>
 
@@ -537,8 +672,8 @@ const Dashboard = () => {
                                             margin: "0 0 12px 0",
                                         }}
                                     >
-                                        Lihat kembali hasil tes yang pernah kamu
-                                        kerjakan.
+                                        Ringkasan hasil dan riwayat tes yang
+                                        pernah Anda kerjakan.
                                     </p>
                                     <button
                                         className="btn"
@@ -616,7 +751,9 @@ const Dashboard = () => {
             <DetailModal
                 isOpen={showDetailModal}
                 onClose={handleCloseDetailModal}
-                userDetail={user}
+                userDetail={detailData}
+                resultDetail={latestResult}
+                historyResults={historyResults}
             />
             <Footer />
         </>

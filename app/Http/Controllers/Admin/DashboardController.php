@@ -9,6 +9,7 @@ use App\Models\JobStandard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -67,11 +68,11 @@ class DashboardController extends Controller
 
             foreach ($discResults as $result) {
                 $scores = $result->graph_scores_most;
-                if (is_array($scores) && count($scores) >= 4) {
-                    $totalD += $scores[0] ?? 0;
-                    $totalI += $scores[1] ?? 0;
-                    $totalS += $scores[2] ?? 0;
-                    $totalC += $scores[3] ?? 0;
+                if (is_array($scores)) {
+                    $totalD += $scores['D'] ?? 0;
+                    $totalI += $scores['I'] ?? 0;
+                    $totalS += $scores['S'] ?? 0;
+                    $totalC += $scores['C'] ?? 0;
                 }
             }
 
@@ -136,12 +137,55 @@ class DashboardController extends Controller
             ];
         }
 
+        // ===== JOB STANDARDS =====
+        // Count and list of job standards (seeded from sheet / JSON)
+        $totalJabatan = JobStandard::count();
+        $jobStandardsList = JobStandard::orderBy('job_title')
+            ->get(['id', 'job_code', 'job_title', 'd', 'i', 's', 'c'])
+            ->toArray();
+
         // ===== GET RECENT USERS =====
 
         $recentUsers = User::where('role', 'peserta')
             ->latest()
             ->take(5)
             ->get(['id', 'name', 'nip', 'email', 'unit_kerja', 'created_at']);
+
+        // ===== DISC DISTRIBUTION LINE CHART =====
+        // Count dominant DISC profile per month for the last 12 months.
+        $startMonth = now()->startOfMonth()->subMonths(11);
+        $monthLabels = [];
+        $discDistributionByMonth = [];
+
+        for ($month = 0; $month < 12; $month++) {
+            $date = $startMonth->copy()->addMonths($month);
+            $key = $date->format('Y-m');
+            $monthLabels[$key] = $date->translatedFormat('M Y');
+            $discDistributionByMonth[$key] = [
+                'x' => $date->translatedFormat('M Y'),
+                'd' => 0,
+                'i' => 0,
+                's' => 0,
+                'c' => 0,
+                'total' => 0,
+            ];
+        }
+
+        DiscResult::query()
+            ->whereNotNull('test_date')
+            ->where('test_date', '>=', $startMonth)
+            ->get(['primary_type', 'test_date'])
+            ->each(function ($result) use (&$discDistributionByMonth) {
+                $key = Carbon::parse($result->test_date)->format('Y-m');
+                $trait = strtolower((string) $result->primary_type);
+
+                if (isset($discDistributionByMonth[$key], $discDistributionByMonth[$key][$trait])) {
+                    $discDistributionByMonth[$key][$trait]++;
+                    $discDistributionByMonth[$key]['total']++;
+                }
+            });
+
+        $discDistribution = array_values($discDistributionByMonth);
 
         // ===== COMPILE ALL STATISTICS =====
 
@@ -159,12 +203,15 @@ $stats = [
             ],
             'peserta_per_jabatan' => $pesertaPerJabatan,
             'tes_per_bulan' => $tesPerBulan,
+            'disc_distribution' => $discDistribution,
             'recent_users' => $recentUsers,
             '_debug' => [
                 'admin_id' => $admin->id ?? null,
                 'admin_name' => $adminName,
                 'admin_email' => $admin->email ?? null,
             ],
+            'total_jabatan' => $totalJabatan,
+            'job_standards' => $jobStandardsList,
         ];
 
         // Debug: log untuk troubleshooting
@@ -175,10 +222,6 @@ $stats = [
         ]);
 
         return Inertia::render('admin/Dashboard', [
-            'admin' => [
-                'name' => $adminName,
-                'email' => $admin->email ?? '',
-            ],
             'stats' => $stats,
         ]);
     }

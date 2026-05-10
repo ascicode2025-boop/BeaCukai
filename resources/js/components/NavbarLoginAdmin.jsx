@@ -15,10 +15,18 @@ const NavbarLoginAdmin = ({ children }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const { post, processing } = useForm();
     const { props } = usePage();
-    const user = props.admin || props.user || props.auth?.user;
+
+    // Get user dari auth.user yang di-share oleh middleware
+    const user = props.auth?.user || props.user || null;
     const profilePhotoUrl =
         user?.profile_photo_url ||
         (user?.profile_photo ? `/storage/${user.profile_photo}` : null);
+
+    // Debug: inspect auth payload (sementara)
+    // console.log('NavbarLoginAdmin user=', user);
+
+
+
 
     // Detect window resize for responsive behavior
     useEffect(() => {
