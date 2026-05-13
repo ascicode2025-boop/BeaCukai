@@ -6,6 +6,7 @@ import {
     Clock,
     ChevronDown,
     BoxArrowRight,
+    PersonCircle,
 } from "react-bootstrap-icons";
 import { useForm, usePage, router } from "@inertiajs/react";
 
@@ -24,9 +25,6 @@ const NavbarLoginAdmin = ({ children }) => {
 
     // Debug: inspect auth payload (sementara)
     // console.log('NavbarLoginAdmin user=', user);
-
-
-
 
     // Detect window resize for responsive behavior
     useEffect(() => {
@@ -247,13 +245,18 @@ const NavbarLoginAdmin = ({ children }) => {
                 <nav className="navbar-container">
                     {/* Sisi Kiri - Bagian Putih & Melengkung */}
                     <div className="custom-navbar-left">
-                        <div className="brand-section">
+                        <div
+                            className="brand-section"
+                            onClick={() => router.visit("/admin/dashboard")}
+                            style={{ cursor: "pointer" }}
+                            title="Dashboard"
+                        >
                             <img
                                 src="/assets/LogoBC.png"
                                 alt="Logo"
                                 className="brand-logo"
                             />
-                            <span className="brand-name">Web Name</span>
+                            <span className="brand-name">B-PASS</span>
                         </div>
 
                         {/* Profile di tengah lengkungan */}
@@ -261,61 +264,8 @@ const NavbarLoginAdmin = ({ children }) => {
                             <div
                                 className="profile-circle-btn"
                                 onClick={() => router.visit("/profile")}
-                                style={{ cursor: "pointer", overflow: "hidden" }}
-                                title="Profil"
-                            >
-                                {profilePhotoUrl ? (
-                                    <img
-                                        src={profilePhotoUrl}
-                                        alt="Foto Profil"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            borderRadius: "50%",
-                                        }}
-                                    />
-                                ) : (
-                                    <svg
-                                        width="45"
-                                        height="45"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <g clipPath="url(#clip0_401_9)">
-                                            <path
-                                                fillRule="evenodd"
-                                                clipRule="evenodd"
-                                                d="M12 0C5.373 0 0 5.373 0 12C0 18.627 5.373 24 12 24C18.627 24 24 18.627 24 12C24 5.373 18.627 0 12 0ZM12 6C13.657 6 15 7.343 15 9C15 10.657 13.657 12 12 12C10.343 12 9 10.657 9 9C9 7.343 10.343 6 12 6ZM12 18C10.134 18 8.459 17.211 7.402 15.923C9.208 15.268 11.054 14.98 12.919 15.101C14.785 15.223 16.598 15.751 18.212 16.656C17.206 17.684 15.705 18 12 18Z"
-                                                fill="#002366"
-                                            />
-                                        </g>
-                                        <defs>
-                                            <clipPath id="clip0_401_9">
-                                                <rect
-                                                    width="24"
-                                                    height="24"
-                                                    fill="white"
-                                                />
-                                            </clipPath>
-                                        </defs>
-                                    </svg>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Sisi Kanan - Bagian Abu-abu & Logout */}
-                    <div className="custom-navbar-right">
-                        {/* Profile Circle untuk Mobile */}
-                        {isMobile && (
-                            <div
-                                className="profile-circle-btn-mobile"
-                                onClick={() => setShowDropdown(!showDropdown)}
                                 style={{
                                     cursor: "pointer",
-                                    position: "relative",
                                     overflow: "hidden",
                                 }}
                                 title="Profil"
@@ -332,42 +282,57 @@ const NavbarLoginAdmin = ({ children }) => {
                                         }}
                                     />
                                 ) : (
-                                    <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <g clipPath="url(#clip0_401_9)">
-                                            <path
-                                                fillRule="evenodd"
-                                                clipRule="evenodd"
-                                                d="M12 0C5.373 0 0 5.373 0 12C0 18.627 5.373 24 12 24C18.627 24 24 18.627 24 12C24 5.373 18.627 0 12 0ZM12 6C13.657 6 15 7.343 15 9C15 10.657 13.657 12 12 12C10.343 12 9 10.657 9 9C9 7.343 10.343 6 12 6ZM12 18C10.134 18 8.459 17.211 7.402 15.923C9.208 15.268 11.054 14.98 12.919 15.101C14.785 15.223 16.598 15.751 18.212 16.656C17.206 17.684 15.705 18 12 18Z"
-                                                fill="#002366"
-                                            />
-                                        </g>
-                                        <defs>
-                                            <clipPath id="clip0_401_9">
-                                                <rect
-                                                    width="24"
-                                                    height="24"
-                                                    fill="white"
-                                                />
-                                            </clipPath>
-                                        </defs>
-                                    </svg>
+                                    <PersonCircle size={45} color="#002366" />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sisi Kanan - Bagian Abu-abu & Logout */}
+                    <div className="custom-navbar-right">
+                        {/* Profile Circle untuk Mobile */}
+                        {isMobile && (
+                            <div
+                                className="profile-circle-btn-mobile"
+                                onClick={() => setShowDropdown(!showDropdown)}
+                                style={{
+                                    cursor: "pointer",
+                                    position: "relative",
+                                }}
+                                title="Profil"
+                            >
+                                {profilePhotoUrl ? (
+                                    <img
+                                        src={profilePhotoUrl}
+                                        alt="Foto Profil"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: "50%",
+                                        }}
+                                    />
+                                ) : (
+                                    <PersonCircle size={24} color="#002366" />
                                 )}
                                 <ChevronDown
-                                    size={14}
+                                    size={16}
                                     style={{
                                         position: "absolute",
-                                        bottom: "-2px",
-                                        right: "-2px",
-                                        background: "#5558d4",
+                                        bottom: "-6px",
+                                        right: "-6px",
+                                        background:
+                                            "linear-gradient(135deg, #5558d4 0%, #7c3aed 100%)",
                                         color: "white",
                                         borderRadius: "50%",
-                                        padding: "1px",
+                                        padding: "3px",
+                                        boxShadow:
+                                            "0 2px 8px rgba(85, 88, 212, 0.3)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        width: "24px",
+                                        height: "24px",
                                     }}
                                 />
                             </div>

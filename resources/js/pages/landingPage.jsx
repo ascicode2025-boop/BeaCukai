@@ -31,7 +31,6 @@ export default function LandingPage() {
         }
     };
 
-    // Sample questions data for landing page example
     const exampleQuestionsData = {
         1: {
             characteristics: [
@@ -78,7 +77,6 @@ export default function LandingPage() {
     const handleAnswerChange = (index, column, value) => {
         const currentAnswer = testAnswers[currentQuestion][column];
 
-        // If clicking the same value again, deselect it
         if (currentAnswer === value) {
             setTestAnswers((prev) => ({
                 ...prev,
@@ -94,7 +92,6 @@ export default function LandingPage() {
             return;
         }
 
-        // Allow selection and update
         const newAnswers = {
             ...testAnswers[currentQuestion],
             [column]: value,
@@ -105,7 +102,6 @@ export default function LandingPage() {
             [currentQuestion]: newAnswers,
         }));
 
-        // Check if both M and L are the same
         if (
             newAnswers.M !== null &&
             newAnswers.L !== null &&
@@ -168,23 +164,19 @@ export default function LandingPage() {
 
         body {
           font-family: 'Oxanium', sans-serif;
-         background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
-         color: #1a1a1a;
+          background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
+          color: #1a1a1a;
           overflow-x: hidden;
         }
 
         @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Absolute Navbar & Logo (Tetap di atas halaman, tidak mengikuti scroll) */
+        /* ============================================
+           HEADER / NAVBAR
+        ============================================ */
         .header-fixed-container {
           position: absolute;
           top: 43.48px;
@@ -194,11 +186,11 @@ export default function LandingPage() {
           justify-content: space-between;
           align-items: flex-start;
           z-index: 2000;
-          pointer-events: none; /* Agar tidak menghalangi klik pada hero di bawahnya */
+          pointer-events: none;
         }
 
         .nav-capsule {
-          pointer-events: auto; /* Active links */
+          pointer-events: auto;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -241,8 +233,6 @@ export default function LandingPage() {
           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-
-
         .logo-container {
           pointer-events: auto;
           display: flex;
@@ -256,7 +246,108 @@ export default function LandingPage() {
           filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
 
-        /* Hero Section */
+        /* Hamburger */
+        .hamburger-btn {
+          display: none;
+          flex-direction: column;
+          gap: 5px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 5px;
+          pointer-events: auto;
+          z-index: 2100;
+        }
+
+        .hamburger-btn span {
+          width: 25px;
+          height: 3px;
+          background: #2d3269;
+          border-radius: 2px;
+          transition: all 0.3s ease;
+          display: block;
+        }
+
+        .hamburger-btn.open span:nth-child(1) {
+          transform: rotate(45deg) translate(5.5px, 5.5px);
+        }
+
+        .hamburger-btn.open span:nth-child(2) {
+          opacity: 0;
+        }
+
+        .hamburger-btn.open span:nth-child(3) {
+          transform: rotate(-45deg) translate(5.5px, -5.5px);
+        }
+
+        /* ============================================
+           SIDEBAR
+        ============================================ */
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+          display: block;
+          opacity: 1;
+        }
+
+        .sidebar {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 280px;
+          height: 100%;
+          background: linear-gradient(180deg, rgba(60, 60, 120, 0.98) 0%, rgba(100, 100, 180, 0.98) 100%);
+          z-index: 999;
+          padding: 80px 30px 30px 30px;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          gap: 20px;
+          flex-direction: column;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.open {
+          display: flex;
+          transform: translateX(0);
+        }
+
+        .sidebar .nav-link-item {
+          width: 100%;
+          padding: 14px 16px;
+          font-size: 13px;
+          border-radius: 8px;
+          text-align: left;
+          margin-bottom: 8px;
+          background: rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
+          border: none;
+          color: white;
+        }
+
+        .sidebar .nav-link-item:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar .nav-link-item.active {
+          background: linear-gradient(180deg, rgba(255, 204, 0, 0.79) 0%, #A0A0E5 100%);
+          color: white;
+        }
+
+        /* ============================================
+           HERO SECTION
+        ============================================ */
         .hero-section {
           display: flex;
           padding: 0 30px 30px 0;
@@ -282,13 +373,13 @@ export default function LandingPage() {
           height: 100%;
           border-radius: 10px;
           object-fit: cover;
-          }
+        }
 
         .hero-content {
           flex: 1;
           padding-left: 60px;
-          padding-right: 40px; /* Menambah padding kanan untuk menggeser ke kiri */
-          padding-top: 40px; /* Menambah padding atas untuk menggeser ke bawah */
+          padding-right: 40px;
+          padding-top: 40px;
           display: flex;
           flex-direction: column;
           align-items: flex-end;
@@ -335,17 +426,16 @@ export default function LandingPage() {
         .regist-here-btn:hover {
           transform: translateY(-3px);
           box-shadow: 0 12px 28px rgba(245, 158, 11, 0.4);
+          color: white;
         }
 
         .regist-here-btn:active {
           transform: translateY(-1px);
         }
 
-        .regist-here-btn:hover {
-          transform: translateY(-3px);
-        }
-
-        /* DISC Cards Section */
+        /* ============================================
+           DISC CARDS SECTION
+        ============================================ */
         .disc-section {
           padding: 60px 40px;
           display: grid;
@@ -397,7 +487,8 @@ export default function LandingPage() {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          background: linear-gradient(90deg, rgba(253, 203, 2, 0.79) 0%, #D9D9D9 100%);}
+          background: linear-gradient(90deg, rgba(253, 203, 2, 0.79) 0%, #D9D9D9 100%);
+        }
 
         .card-body-custom h5 {
           font-weight: 800;
@@ -414,12 +505,9 @@ export default function LandingPage() {
           font-weight: 600;
         }
 
-        @media (max-width: 992px) {
-          .disc-section { grid-template-columns: 1fr; }
-          .disc-card { height: auto; }
-        }
-
-        /* Assessment Box Section */
+        /* ============================================
+           ASSESSMENT SECTION
+        ============================================ */
         .assessment-container {
           padding: 60px 40px;
           background: transparent;
@@ -428,7 +516,7 @@ export default function LandingPage() {
         }
 
         .assessment-box {
-         background: conic-gradient(from 180deg at 50% 50%, #333366 0deg, #A0A0E5 360deg);
+          background: conic-gradient(from 180deg at 50% 50%, #333366 0deg, #A0A0E5 360deg);
           border-radius: 40px;
           display: flex;
           padding: 80px 60px;
@@ -504,57 +592,9 @@ export default function LandingPage() {
           box-shadow: 0 15px 25px rgba(0,0,0,0.15);
         }
 
-        /* Footer Section */
-        .footer-section {
-          background: radial-gradient(50% 50% at 50% 50%, rgba(255, 204, 0, 0.79) 0%, rgba(251, 228, 136, 0.7821) 100%);
-          color: #2d3269;
-          padding: 60px 80px;
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          border-radius: 120px 120px 0 0;
-        }
-
-        .footer-left {
-          max-width: 480px;
-        }
-
-        .footer-left h3 {
-          font-weight: 900;
-          font-size: 26px;
-          margin-bottom: 15px;
-          color: #2d3269;
-        }
-
-        .footer-left p {
-          font-size: 13px;
-          line-height: 1.5;
-          margin-bottom: 25px;
-          color: #2d3269;
-          font-weight: 500;
-        }
-
-        .footer-socials {
-          display: flex;
-          gap: 20px;
-          font-size: 22px;
-          color: #2d3269;
-        }
-
-        .footer-right {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-        }
-
-        .powered-by-label {
-          font-size: 12px;
-          font-weight: 800;
-          color: #2d3269;
-          margin-top: 10px;
-        }
-
-        /* Back Button Styles */
+        /* ============================================
+           TEST QUESTION STYLES
+        ============================================ */
         .back-button {
           position: absolute;
           top: 15px;
@@ -578,9 +618,7 @@ export default function LandingPage() {
           box-shadow: 0 6px 16px rgba(85, 88, 212, 0.4);
         }
 
-        .back-button:active {
-          transform: translateY(0);
-        }
+        .back-button:active { transform: translateY(0); }
 
         .back-button svg {
           width: 60%;
@@ -588,7 +626,6 @@ export default function LandingPage() {
           filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
         }
 
-        /* Test Question Display Styles */
         .test-question-wrapper {
           position: relative;
           background: white;
@@ -618,7 +655,6 @@ export default function LandingPage() {
         .test-question-header .instructions {
           font-size: 13px;
           line-height: 1.6;
-          opacity: 0.95;
         }
 
         .instructions-item {
@@ -661,17 +697,9 @@ export default function LandingPage() {
           transition: all 0.2s ease;
         }
 
-        .table-row:hover {
-          background-color: #F3F4F6;
-        }
-
-        .table-row:nth-child(even) {
-          background-color: #F9FAFB;
-        }
-
-        .table-row:nth-child(even):hover {
-          background-color: #F3F4F6;
-        }
+        .table-row:hover { background-color: #F3F4F6; }
+        .table-row:nth-child(even) { background-color: #F9FAFB; }
+        .table-row:nth-child(even):hover { background-color: #F3F4F6; }
 
         .table-cell {
           padding: 15px 10px;
@@ -683,9 +711,7 @@ export default function LandingPage() {
           cursor: pointer;
         }
 
-        .table-cell:last-child {
-          border-right: none;
-        }
+        .table-cell:last-child { border-right: none; }
 
         .table-cell-checkbox {
           width: 20px;
@@ -702,7 +728,6 @@ export default function LandingPage() {
         .table-cell-checkbox.checked {
           background-color: #333366;
           border-color: #333366;
-          box-shadow: none;
         }
 
         .table-cell-checkbox.checked::after {
@@ -756,13 +781,8 @@ export default function LandingPage() {
           opacity: 0.6;
         }
 
-        .test-nav-btn.back {
-          background-color: #A0A0E5;
-        }
-
-        .test-nav-btn.back:hover:not(:disabled) {
-          background-color: #8080c5;
-        }
+        .test-nav-btn.back { background-color: #A0A0E5; }
+        .test-nav-btn.back:hover:not(:disabled) { background-color: #8080c5; }
 
         .test-question-counter {
           font-size: 13px;
@@ -780,162 +800,111 @@ export default function LandingPage() {
           align-items: center;
         }
 
-        /* Hamburger Menu Styles */
-        .hamburger-btn {
-          display: none;
-          flex-direction: column;
-          gap: 5px;
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 0;
-          pointer-events: auto;
-        }
-
-        .hamburger-btn span {
-          width: 25px;
-          height: 3px;
-          background: black;
-          border-radius: 2px;
-          transition: all 0.3s ease;
-        }
-
-        .hamburger-btn.open span:nth-child(1) {
-          transform: rotate(45deg) translate(10px, 10px);
-        }
-
-        .hamburger-btn.open span:nth-child(2) {
-          opacity: 0;
-        }
-
-        .hamburger-btn.open span:nth-child(3) {
-          transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        /* Sidebar Styles */
-        .sidebar-overlay {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          z-index: 998;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .sidebar-overlay.open {
-          display: block;
-          opacity: 1;
-        }
-
-        .sidebar {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 280px;
-          height: 100%;
-          background: linear-gradient(180deg, rgba(60, 60, 120, 0.95) 0%, rgba(100, 100, 180, 0.95) 100%);
-          z-index: 999;
-          padding: 80px 30px 30px 30px;
-          transform: translateX(-100%);
-          transition: transform 0.3s ease;
-          gap: 20px;
-          flex-direction: column;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .sidebar.open {
-          display: flex;
-          transform: translateX(0);
-        }
-
-        .sidebar .nav-link-item {
-          width: 100%;
-          padding: 14px 16px;
-          font-size: 13px;
-          border-radius: 8px;
-          text-align: left;
-          margin-bottom: 8px;
-          background: rgba(255, 255, 255, 0.1);
-          transition: all 0.3s ease;
-          border: none;
-          color: white;
-        }
-
-        .sidebar .nav-link-item:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-
-        .sidebar .nav-link-item.active {
-          background: linear-gradient(180deg, rgba(255, 204, 0, 0.79) 0%, #A0A0E5 100%);
-          color: white;
-        }
-
-        .footer-logo-container {
-          position: relative;
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-
-        /* Top corners marker */
-        .corner-marker {
-          position: absolute;
-          width: 5px;
-          height: 5px;
-          border-color: white;
-          border-style: solid;
-        }
-        .corner-tl { top: 0; left: 0; border-width: 1px 0 0 1px; }
-        .corner-tr { top: 0; right: 0; border-width: 1px 1px 0 0; }
-        .corner-bl { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
-        .corner-br { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
-
-        .footer-logo-img {
-          width: 80px;
-          margin-bottom: 10px;
-        }
-
-        .footer-logo-text {
-          font-size: 12px;
-          font-weight: 800;
+        /* ============================================
+           FOOTER
+        ============================================ */
+        .footer-section {
+          background: radial-gradient(50% 50% at 50% 50%, rgba(255, 204, 0, 0.79) 0%, rgba(251, 228, 136, 0.7821) 100%);
           color: #2d3269;
-          text-transform: capitalize;
+          padding: 60px 80px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          border-radius: 120px 120px 0 0;
         }
 
+        .footer-left {
+          max-width: 480px;
+        }
+
+        .footer-left h3 {
+          font-weight: 900;
+          font-size: 26px;
+          margin-bottom: 15px;
+          color: #2d3269;
+          text-transform: uppercase;
+        }
+
+        .footer-left p {
+          font-size: 13px;
+          line-height: 1.5;
+          margin-bottom: 25px;
+          color: #2d3269;
+          font-weight: 500;
+        }
+
+        .footer-socials {
+          display: flex;
+          gap: 20px;
+          font-size: 22px;
+          color: #2d3269;
+        }
+
+        .footer-socials i { cursor: pointer; transition: opacity 0.2s; }
+        .footer-socials i:hover { opacity: 0.7; }
+
+        .footer-right {
+          display: flex;
+          margin-top: 15px;
+        }
+
+        .supported-by {
+          display: flex;
+          gap: 15px;
+          font-size: 14px;
+          color: #4a5578;
+        }
+
+        .supported-by .label {
+          white-space: nowrap;
+          color: #2d3269;
+          font-weight: 600;
+        }
+
+        .supported-by .content {
+          line-height: 1.4;
+          color: #4a5578;
+        }
+
+        .supported-by .content strong {
+          color: #2d3269;
+          font-weight: 800;
+          display: block;
+          margin-top: 5px;
+        }
+
+        /* ============================================
+           TABLET: 768px - 1024px
+        ============================================ */
         @media (max-width: 1024px) {
           .header-fixed-container {
-            top: 43.48px;
-            left: 34px;
-          }
-
-          .logo-main {
-            width: 80px;
+            top: 30px;
+            left: 20px;
+            width: calc(100% - 40px);
+            align-items: center;
           }
 
           .nav-capsule {
             gap: 5px;
-            background: linear-gradient(90deg, rgba(184, 193, 226, 0.95) 0%, rgba(184, 193, 226, 0.95) 100%);
             width: 420px;
             height: 45px;
+            padding: 0 10px;
           }
 
           .nav-link-item {
-            font-size: 10pxa;
+            font-size: 10px;
             padding: 6px 12px;
           }
 
-          .hero-section {
-            padding: 0 20px 20px 0;
-          }
+          .logo-main { width: 80px; }
+          .logo-container { margin-right: 0; }
+
+          .hero-section { padding: 0 20px 20px 0; }
 
           .hero-image-container {
-            flex: 1;
+            width: 580px;
+            height: 470px;
+            left: -100px;
           }
 
           .hero-content {
@@ -944,13 +913,13 @@ export default function LandingPage() {
           }
 
           .hero-content h1 {
-            font-size: 36px;
+            font-size: 38px;
             margin-bottom: 20px;
           }
 
           .hero-content p {
-            font-size: 12px;
-            margin-bottom: 25px;
+            font-size: 13px;
+            margin-bottom: 28px;
             max-width: 400px;
           }
 
@@ -960,469 +929,195 @@ export default function LandingPage() {
           }
 
           .disc-section {
-            padding: 40px 20px;
+            padding: 40px 25px;
             gap: 20px;
           }
 
-          .disc-card {
-            height: 140px;
-          }
+          .disc-card { height: 140px; }
 
-          .card-body-custom h5 {
-            font-size: 16px;
-            margin-bottom: 6px;
-          }
+          .card-body-custom { padding: 15px 20px; }
+          .card-body-custom h5 { font-size: 16px; }
+          .card-body-custom p { font-size: 12px; }
 
-          .card-body-custom p {
-            font-size: 12px;
-          }
-
-          .assessment-container {
-            padding: 40px 20px;
-          }
+          .assessment-container { padding: 40px 25px; }
 
           .assessment-box {
             padding: 50px 40px;
             gap: 30px;
           }
 
-          .assessment-left h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-          }
+          .assessment-left h2 { font-size: 26px; margin-bottom: 20px; }
+          .assessment-left p { font-size: 12px; }
 
-          .assessment-left p {
-            font-size: 12px;
-          }
-
-          .inner-test-card {
-            max-width: 350px;
-            padding: 30px;
-          }
-
-          .inner-test-card img {
-            height: 180px;
-            margin-bottom: 20px;
-          }
-
-          .test-example-btn {
-            padding: 12px 30px;
-            font-size: 13px;
-          }
+          .inner-test-card { max-width: 360px; padding: 30px; }
+          .inner-test-card img { height: 190px; margin-bottom: 20px; }
+          .test-example-btn { padding: 13px 30px; font-size: 13px; }
 
           .footer-section {
-            padding: 40px 40px;
+            padding: 50px 50px;
+            border-radius: 80px 80px 0 0;
             gap: 30px;
           }
 
-          .footer-left {
-            max-width: 100%;
-          }
-
-          .footer-left h3 {
-            font-size: 20px;
-          }
-
-          .footer-left p {
-            font-size: 12px;
-          }
-
-          .powered-by-label {
-            font-size: 11px;
-          }
-
-          .back-button {
-            width: 45px;
-            height: 45px;
-            top: 12px;
-            left: 20px;
-          }
-
-          .test-question-wrapper {
-            padding: 20px;
-          }
-
-          .test-question-header {
-            padding: 15px 20px 15px 65px;
-            margin-bottom: 20px;
-          }
-
-          .test-question-header h3 {
-            font-size: 14px;
-            margin-bottom: 10px;
-          }
-
-          .test-question-header .instructions {
-            font-size: 12px;
-            line-height: 1.6;
-          }
-
-          .table-header {
-            grid-template-columns: 70px 70px 1fr;
-            font-size: 13px;
-          }
-
-          .table-header-cell {
-            padding: 12px;
-            font-size: 12px;
-          }
-
-          .table-row {
-            grid-template-columns: 70px 70px 1fr;
-          }
-
-          .table-cell {
-            padding: 12px;
-          }
-
-          .table-cell-description {
-            padding: 12px;
-            font-size: 12px;
-          }
+          .footer-left h3 { font-size: 22px; }
+          .footer-left p { font-size: 12px; }
         }
 
-        @media (max-width: 820px) {
-          .header-fixed-container {
-            top: 35px;
-            left: 20px;
-            width: calc(100% - 40px);
-          }
-
-          .logo-main {
-            width: 70px;
-          }
-
+        /* ============================================
+           SMALL TABLET: 768px - 900px
+        ============================================ */
+        @media (max-width: 900px) {
           .nav-capsule {
             width: 360px;
             height: 42px;
-            gap: 3px;
           }
 
           .nav-link-item {
             font-size: 9.5px;
-            padding: 5px 10px;
-          }
-
-          .hero-section {
-            padding: 0 20px 20px 0;
-            min-height: 90vh;
+            padding: 5px 9px;
           }
 
           .hero-image-container {
-            width: 520px;
-            height: 420px;
-            top: -10px;
+            width: 500px;
+            height: 410px;
             left: -80px;
           }
 
-          .hero-content {
-            padding-left: 40px;
-            padding-right: 20px;
-            align-items: center;
-          }
+          .hero-content h1 { font-size: 32px; }
+          .hero-content p { font-size: 12px; max-width: 350px; }
 
-          .hero-content h1 {
-            font-size: 32px;
-            margin-bottom: 18px;
-            text-align: center;
-          }
-
-          .hero-content p {
-            font-size: 11px;
-            margin-bottom: 25px;
-            text-align: center;
-            max-width: 420px;
-          }
-
-          .regist-here-btn {
-            height: 42px;
-            width: 180px;
-            font-size: 16px;
-          }
-
-          .disc-section {
-            padding: 50px 30px;
-            gap: 20px;
-          }
-
-          .disc-card {
-            height: 150px;
-            border-left: 10px solid #2d3269;
-          }
-
-          .card-letter-wrapper {
-            width: 33%;
-          }
+          .disc-card { height: 130px; }
 
           .letter-circle {
-            width: 80px;
-            height: 80px;
-            font-size: 52px;
+            width: 75px;
+            height: 75px;
+            font-size: 48px;
           }
 
-          .card-body-custom h5 {
-            font-size: 17px;
-            margin-bottom: 6px;
-          }
-
-          .card-body-custom p {
-            font-size: 13px;
-            line-height: 1.3;
-          }
-
-          .assessment-container {
-            padding: 50px 30px;
-          }
+          .card-body-custom h5 { font-size: 14px; }
+          .card-body-custom p { font-size: 11px; }
 
           .assessment-box {
-            padding: 60px 50px;
-            gap: 40px;
+            flex-direction: column;
+            padding: 40px 35px;
+            text-align: center;
           }
 
-          .assessment-left h2 {
-            font-size: 40px;
-            margin-bottom: 25px;
-          }
-
-          .assessment-left p {
-            font-size: 13px;
-            line-height: 1.7;
-          }
-
-          .inner-test-card {
-            max-width: 380px;
-            padding: 35px;
-          }
-
-          .inner-test-card img {
-            height: 200px;
-            margin-bottom: 25px;
-          }
-
-          .test-example-btn {
-            padding: 14px 35px;
-            font-size: 14px;
-          }
+          .assessment-left p { text-align: center; }
+          .assessment-right { width: 100%; }
+          .inner-test-card { max-width: 100%; }
 
           .footer-section {
-            padding: 50px 50px;
-            gap: 30px;
-          }
-
-          .footer-left h3 {
-            font-size: 22px;
-          }
-
-          .footer-left p {
-            font-size: 12px;
-          }
-
-          .powered-by-label {
-            font-size: 11px;
-          }
-
-          .back-button {
-            width: 44px;
-            height: 44px;
-            top: 12px;
-            left: 18px;
-          }
-
-          .test-question-wrapper {
-            padding: 20px;
-          }
-
-          .test-question-header {
-            padding: 15px 20px 15px 60px;
-            margin-bottom: 20px;
-          }
-
-          .test-question-header h3 {
-            font-size: 14px;
-            margin-bottom: 10px;
-          }
-
-          .test-question-header .instructions {
-            font-size: 12px;
-            line-height: 1.6;
-          }
-
-          .table-header {
-            grid-template-columns: 65px 65px 1fr;
-            font-size: 12px;
-          }
-
-          .table-header-cell {
-            padding: 12px 10px;
-            font-size: 11px;
-          }
-
-          .table-row {
-            grid-template-columns: 65px 65px 1fr;
-          }
-
-          .table-cell {
-            padding: 12px 10px;
-          }
-
-          .table-cell-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #666;
-          }
-
-          .table-cell-description {
-            padding: 12px 10px;
-            font-size: 12px;
+            border-radius: 60px 60px 0 0;
+            padding: 40px 40px;
           }
         }
 
-        @media (max-width: 768px) {
+        /* ============================================
+           MOBILE: max 767px — Hamburger Menu
+        ============================================ */
+        @media (max-width: 767px) {
           .header-fixed-container {
-            top: 30px;
+            top: 18px;
             left: 0;
             width: 100%;
-            padding: 0 15px;
+            padding: 0 16px;
             justify-content: flex-start;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
           }
 
-          .hamburger-btn {
-            display: flex;
-            margin-right: auto;
-          }
-
-          .logo-main {
-            width: 55px;
-          }
+          /* Tampilkan hamburger, sembunyikan nav capsule */
+          .hamburger-btn { display: flex; }
+          .nav-capsule { display: none !important; }
 
           .logo-container {
-            margin-left: 0;
+            margin-left: auto;
             margin-right: 0;
           }
 
-          .nav-capsule {
-            display: none !important;
-          }
+            .logo-main { width: 70px; }
 
-          .nav-link-item {
-            font-size: 9px;
-            padding: 5px 10px;
-          }
-
-          /* Hero Section */
+          /* Hero – stack vertikal, sembunyikan gambar rotated */
           .hero-section {
             flex-direction: column;
-            padding: 15px;
+            padding: 20px 16px 30px;
             min-height: auto;
-            margin-top: 100px;
+            margin-top: 90px;
           }
 
-          .hero-image-container {
-            display: none;
-          }
-
-          .hero-image {
-            display: none;
-          }
+          .hero-image-container { display: none; }
 
           .hero-content {
-            padding: 20px 10px;
+            padding: 0;
             align-items: center;
             flex: 1;
+            width: 100%;
           }
 
           .hero-content h1 {
             font-size: 28px;
             line-height: 1.2;
-            margin-bottom: 15px;
-            font-weight: 700;
+            margin-bottom: 16px;
             text-align: center;
           }
 
           .hero-content p {
-            font-size: 12px;
+            font-size: 13px;
             line-height: 1.6;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
             max-width: 100%;
             text-align: center;
           }
 
           .regist-here-btn {
-            padding: 0;
+            padding: 12px 36px;
             font-size: 14px;
-            width: auto;
-            height: 40px;
-            min-width: 160px;
           }
 
-          /* DISC Cards Section */
+          /* DISC cards – 1 kolom */
           .disc-section {
-            padding: 30px 15px;
+            padding: 32px 16px;
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 14px;
           }
 
           .disc-card {
             height: 120px;
+            border-left: 8px solid #2d3269;
           }
 
-          .card-letter-wrapper {
-            width: 30%;
-          }
+          .card-letter-wrapper { width: 28%; }
 
           .letter-circle {
-            width: 70px;
-            height: 70px;
-            font-size: 45px;
+            width: 68px;
+            height: 68px;
+            font-size: 42px;
           }
 
           .card-body-custom {
-            width: 70%;
-            padding: 15px 20px;
+            width: 72%;
+            padding: 14px 18px;
           }
 
-          .card-body-custom h5 {
-            font-size: 14px;
-            margin-bottom: 5px;
-          }
+          .card-body-custom h5 { font-size: 14px; margin-bottom: 5px; }
+          .card-body-custom p { font-size: 11px; line-height: 1.3; }
 
-          .card-body-custom p {
-            font-size: 11px;
-            line-height: 1.3;
-          }
-
-          /* Assessment Box Section */
-          .assessment-container {
-            padding: 30px 15px;
-          }
+          /* Assessment */
+          .assessment-container { padding: 28px 16px; }
 
           .assessment-box {
             flex-direction: column;
-            padding: 30px 20px;
-            text-align: center;
-            border-radius: 25px;
+            padding: 28px 20px;
+            border-radius: 24px;
             gap: 20px;
-          }
-
-          .assessment-left h2 {
-            font-weight: 900;
-            font-size: 24px;
-            margin-bottom: 15px;
-            line-height: 1.1;
-          }
-
-          .assessment-left p {
-            font-size: 11px;
-            line-height: 1.6;
             text-align: center;
-            margin: 0;
           }
 
-          .assessment-right {
-            width: 100%;
-          }
+          .assessment-left h2 { font-size: 22px; margin-bottom: 14px; }
+          .assessment-left p { font-size: 12px; line-height: 1.6; text-align: center; }
+
+          .assessment-right { width: 100%; }
 
           .inner-test-card {
             max-width: 100%;
@@ -1430,61 +1125,47 @@ export default function LandingPage() {
           }
 
           .inner-test-card img {
-            height: 150px;
-            margin-bottom: 15px;
+            height: 160px;
+            margin-bottom: 16px;
           }
 
           .test-example-btn {
-            padding: 10px 25px;
+            padding: 12px 24px;
+            font-size: 13px;
+          }
+
+          /* Test question wrapper */
+          .test-question-wrapper { padding: 16px; }
+
+          .test-question-header {
+            padding: 14px 16px 14px 60px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+          }
+
+          .test-question-header h3 { font-size: 14px; margin-bottom: 8px; }
+          .test-question-header .instructions { font-size: 12px; line-height: 1.5; }
+          .instructions-item { margin-bottom: 6px; }
+
+          .table-header { grid-template-columns: 64px 64px 1fr; }
+          .table-header-cell { padding: 10px 6px; font-size: 11px; }
+
+          .table-row { grid-template-columns: 64px 64px 1fr; }
+          .table-cell { padding: 10px 6px; }
+
+          .table-cell-checkbox {
+            width: 18px;
+            height: 18px;
+          }
+
+          .table-cell-description {
+            padding: 10px 12px;
             font-size: 12px;
           }
 
-          /* Footer Section */
-          .footer-section {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 40px 30px;
-            border-radius: 40px 40px 0 0;
-            gap: 25px;
-          }
-
-          .footer-left {
-            max-width: 100%;
-            margin-bottom: 0;
-          }
-
-          .footer-left h3 {
-            font-weight: 900;
-            font-size: 20px;
-            margin-bottom: 12px;
-          }
-
-          .footer-left p {
-            font-size: 12px;
-            line-height: 1.5;
-            margin-bottom: 18px;
-          }
-
-          .footer-socials {
-            justify-content: center;
-            gap: 18px;
-            font-size: 20px;
-          }
-
-          .footer-right {
-            flex-direction: column;
-            align-items: center;
-            gap: 0;
-            width: 100%;
-            margin-right: 0 !important;
-            margin-top: 0 !important;
-          }
-
-          .powered-by-label {
-            font-size: 11px;
-            margin-top: 8px;
-          }
+          .test-navigation { gap: 8px; }
+          .test-nav-btn { padding: 10px 18px; font-size: 12px; }
+          .test-question-counter { font-size: 12px; }
 
           .back-button {
             width: 42px;
@@ -1493,307 +1174,160 @@ export default function LandingPage() {
             left: 16px;
           }
 
-          .test-question-wrapper {
-            padding: 15px;
+          /* Footer */
+          .footer-section {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 40px 28px;
+            border-radius: 40px 40px 0 0;
+            gap: 28px;
           }
 
-          .test-question-header {
-            padding: 12px 15px 12px 55px;
-            margin-bottom: 15px;
-          }
+          .footer-left { max-width: 100%; }
+          .footer-left h3 { font-size: 20px; margin-bottom: 12px; }
+          .footer-left p { font-size: 12px; margin-bottom: 18px; }
+          .footer-socials { font-size: 20px; gap: 16px; }
 
-          .test-question-header h3 {
-            font-size: 13px;
-            margin-bottom: 8px;
-          }
-
-          .test-question-header .instructions {
-            font-size: 11px;
-            line-height: 1.5;
-          }
-
-          .instructions-item {
-            margin-bottom: 6px;
-          }
-
-          .test-question-table {
-            margin-top: 15px;
-          }
-
-          .table-header {
-            grid-template-columns: 60px 60px 1fr;
-            font-size: 11px;
-          }
-
-          .table-header-cell {
-            padding: 10px;
-            font-size: 10px;
-          }
-
-          .table-row {
-            grid-template-columns: 60px 60px 1fr;
-          }
-
-          .table-cell {
-            padding: 10px;
-          }
-
-          .table-cell-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #666;
-          }
-
-          .table-cell-description {
-            padding: 10px;
-            font-size: 11px;
-          }
+          .footer-right { margin-top: 0; width: 100%; }
+          .supported-by { font-size: 13px; }
         }
 
+        /* ============================================
+           SMALL MOBILE: max 480px
+        ============================================ */
         @media (max-width: 480px) {
           .header-fixed-container {
-            top: 15px;
-            left: 0;
-            width: 100%;
+            top: 14px;
             padding: 0 12px;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 12px;
           }
 
-          .hamburger-btn {
-            display: flex;
-            margin-right: auto;
-          }
+            .logo-main { width: 58px; }
 
           .hamburger-btn span {
             width: 22px;
             height: 2.5px;
           }
 
-          .logo-main {
-            width: 45px;
-          }
-
-          .logo-container {
-            margin-left: 0;
-            margin-right: 0;
-          }
-
-          .nav-capsule {
-            display: none !important;
-          }
-
-          .nav-link-item {
-            font-size: 8px;
-            padding: 4px 8px;
-          }
-
           .hero-section {
-            margin-top: 90px;
-            padding: 12px;
+            margin-top: 78px;
+            padding: 16px 12px 24px;
           }
 
-          .hero-image-container {
-            display: none;
-          }
-
-          .hero-content {
-            padding: 15px 8px;
-          }
-
-          .hero-content h1 {
-            font-size: 22px;
-            margin-bottom: 12px;
-            line-height: 1.3;
-          }
-
-          .hero-content p {
-            font-size: 11px;
-            margin-bottom: 18px;
-            line-height: 1.5;
-          }
+          .hero-content h1 { font-size: 24px; margin-bottom: 14px; }
+          .hero-content p { font-size: 12px; margin-bottom: 20px; }
 
           .regist-here-btn {
-            padding: 0;
-            font-size: 12px;
-            height: 38px;
-            width: 150px;
+            padding: 11px 30px;
+            font-size: 13px;
           }
 
           .disc-section {
-            padding: 18px 10px;
-            grid-template-columns: 1fr;
+            padding: 22px 12px;
             gap: 10px;
           }
 
           .disc-card {
-            height: 100px;
+            height: 108px;
             border-left: 6px solid #2d3269;
           }
 
-          .card-letter-wrapper {
-            width: 25%;
-          }
+          .card-letter-wrapper { width: 26%; }
 
           .letter-circle {
-            width: 55px;
-            height: 55px;
-            font-size: 32px;
+            width: 58px;
+            height: 58px;
+            font-size: 35px;
           }
 
           .card-body-custom {
-            width: 75%;
-            padding: 10px 12px;
+            width: 74%;
+            padding: 10px 14px;
           }
 
-          .card-body-custom h5 {
-            font-size: 11px;
-            margin-bottom: 3px;
-          }
+          .card-body-custom h5 { font-size: 12px; margin-bottom: 4px; }
+          .card-body-custom p { font-size: 10px; line-height: 1.3; }
 
-          .card-body-custom p {
-            font-size: 8px;
-            line-height: 1.2;
-          }
-
-          .assessment-container {
-            padding: 15px 10px;
-          }
+          .assessment-container { padding: 18px 12px; }
 
           .assessment-box {
-            padding: 18px 12px;
+            padding: 22px 16px;
             border-radius: 18px;
-            gap: 12px;
+            gap: 16px;
           }
 
-          .assessment-left h2 {
-            font-size: 16px;
-            margin-bottom: 10px;
-          }
+          .assessment-left h2 { font-size: 18px; margin-bottom: 10px; }
+          .assessment-left p { font-size: 11px; line-height: 1.5; }
 
-          .assessment-left p {
-            font-size: 9px;
-            line-height: 1.5;
-          }
+          .inner-test-card { padding: 14px; }
+          .inner-test-card img { height: 130px; margin-bottom: 12px; }
+          .test-example-btn { padding: 10px 20px; font-size: 12px; }
 
-          .inner-test-card {
-            padding: 12px;
-          }
-
-          .inner-test-card img {
-            height: 100px;
-            margin-bottom: 10px;
-          }
-
-          .test-example-btn {
-            padding: 8px 18px;
-            font-size: 10px;
-          }
-
-          .footer-section {
-            padding: 25px 15px;
-            border-radius: 30px 30px 0 0;
-            gap: 15px;
-          }
-
-          .footer-left {
-            margin-bottom: 8px;
-          }
-
-          .footer-left h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-          }
-
-          .footer-left p {
-            font-size: 10px;
-            margin-bottom: 12px;
-          }
-
-          .footer-socials {
-            gap: 12px;
-            font-size: 16px;
-            margin-bottom: 12px;
-          }
-
-          .footer-right {
-            margin-right: 0 !important;
-            margin-top: 0 !important;
-          }
-
-          .powered-by-label {
-            font-size: 9px;
-            margin-top: 4px;
-          }
-
-          .back-button {
-            width: 40px;
-            height: 40px;
-            top: 10px;
-            left: 14px;
-          }
-
-          .test-question-wrapper {
-            padding: 12px;
-          }
+          /* Test question pada mobile kecil */
+          .test-question-wrapper { padding: 12px; }
 
           .test-question-header {
-            padding: 10px 12px 10px 50px;
+            padding: 12px 12px 12px 52px;
             margin-bottom: 12px;
           }
 
-          .test-question-header h3 {
-            font-size: 12px;
-            margin-bottom: 6px;
-          }
+          .test-question-header h3 { font-size: 13px; margin-bottom: 6px; }
+          .test-question-header .instructions { font-size: 11px; }
 
-          .test-question-header .instructions {
-            font-size: 10px;
-            line-height: 1.4;
-          }
+          .table-header { grid-template-columns: 52px 52px 1fr; }
+          .table-header-cell { padding: 8px 4px; font-size: 10px; }
 
-          .instructions-item {
-            margin-bottom: 5px;
-          }
-
-          .test-question-table {
-            margin-top: 12px;
-          }
-
-          .table-header {
-            grid-template-columns: 50px 50px 1fr;
-            font-size: 10px;
-          }
-
-          .table-header-cell {
-            padding: 8px 5px;
-            font-size: 9px;
-          }
-
-          .table-row {
-            grid-template-columns: 50px 50px 1fr;
-          }
-
-          .table-cell {
-            padding: 8px 5px;
-          }
+          .table-row { grid-template-columns: 52px 52px 1fr; }
+          .table-cell { padding: 8px 4px; }
 
           .table-cell-checkbox {
             width: 16px;
             height: 16px;
-            border: 1.5px solid #666;
+            border-width: 1.5px;
           }
 
           .table-cell-description {
-            padding: 8px 5px;
-            font-size: 9px;
+            padding: 8px 8px;
+            font-size: 11px;
           }
+
+          .test-nav-btn { padding: 9px 14px; font-size: 11px; }
+          .test-question-counter { font-size: 11px; }
+
+          .back-button {
+            width: 38px;
+            height: 38px;
+            top: 10px;
+            left: 12px;
+          }
+
+          /* Footer */
+          .footer-section {
+            padding: 32px 20px;
+            border-radius: 30px 30px 0 0;
+            gap: 22px;
+          }
+
+          .footer-left h3 { font-size: 18px; }
+          .footer-left p { font-size: 11px; }
+          .footer-socials { font-size: 18px; gap: 14px; }
+          .supported-by { font-size: 12px; flex-direction: column; gap: 4px; }
         }
       `}</style>
 
-            {/* Non-Scrolling Overlay Header */}
+            {/* ── HEADER ── */}
             <header className="header-fixed-container">
+                {/* Hamburger: hanya tampil di mobile */}
+                <button
+                    className={`hamburger-btn ${sidebarOpen ? "open" : ""}`}
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    aria-label="Toggle navigation"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                {/* Nav Capsule: hanya tampil di desktop/tablet */}
                 <div className="nav-capsule">
                     <button
                         className={`nav-link-item ${activeNav === "DISC" ? "active" : ""}`}
@@ -1822,14 +1356,8 @@ export default function LandingPage() {
                         MASUK
                     </Link>
                 </div>
-                <button
-                    className={`hamburger-btn ${sidebarOpen ? "open" : ""}`}
-                    onClick={() => setSidebarOpen(!sidebarOpen)}
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+
+                {/* Logo */}
                 <div className="logo-container">
                     <img
                         src="/assets/LogoBC.png"
@@ -1839,13 +1367,13 @@ export default function LandingPage() {
                 </div>
             </header>
 
-            {/* Sidebar Overlay */}
+            {/* ── SIDEBAR OVERLAY ── */}
             <div
                 className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`}
                 onClick={() => setSidebarOpen(false)}
             ></div>
 
-            {/* Sidebar */}
+            {/* ── SIDEBAR ── */}
             <nav className={`sidebar ${sidebarOpen ? "open" : ""}`}>
                 <button
                     className={`nav-link-item ${activeNav === "DISC" ? "active" : ""}`}
@@ -1869,13 +1397,16 @@ export default function LandingPage() {
                     href="/login"
                     className={`nav-link-item ${activeNav === "SIGN IN" ? "active" : ""}`}
                     style={{ textDecoration: "none" }}
-                    onClick={() => setActiveNav("SIGN IN")}
+                    onClick={() => {
+                        setActiveNav("SIGN IN");
+                        setSidebarOpen(false);
+                    }}
                 >
                     MASUK
                 </Link>
             </nav>
 
-            {/* Hero Section */}
+            {/* ── HERO SECTION ── */}
             <section className="hero-section" id="hero">
                 <div className="hero-image-container">
                     <img
@@ -1896,64 +1427,48 @@ export default function LandingPage() {
                         (D, I, S, C) untuk memahami gaya kerja dan komunikasi.
                     </p>
                     <Link href="/register" className="regist-here-btn">
-                        Daftar Sekarang
+                        DAFTAR DISINI!
                     </Link>
                 </div>
             </section>
 
-            {/* DISC Cards Section */}
+            {/* ── DISC CARDS ── */}
             <section className="disc-section" id="disc">
-                <div className="disc-card">
-                    <div className="card-letter-wrapper">
-                        <div className="letter-circle">D</div>
+                {[
+                    {
+                        letter: "D",
+                        title: "Dominance (Dominasi)",
+                        desc: "Cenderung tegas, berorientasi pada hasil, kompetitif, dan suka mengendalikan situasi.",
+                    },
+                    {
+                        letter: "I",
+                        title: "Influence (Pengaruh)",
+                        desc: "Cenderung antusias, ramah, persuasif, dan pandai bersosialisasi.",
+                    },
+                    {
+                        letter: "S",
+                        title: "Steadiness (Kestabilan)",
+                        desc: "Cenderung tenang, sabar, konsisten, dan menyukai stabilitas.",
+                    },
+                    {
+                        letter: "C",
+                        title: "Compliance (Kehati-hatian)",
+                        desc: "Cenderung analitis, detail, teliti, dan patuh pada aturan.",
+                    },
+                ].map(({ letter, title, desc }) => (
+                    <div className="disc-card" key={letter}>
+                        <div className="card-letter-wrapper">
+                            <div className="letter-circle">{letter}</div>
+                        </div>
+                        <div className="card-body-custom">
+                            <h5>{title}</h5>
+                            <p>{desc}</p>
+                        </div>
                     </div>
-                    <div className="card-body-custom">
-                        <h5>Dominance (Dominasi)</h5>
-                        <p>
-                            Cenderung tegas, berorientasi pada hasil,
-                            kompetitif, dan suka mengendalikan situasi.
-                        </p>
-                    </div>
-                </div>
-                <div className="disc-card">
-                    <div className="card-letter-wrapper">
-                        <div className="letter-circle">I</div>
-                    </div>
-                    <div className="card-body-custom">
-                        <h5>Influence (Pengaruh)</h5>
-                        <p>
-                            Cenderung antusias, ramah, persuasif, dan pandai
-                            bersosialisasi.
-                        </p>
-                    </div>
-                </div>
-                <div className="disc-card">
-                    <div className="card-letter-wrapper">
-                        <div className="letter-circle">S</div>
-                    </div>
-                    <div className="card-body-custom">
-                        <h5>Steadiness (Kestabilan)</h5>
-                        <p>
-                            Cenderung tenang, sabar, konsisten, dan menyukai
-                            stabilitas.
-                        </p>
-                    </div>
-                </div>
-                <div className="disc-card">
-                    <div className="card-letter-wrapper">
-                        <div className="letter-circle">C</div>
-                    </div>
-                    <div className="card-body-custom">
-                        <h5>Compliance (Kehati-hatian)</h5>
-                        <p>
-                            Cenderung analitis, detail, teliti, dan patuh pada
-                            aturan.
-                        </p>
-                    </div>
-                </div>
+                ))}
             </section>
 
-            {/* Assessment Box Section */}
+            {/* ── ASSESSMENT SECTION ── */}
             <section className="assessment-container" id="about">
                 {!showTestQuestion ? (
                     <div className="assessment-box">
@@ -1966,7 +1481,7 @@ export default function LandingPage() {
                                 profil kepribadianmu serta tingkat kecocokan
                                 dengan jabatan yang dipilih.
                             </p>
-
+                            <br />
                             <p>
                                 DISC is a personality test that helps you
                                 understand how you behave and interact with
@@ -1995,6 +1510,7 @@ export default function LandingPage() {
                         <button
                             onClick={handleCloseTest}
                             className="back-button"
+                            aria-label="Kembali"
                         >
                             <svg
                                 viewBox="0 0 45 45"
@@ -2013,10 +1529,9 @@ export default function LandingPage() {
                             </svg>
                         </button>
 
-                        {/* Title & Instructions */}
+                        {/* Header */}
                         <div className="test-question-header">
                             <h3>Soal ke-{currentQuestion}</h3>
-
                             <div className="instructions">
                                 <div className="instructions-item">
                                     <strong>1.</strong> Untuk setiap nomor
@@ -2025,7 +1540,7 @@ export default function LandingPage() {
                                     tanda silang (x) di kolom M.
                                 </div>
                                 <div className="instructions-item">
-                                    <strong>2.</strong> Kemudiam, pilih satu
+                                    <strong>2.</strong> Kemudian, pilih satu
                                     karakteristik yang lain yang paling tidak
                                     cocok dengan diri anda dan beri tanda silang
                                     (X) di kolom L.
@@ -2035,21 +1550,18 @@ export default function LandingPage() {
 
                         {/* Table */}
                         <div className="test-question-table">
-                            {/* Header Row */}
                             <div className="table-header">
                                 <div className="table-header-cell">M</div>
                                 <div className="table-header-cell">L</div>
                                 <div className="table-header-cell">
-                                    karakteristik
+                                    Karakteristik
                                 </div>
                             </div>
 
-                            {/* Data Rows */}
                             {exampleQuestionsData[
                                 currentQuestion
                             ]?.characteristics.map((item, idx) => (
                                 <div key={idx} className="table-row">
-                                    {/* M Column */}
                                     <div className="table-cell">
                                         <div
                                             className={`table-cell-checkbox ${testAnswers[currentQuestion].M === idx ? "checked" : ""}`}
@@ -2062,8 +1574,6 @@ export default function LandingPage() {
                                             }
                                         ></div>
                                     </div>
-
-                                    {/* L Column */}
                                     <div className="table-cell">
                                         <div
                                             className={`table-cell-checkbox ${testAnswers[currentQuestion].L === idx ? "checked" : ""}`}
@@ -2076,8 +1586,6 @@ export default function LandingPage() {
                                             }
                                         ></div>
                                     </div>
-
-                                    {/* Description Column */}
                                     <div className="table-cell-description">
                                         {item}
                                     </div>
@@ -2085,7 +1593,7 @@ export default function LandingPage() {
                             ))}
                         </div>
 
-                        {/* Error Message */}
+                        {/* Error */}
                         {testErrors[currentQuestion] && (
                             <div className="test-error-message">
                                 {testErrors[currentQuestion]}
@@ -2116,16 +1624,16 @@ export default function LandingPage() {
                 )}
             </section>
 
-            {/* Footer Section */}
+            {/* ── FOOTER ── */}
             <footer className="footer-section" id="footer">
                 <div className="footer-left">
-                    <h3>TENTANG KAMI</h3>
+                    <h3>KONTAK KAMI</h3>
                     <p>
-                        BeaCukai DISC Self-Assessment adalah platform inovatif
-                        yang membantu Anda memahami profil kepribadian dan
-                        potensi diri melalui tes DISC yang komprehensif. Kami
-                        berkomitmen untuk memberikan hasil analisis yang akurat
-                        dan actionable untuk pengembangan karir Anda.
+                        Tes DISC Bea Cukai adalah tes kepribadian untuk menilai
+                        karakter, cara kerja, komunikasi, dan kecocokan peserta
+                        dengan lingkungan kerja Bea Cukai. Tes ini mengukur 4
+                        tipe kepribadian: Dominance, Influence, Steadiness, dan
+                        Conscientiousness.
                     </p>
                     <div className="footer-socials">
                         <i className="fab fa-instagram"></i>
@@ -2139,13 +1647,19 @@ export default function LandingPage() {
                         <i className="fas fa-envelope"></i>
                     </div>
                 </div>
-                <div
-                    className="footer-right"
-                    style={{ marginRight: "5rem", marginTop: "50px" }}
-                >
-                    <span className="powered-by-label">
-                        Powered by: Beacukai
-                    </span>
+
+                <div className="footer-right">
+                    <div className="supported-by">
+                        <span className="label">Didukung oleh:</span>
+                        <div className="content">
+                            Bagian Pengembangan
+                            <br />
+                            Kepegawaian
+                            <br />
+                            <br />
+                            <strong>Sekretaris DJBC</strong>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </>

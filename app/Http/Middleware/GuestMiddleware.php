@@ -22,6 +22,14 @@ class GuestMiddleware
             /** @var User $user */
             $user = Auth::user();
 
+            if ($request->is('login')) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return $next($request);
+            }
+
             // Redirect berdasarkan role
             if ($user->isAdmin()) {
                 return redirect('/admin/dashboard')->with('info', 'Anda sudah login sebagai admin');

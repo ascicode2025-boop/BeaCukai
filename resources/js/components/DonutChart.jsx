@@ -23,8 +23,9 @@ const DonutChart = ({ title, centerText, legend, layout = "bottom" }) => {
     // Calculate segments with stroke-dasharray approach
     let currentOffset = 0;
     const segments = legend.map((item) => {
-        const percentage = (item.value / total) * 100;
-        const strokeDasharray = (percentage / 100) * circumference;
+        const percentage = total > 0 ? (item.value / total) * 100 : 0;
+        const strokeDasharray =
+            Math.max(0, (percentage / 100) * circumference) || 0;
         const offset = currentOffset;
 
         currentOffset += strokeDasharray;
@@ -32,7 +33,7 @@ const DonutChart = ({ title, centerText, legend, layout = "bottom" }) => {
         return {
             ...item,
             percentage,
-            strokeDasharray,
+            strokeDasharray: isNaN(strokeDasharray) ? 0 : strokeDasharray,
             strokeDashoffset: -offset,
         };
     });

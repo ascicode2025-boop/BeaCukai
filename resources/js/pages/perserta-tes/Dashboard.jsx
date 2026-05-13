@@ -40,7 +40,11 @@ const Dashboard = () => {
             if (savedData) {
                 try {
                     const parsed = JSON.parse(savedData);
-                    if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
+                    if (
+                        parsed?.user_id &&
+                        user?.id &&
+                        parsed.user_id !== user.id
+                    ) {
                         setLatestResult(null);
                         setHistoryResults([]);
                         return;
@@ -65,10 +69,7 @@ const Dashboard = () => {
                         JSON.stringify(historyList),
                     );
                     localStorage.setItem(selectedKey, legacyEntry.id);
-                    localStorage.setItem(
-                        storageKey,
-                        JSON.stringify(updated),
-                    );
+                    localStorage.setItem(storageKey, JSON.stringify(updated));
                 } catch (error) {
                     console.error("Failed to parse discResultData:", error);
                 }
@@ -78,8 +79,7 @@ const Dashboard = () => {
         const normalizedHistory = historyList
             .map((item) => ({
                 ...item,
-                submitted_at:
-                    item.submitted_at || new Date().toISOString(),
+                submitted_at: item.submitted_at || new Date().toISOString(),
                 user_id: item.user_id || user?.id || null,
                 user_email: item.user_email || user?.email || null,
             }))
@@ -88,8 +88,7 @@ const Dashboard = () => {
                     !item.user_id || !user?.id || item.user_id === user.id,
             )
             .sort(
-                (a, b) =>
-                    new Date(b.submitted_at) - new Date(a.submitted_at),
+                (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at),
             );
 
         setHistoryResults(normalizedHistory);
@@ -596,7 +595,8 @@ const Dashboard = () => {
                                         </div>
                                         <span
                                             style={{
-                                                backgroundColor: statusStyle.backgroundColor,
+                                                backgroundColor:
+                                                    statusStyle.backgroundColor,
                                                 color: "white",
                                                 padding:
                                                     "clamp(6px, 2vw, 8px) clamp(12px, 3vw, 16px)",
@@ -606,7 +606,8 @@ const Dashboard = () => {
                                                 fontWeight: "800",
                                                 fontFamily:
                                                     "'Oxanium', sans-serif",
-                                                boxShadow: statusStyle.boxShadow,
+                                                boxShadow:
+                                                    statusStyle.boxShadow,
                                                 whiteSpace: "nowrap",
                                             }}
                                         >

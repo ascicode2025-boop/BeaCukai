@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\KelolaAkunController;
 use App\Http\Controllers\Admin\KelolaJabatanController;
+use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\DiscController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DiscResult;
@@ -117,49 +118,8 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
 // Admin routes - harus login + admin role + session timeout
 Route::prefix('admin')->middleware(['admin', 'session.timeout'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/data-peserta', function () {
-        $pesertaData = User::where('role', 'peserta')
-            ->with(['discResults' => function ($query) {
-                $query->latest('test_date');
-            }])
-            ->orderBy('name')
-            ->get(['id', 'name', 'nip', 'unit_kerja'])
-            ->map(function ($user, $index) {
-                $latestResult = $user->discResults->first();
-                $jpm = $latestResult?->completion_percentage;
-                $status = 'Belum Tes';
-
-                if ($latestResult) {
-                    if ($jpm >= 85) {
-                        $status = 'Sangat Cocok';
-                    } elseif ($jpm >= 70) {
-                        $status = 'Cocok';
-                    } elseif ($jpm >= 55) {
-                        $status = 'Cukup Cocok';
-                    } else {
-                        $status = 'Kurang Cocok';
-                    }
-                }
-
-                return [
-                    'id' => $user->id,
-                    'no' => $index + 1,
-                    'nama' => $user->name,
-                    'nip' => $user->nip,
-                    'jabatan' => $user->unit_kerja ?? 'Belum diisi',
-                    'tanggalTes' => $latestResult?->test_date?->format('d-m-Y') ?? '-',
-                    'skorDominan' => $latestResult?->primary_type ?? '-',
-                    'jpm' => $jpm !== null ? round($jpm) : '-',
-                    'status' => $status,
-                ];
-            })
-            ->values()
-            ->all();
-
-        return Inertia::render('admin/DataPeserta', [
-            'pesertaData' => $pesertaData,
-        ]);
-    })->name('admin.data-peserta');
+    // Use ResultController to render admin data peserta (list + detail)
+    Route::get('/data-peserta', [ResultController::class, 'hasil'])->name('admin.data-peserta');
     Route::get('/manage-positions', [KelolaJabatanController::class, 'index'])
         ->name('admin.manage-positions');
     Route::post('/manage-positions', [KelolaJabatanController::class, 'store'])
@@ -177,29 +137,8 @@ Route::prefix('admin')->middleware(['admin', 'session.timeout'])->group(function
         ->name('admin.kelola-akun.store');
     Route::post('/kelola-akun/{user}/toggle-status', [KelolaAkunController::class, 'toggleStatus'])
         ->name('admin.kelola-akun.toggle-status');
-    Route::get('/hasil', function (Request $request) {
-        $admin = Auth::user();
-        $userId = $request->query('user_id');
-
-        if (!$userId) {
-            return redirect('/admin/data-peserta')->with('error', 'Peserta tidak dipilih');
-        }
-
-        $peserta = User::find($userId);
-        if (!$peserta || $peserta->role !== 'peserta') {
-            return redirect('/admin/data-peserta')->with('error', 'Peserta tidak ditemukan');
-        }
-
-        $latestResult = DiscResult::where('user_id', $userId)
-            ->latest('test_date')
-            ->first();
-
-        return Inertia::render('admin/GenerateHasil', [
-            'admin' => $admin,
-            'peserta' => $peserta,
-            'discResult' => $latestResult,
-        ]);
-    })->name('admin.hasil');
+    // Admin hasil list / view
+    // /admin/hasil route removed; use /admin/data-peserta for listing and detail
 
     Route::get('/hasil-ringkas', function (Request $request) {
         $userId = $request->query('user_id');

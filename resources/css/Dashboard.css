@@ -1,7 +1,6 @@
 :root {
     --primary-purple: #5850ec;
     --accent-yellow: #facc15;
-    --bg-gradient: linear-gradient(135deg, #f5f7ff 0%, #e0e7ff 100%);
 }
 
 /* Animations */
@@ -129,7 +128,6 @@
 }
 
 body {
-    background: linear-gradient(180deg, #EDEDFF 0%, #DFDFFF 100%);
     min-height: 100vh;
     font-family: 'Oxanium', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     scroll-behavior: smooth;

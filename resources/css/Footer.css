@@ -1,90 +1,58 @@
-/* Footer Styling */
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&display=swap');
+
+/* ============ FOOTER ============ */
 .footer {
+    width: 100%;
     background: radial-gradient(50% 50% at 50% 50%, #FFCC00 0%, #FFFFFF 100%);
-    color: #1e1b4b;
-    padding: 25px 20px;
-    margin-top: 60px;
+    border-top: 1px solid rgba(255, 200, 0, 0.4);
+    box-shadow: 0 -2px 12px rgba(255, 204, 0, 0.25);
+    padding: 10px 0;
     border-radius: 50px 50px 0 0;
 }
 
 .footer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
     max-width: 1200px;
     margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
+    padding: 0 24px;
 }
 
-.footer-copyright {
-    font-size: 0.9rem;
-    color: #1e1b4b;
-    margin: 0;
-}
-
-.footer-credit {
-    font-size: 0.9rem;
-    color: #1e1b4b;
-    margin: 0;
-    margin-left: -40px;
-}
-
-.footer-brand {
-    color: #5850ec;
+.footer-text {
+    font-size: 13px;
     font-weight: 700;
+    color: #002366;
+    font-family: 'Oxanium', sans-serif;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
 
-/* Responsive Footer */
-@media (max-width: 1024px) {
-    .footer-container {
-        gap: 15px;
-    }
-
-    .footer-copyright,
-    .footer-credit {
-        font-size: 0.9rem;
-    }
+.footer-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@media (max-width: 768px) {
+.footer-logo {
+    width: 18px;
+    height: 18px;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 480px) {
     .footer {
-        padding: 20px 15px;
-        margin-top: 40px;
-        border-radius: 50px 50px 0 0;
+        padding: 8px 0;
     }
 
-    .footer-container {
-        justify-content: center;
-        text-align: center;
-        flex-direction: column;
-        gap: 12px;
+    .footer-text {
+        font-size: 12px;
     }
 
-    .footer-copyright,
-    .footer-credit {
-        font-size: 0.85rem;
-    }
-
-    .footer-credit {
-        margin-left: 0;
-    }
-}
-
-@media (max-width: 600px) {
-    .footer {
-        padding: 18px 12px;
-        margin-top: 30px;
-    }
-
-    .footer-container {
-        gap: 10px;
-        padding: 0 5px;
-    }
-
-    .footer-copyright,
-    .footer-credit {
-        font-size: 0.75rem;
-        word-break: break-word;
+    .footer-logo {
+        width: 30px;
+        height: 30px;
     }
 }

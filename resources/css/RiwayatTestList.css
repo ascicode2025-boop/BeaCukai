@@ -1,14 +1,18 @@
+body{
+        background: linear-gradient(180deg, #EDEDFF 0%, #DFDFFF 100%) !important;
+}
+
+
 /* ============ CONTAINER & BACKGROUND ============ */
 .riwayat-list-container {
-    background: linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);
-    background-image:
-        radial-gradient(circle at top-right, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at bottom-left, rgba(168, 85, 247, 0.10) 0%, transparent 45%);
+    background: linear-gradient(180deg, #EDEDFF 0%, #DFDFFF 100%) !important;
     padding: 40px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
+
 
 /* ============ HEADER SECTION ============ */
 .header-section {
@@ -70,6 +74,108 @@
     animation: slideInUp 0.5s ease-out;
 }
 
+.riwayat-empty-state {
+    margin: 10px auto 0;
+    max-width: 560px;
+    width: 100%;
+}
+
+.riwayat-empty-state-box {
+    padding: 32px 28px;
+    text-align: center;
+    color: #4b5563;
+    background: linear-gradient(135deg, #ffffff 0%, #f4f1ff 100%);
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 12px 34px rgba(124, 58, 237, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.riwayat-empty-state-box::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -20px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.18), transparent 70%);
+    opacity: 0.8;
+}
+
+.riwayat-empty-state-box::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: -30px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.18), transparent 70%);
+    opacity: 0.9;
+}
+
+.empty-title {
+    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #4c1d95;
+    position: relative;
+    z-index: 1;
+}
+
+.empty-desc {
+    margin: 0 auto 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.empty-primary,
+.empty-secondary {
+    border: none;
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: 'Oxanium', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.empty-primary {
+    background: linear-gradient(135deg, #7c3aed 0%, #5850ec 100%);
+    color: white;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+}
+
+.empty-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(124, 58, 237, 0.35);
+}
+
+.empty-secondary {
+    background: white;
+    color: #4c1d95;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.empty-secondary:hover {
+    transform: translateY(-2px);
+    border-color: #7c3aed;
+    box-shadow: 0 10px 22px rgba(124, 58, 237, 0.15);
+}
+
 @keyframes slideInUp {
     from {
         opacity: 0;
@@ -106,6 +212,10 @@
     border-color: #7c3aed;
     box-shadow: 0 16px 40px rgba(124, 58, 237, 0.25);
     background: linear-gradient(135deg, #ede9fe 0%, #e9d5ff 100%);
+}
+
+.riwayat-card:hover .view-result-text {
+    transform: translateX(4px);
 }
 
 .riwayat-card-header {
@@ -170,6 +280,17 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: transform 0.25s ease;
+}
+
+.riwayat-card-summary {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(124, 58, 237, 0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
 }
 
 /* ============ DETAIL HASIL SECTION ============ */

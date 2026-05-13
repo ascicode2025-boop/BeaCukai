@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "../../css/ConfirmationModal.css";
-import "../../css/ConfirmationModalCheckbox.css";
 
 const ConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
     const [isConfirmed, setIsConfirmed] = useState(false);
@@ -16,6 +15,8 @@ const ConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+
+                {/* Header */}
                 <div className="modal-header">
                     <h3 className="modal-title">Mulai Tes</h3>
                     <button
@@ -27,6 +28,7 @@ const ConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
                     </button>
                 </div>
 
+                {/* Body */}
                 <div className="modal-body">
                     <div className="instruction-image-container">
                         <img
@@ -35,46 +37,40 @@ const ConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
                             className="instruction-image"
                         />
                     </div>
+
                     <div className="instruction-guide">
                         <p className="guide-item">
-                            <span className="guide-number">1.</span> Untuk
-                            setiap nomor, pilihlah satu karakterisktik yang
-                            paling cocok dengan diri anda dan beri tanda silang
-                            (x) di kolom M.
-                        </p>
-                        <p className="guide-item">
-                            <span className="guide-number">2.</span> Kemudiam,
-                            pilih salah satu karakteristik yang lain yang paling
-                            tidak cocok dengan diri anda dan beri tanda silang
-                            (X) di kolom L.
-                        </p>
-                        <p className="guide-item">
-                            <span className="guide-number">3.</span> Lakukan
-                            kedua langkah di atas untuk ke 24 soal ini.
+                            Setiap kotak terdapat <strong>empat pertanyaan</strong>. Berilah tanda{" "}
+                            <span className="badge-m">M</span> pada pernyataan yang{" "}
+                            <em>mirip</em> dengan Anda, dan{" "}
+                            <span className="badge-l">L</span> pada yang{" "}
+                            <em>tidak mirip</em>. Pilih hanya <strong>satu M</strong> dan{" "}
+                            <strong>satu L</strong> per kotak.
                         </p>
                     </div>
+
                     <div className="instruction-text">
                         <p className="primary-text">Apakah Anda sudah siap?</p>
                         <p className="secondary-text">
-                            Silahkan klik tombol di bawah jika Anda sudah yakin
-                            untuk memulai tes.
+                            Silahkan klik tombol di bawah jika Anda sudah yakin untuk memulai tes.
                         </p>
                     </div>
                 </div>
 
+                {/* Footer */}
                 <div className="modal-footer">
-                    <div className="checkbox-container">
+                    <label className="checkbox-container">
                         <input
                             type="checkbox"
                             id="confirm-checkbox"
                             checked={isConfirmed}
                             onChange={(e) => setIsConfirmed(e.target.checked)}
                         />
-                        <label htmlFor="confirm-checkbox">
-                            Saya sudah membaca dan memahami instruksi pengerjaan
-                            tes.
-                        </label>
-                    </div>
+                        <span className="checkbox-label">
+                            Saya sudah membaca dan memahami instruksi pengerjaan tes.
+                        </span>
+                    </label>
+
                     <div className="button-group">
                         <button className="btn-cancel" onClick={onClose}>
                             Batal
@@ -88,6 +84,7 @@ const ConfirmationModal = ({ isOpen, onConfirm, onClose }) => {
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
     );

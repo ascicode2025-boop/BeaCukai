@@ -32,7 +32,11 @@ const RiwayatTestList = () => {
             if (savedData) {
                 try {
                     const parsed = JSON.parse(savedData);
-                    if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
+                    if (
+                        parsed?.user_id &&
+                        user?.id &&
+                        parsed.user_id !== user.id
+                    ) {
                         setRiwayatTests([]);
                         return;
                     }
@@ -52,10 +56,7 @@ const RiwayatTestList = () => {
                         historyKey,
                         JSON.stringify(historyList),
                     );
-                    localStorage.setItem(
-                        storageKey,
-                        JSON.stringify(updated),
-                    );
+                    localStorage.setItem(storageKey, JSON.stringify(updated));
                 } catch (error) {
                     console.error("Failed to parse discResultData:", error);
                 }
@@ -65,8 +66,7 @@ const RiwayatTestList = () => {
         const normalizedHistory = historyList
             .map((item) => ({
                 ...item,
-                submitted_at:
-                    item.submitted_at || new Date().toISOString(),
+                submitted_at: item.submitted_at || new Date().toISOString(),
                 user_id: item.user_id || user?.id || null,
                 user_email: item.user_email || user?.email || null,
             }))
@@ -75,8 +75,7 @@ const RiwayatTestList = () => {
                     !item.user_id || !user?.id || item.user_id === user.id,
             )
             .sort(
-                (a, b) =>
-                    new Date(b.submitted_at) - new Date(a.submitted_at),
+                (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at),
             );
 
         const mapped = normalizedHistory.map((item) => {
@@ -112,15 +111,20 @@ const RiwayatTestList = () => {
         router.visit("/perserta-tes/hasil");
     };
 
+    const handleMulaiTes = () => {
+        router.visit("/perserta-tes/soal");
+    };
+
+    const handleKeDashboard = () => {
+        router.visit("/perserta-tes/dashboard");
+    };
+
     return (
         <>
             <NavbarLogin />
             <div className="riwayat-list-container">
                 {/* Header Section */}
                 <div className="header-section">
-                    <button className="btn-back-arrow" onClick={handleKembali}>
-                        ← Kembali
-                    </button>
                     <div className="header-accent"></div>
                     <h1 className="header-title">
                         Riwayat DISC Self-Assessment
@@ -169,7 +173,23 @@ const RiwayatTestList = () => {
                         </div>
                     ) : (
                         <div className="riwayat-empty-state">
-                            Anda belum mengerjakan tes DISC.
+                            <div className="riwayat-empty-state-box">
+                                <h3 className="empty-title">
+                                    Belum ada riwayat tes
+                                </h3>
+                                <p className="empty-desc">
+                                    Mulai DISC Self-Assessment untuk melihat
+                                    hasil dan riwayat Anda di sini.
+                                </p>
+                                <div className="empty-actions">
+                                    <button
+                                        className="empty-secondary"
+                                        onClick={handleKeDashboard}
+                                    >
+                                        Ke Dashboard
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

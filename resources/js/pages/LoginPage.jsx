@@ -4,12 +4,12 @@ import { Link, usePage, useForm } from "@inertiajs/react";
 
 // Fungsi enkripsi dan dekripsi sederhana
 const encryptData = (data) => {
-    return btoa(data); // Base64 encoding
+    return btoa(data);
 };
 
 const decryptData = (data) => {
     try {
-        return atob(data); // Base64 decoding
+        return atob(data);
     } catch (e) {
         return null;
     }
@@ -34,32 +34,25 @@ export default function LoginPage() {
         remember: false,
     });
 
-    // Combine errors dari props dan form
     const allErrors = { ...initialErrors, ...errors };
 
-    // Fungsi untuk menampilkan pop up error
     const showError = (message) => {
         setErrorMessage(message);
         setShowErrorPopup(true);
         setTimeout(() => setShowErrorPopup(false), 4000);
     };
 
-    // Cek apakah user diarahkan dari halaman yang butuh auth
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("auth_required") === "1") {
-            setInfoMessage(
-                "🔐 Silakan login terlebih dahulu untuk mengakses halaman tersebut",
-            );
+            setInfoMessage("🔐 Silakan login terlebih dahulu untuk mengakses halaman tersebut");
             setShowInfoPopup(true);
             const timer = setTimeout(() => setShowInfoPopup(false), 5000);
-            // Hapus query param dari URL tanpa reload
             window.history.replaceState({}, document.title, "/login");
             return () => clearTimeout(timer);
         }
     }, []);
 
-    // Tampilkan success popup jika ada flash message
     useEffect(() => {
         if (successMessage) {
             setShowSuccessPopup(true);
@@ -68,7 +61,6 @@ export default function LoginPage() {
         }
     }, [successMessage]);
 
-    // Tampilkan warning popup (session timeout)
     useEffect(() => {
         if (warningMessage) {
             setShowWarningPopup(true);
@@ -77,11 +69,9 @@ export default function LoginPage() {
         }
     }, [warningMessage]);
 
-    // Tampilkan error dari backend
     useEffect(() => {
         if (Object.keys(allErrors).length > 0) {
             const getErrorMsg = (err) => (Array.isArray(err) ? err[0] : err);
-
             if (allErrors.nip) {
                 showError(getErrorMsg(allErrors.nip));
             } else if (allErrors.password) {
@@ -90,14 +80,11 @@ export default function LoginPage() {
         }
     }, [JSON.stringify(allErrors)]);
 
-    // Load saved credentials dari localStorage saat component mount
     useEffect(() => {
         const savedNip = localStorage.getItem("remember_nip");
         const savedPassword = localStorage.getItem("remember_password");
-
         if (savedNip && savedPassword) {
             const decryptedPassword = decryptData(savedPassword);
-
             if (decryptedPassword) {
                 setData({
                     ...data,
@@ -111,129 +98,153 @@ export default function LoginPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Cek field kosong
         if (!data.nip || !data.password) {
             showError("⚠️ NIP dan Password harus diisi");
             return;
         }
-
-        // Simpan ke localStorage jika "Ingat Saya" di-check
         if (data.remember) {
             localStorage.setItem("remember_nip", data.nip);
-            localStorage.setItem(
-                "remember_password",
-                encryptData(data.password),
-            );
-            console.log("✅ Credentials disimpan dengan aman");
+            localStorage.setItem("remember_password", encryptData(data.password));
         } else {
-            // Hapus dari localStorage jika tidak di-check
             localStorage.removeItem("remember_nip");
             localStorage.removeItem("remember_password");
-            console.log("🗑️ Credentials dihapus");
         }
-
         post("/login");
     };
+
     return (
         <div className="login-wrapper">
+            {/* ======= DEKORASI LINGKARAN BACKGROUND ======= */}
+            {/* Lingkaran besar kanan atas */}
+            <div style={{
+                position: "fixed", top: "-120px", right: "-120px",
+                width: "420px", height: "420px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(102,102,204,0.18) 0%, rgba(0,35,102,0.08) 100%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Lingkaran sedang kiri bawah */}
+            <div style={{
+                position: "fixed", bottom: "-80px", left: "-80px",
+                width: "320px", height: "320px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(102,102,204,0.15) 0%, rgba(0,35,102,0.06) 100%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Lingkaran kecil kiri atas */}
+            <div style={{
+                position: "fixed", top: "60px", left: "40px",
+                width: "160px", height: "160px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(92,95,182,0.13) 0%, transparent 80%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Lingkaran kecil kanan bawah */}
+            <div style={{
+                position: "fixed", bottom: "80px", right: "60px",
+                width: "120px", height: "120px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(92,95,182,0.12) 0%, transparent 80%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Lingkaran outline tengah kiri */}
+            <div style={{
+                position: "fixed", top: "50%", left: "-60px",
+                transform: "translateY(-50%)",
+                width: "220px", height: "220px", borderRadius: "50%",
+                border: "2px solid rgba(102,102,204,0.15)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Lingkaran outline tengah kanan */}
+            <div style={{
+                position: "fixed", top: "30%", right: "-40px",
+                width: "180px", height: "180px", borderRadius: "50%",
+                border: "2px solid rgba(0,35,102,0.1)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Lingkaran outline besar bawah tengah */}
+            <div style={{
+                position: "fixed", bottom: "-160px", left: "50%",
+                transform: "translateX(-50%)",
+                width: "380px", height: "380px", borderRadius: "50%",
+                border: "2px solid rgba(102,102,204,0.1)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Titik kecil solid atas kanan */}
+            <div style={{
+                position: "fixed", top: "120px", right: "180px",
+                width: "18px", height: "18px", borderRadius: "50%",
+                background: "rgba(102,102,204,0.25)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Titik kecil solid bawah kiri */}
+            <div style={{
+                position: "fixed", bottom: "160px", left: "120px",
+                width: "12px", height: "12px", borderRadius: "50%",
+                background: "rgba(0,35,102,0.2)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Titik sedang solid tengah kanan */}
+            <div style={{
+                position: "fixed", top: "55%", right: "140px",
+                width: "28px", height: "28px", borderRadius: "50%",
+                background: "rgba(92,95,182,0.15)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* ======= END DEKORASI ======= */}
+
             {/* Pop Up Success Registrasi */}
             {showSuccessPopup && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        zIndex: 9999,
-                        background: "#4CAF50",
-                        color: "white",
-                        padding: "16px 32px",
-                        borderRadius: "12px",
-                        fontWeight: "bold",
-                        boxShadow: "0 4px 20px rgba(76, 175, 80, 0.3)",
-                        maxWidth: "400px",
-                        width: "calc(100% - 40px)",
-                        animation: "slideDown 0.3s ease-out",
-                    }}
-                >
+                <div style={{
+                    position: "fixed", top: 20, left: "50%",
+                    transform: "translateX(-50%)", zIndex: 9999,
+                    background: "#4CAF50", color: "white",
+                    padding: "16px 32px", borderRadius: "12px",
+                    fontWeight: "bold", boxShadow: "0 4px 20px rgba(76, 175, 80, 0.3)",
+                    maxWidth: "400px", width: "calc(100% - 40px)",
+                    animation: "slideDown 0.3s ease-out",
+                }}>
                     ✓ {successMessage}
                 </div>
             )}
 
             {/* Pop Up Info (Auth Required) */}
             {showInfoPopup && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        zIndex: 9999,
-                        background:
-                            "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
-                        color: "white",
-                        padding: "16px 32px",
-                        borderRadius: "12px",
-                        fontWeight: "bold",
-                        boxShadow: "0 4px 20px rgba(59, 130, 246, 0.4)",
-                        maxWidth: "500px",
-                        width: "calc(100% - 40px)",
-                        animation: "slideDown 0.3s ease-out",
-                        fontSize: "14px",
-                    }}
-                >
+                <div style={{
+                    position: "fixed", top: 20, left: "50%",
+                    transform: "translateX(-50%)", zIndex: 9999,
+                    background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
+                    color: "white", padding: "16px 32px", borderRadius: "12px",
+                    fontWeight: "bold", boxShadow: "0 4px 20px rgba(59, 130, 246, 0.4)",
+                    maxWidth: "500px", width: "calc(100% - 40px)",
+                    animation: "slideDown 0.3s ease-out", fontSize: "14px",
+                }}>
                     {infoMessage}
                 </div>
             )}
 
             {/* Pop Up Warning (Session Timeout) */}
             {showWarningPopup && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        zIndex: 9999,
-                        background:
-                            "linear-gradient(90deg, #f59e0b 0%, #d97706 100%)",
-                        color: "white",
-                        padding: "16px 32px",
-                        borderRadius: "12px",
-                        fontWeight: "bold",
-                        boxShadow: "0 4px 20px rgba(245, 158, 11, 0.4)",
-                        maxWidth: "500px",
-                        width: "calc(100% - 40px)",
-                        animation: "slideDown 0.3s ease-out",
-                        fontSize: "14px",
-                    }}
-                >
+                <div style={{
+                    position: "fixed", top: 20, left: "50%",
+                    transform: "translateX(-50%)", zIndex: 9999,
+                    background: "linear-gradient(90deg, #f59e0b 0%, #d97706 100%)",
+                    color: "white", padding: "16px 32px", borderRadius: "12px",
+                    fontWeight: "bold", boxShadow: "0 4px 20px rgba(245, 158, 11, 0.4)",
+                    maxWidth: "500px", width: "calc(100% - 40px)",
+                    animation: "slideDown 0.3s ease-out", fontSize: "14px",
+                }}>
                     ⏱️ {warningMessage}
                 </div>
             )}
 
             {/* Pop Up Error */}
             {showErrorPopup && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 20,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        zIndex: 9999,
-                        background: "#ff4d4d",
-                        color: "white",
-                        padding: "14px 28px",
-                        borderRadius: "10px",
-                        fontWeight: "bold",
-                        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-                        maxWidth: "500px",
-                        width: "calc(100% - 40px)",
-                        animation: "slideDown 0.3s ease-out",
-                        fontSize: "14px",
-                    }}
-                >
+                <div style={{
+                    position: "fixed", top: 20, left: "50%",
+                    transform: "translateX(-50%)", zIndex: 9999,
+                    background: "#ff4d4d", color: "white",
+                    padding: "14px 28px", borderRadius: "10px",
+                    fontWeight: "bold", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+                    maxWidth: "500px", width: "calc(100% - 40px)",
+                    animation: "slideDown 0.3s ease-out", fontSize: "14px",
+                }}>
                     {errorMessage}
                 </div>
             )}
@@ -242,20 +253,22 @@ export default function LoginPage() {
                 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;700;800;900&display=swap');
 
                 @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateX(-50%) translateY(-20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(-50%) translateY(0);
-                    }
+                    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+                }
+
+                @keyframes floatCircle {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-12px); }
+                }
+
+                @keyframes floatCircleReverse {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(12px); }
                 }
 
                 * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
+                    margin: 0; padding: 0; box-sizing: border-box;
                     font-family: 'Oxanium', sans-serif;
                 }
 
@@ -268,28 +281,6 @@ export default function LoginPage() {
                     position: relative;
                     overflow: hidden;
                     padding: 40px 20px;
-                }
-
-                /* Background Circles - Using Images */
-                .bg-circle {
-                    position: absolute;
-                    z-index: 1;
-                    pointer-events: none;
-                }
-
-                .circle-1 {
-                    width: 450px;
-                    height: 450px;
-                    top: -100px;
-                    left: 50%;
-                    transform: translateX(-20%);
-                }
-
-                .circle-2 {
-                    width: 350px;
-                    height: 350px;
-                    bottom: -50px;
-                    left: 5%;
                 }
 
                 .login-card {
@@ -315,21 +306,6 @@ export default function LoginPage() {
                     min-height: 550px;
                 }
 
-                .character-img-container {
-                  position: relative;
-                  width: 100%;
-                  display: flex;
-                  justify-content: center;
-                  align-items: flex-end;
-                }
-
-                .char-img {
-                  width: 100%;
-                  max-width: 320px;
-                  object-fit: contain;
-                  margin-bottom: -20px;
-                }
-
                 .login-right {
                     flex: 1;
                     padding: 50px 50px 40px 50px;
@@ -349,8 +325,8 @@ export default function LoginPage() {
                 }
 
                 .form-container {
-                  width: 100%;
-                  max-width: 100%;
+                    width: 100%;
+                    max-width: 100%;
                 }
 
                 .form-group-custom {
@@ -442,21 +418,17 @@ export default function LoginPage() {
                 }
 
                 .remember-me-checkbox {
-                    width: 18px;
-                    height: 18px;
-                    min-width: 18px;
-                    min-height: 18px;
+                    width: 18px; height: 18px;
+                    min-width: 18px; min-height: 18px;
                     margin-right: 12px;
-                    margin-top: 0;
-                    margin-bottom: 0;
+                    margin-top: 0; margin-bottom: 0;
                     accent-color: #5c5fb6;
                     cursor: pointer;
                     pointer-events: auto !important;
                     flex-shrink: 0;
                     position: relative;
                     z-index: 20;
-                    top: 0;
-                    left: 0;
+                    top: 0; left: 0;
                 }
 
                 .forgot-password {
@@ -502,9 +474,12 @@ export default function LoginPage() {
                     transition: all 0.3s ease;
                 }
 
-                .regist-here-link:hover {
-                    color: #333333;
-                }
+                .regist-here-link:hover { color: #333333; }
+
+                /* Animasi floating untuk dekorasi */
+                .deco-float-up   { animation: floatCircle 6s ease-in-out infinite; }
+                .deco-float-down { animation: floatCircleReverse 7s ease-in-out infinite; }
+                .deco-float-slow { animation: floatCircle 9s ease-in-out infinite; }
 
                 @media (max-width: 768px) {
                     .login-card {
@@ -512,35 +487,93 @@ export default function LoginPage() {
                         width: 100%;
                         max-width: 400px;
                     }
-                    .login-left {
-                        display: none;
-                    }
+                    .login-left { display: none; }
                     .login-right {
                         padding: 40px 20px;
                         padding-top: 60px;
                     }
-                    .login-right h2 {
-                        font-size: 20px;
-                        margin-bottom: 40px;
-                    }
-                    .form-container {
-                        max-width: 100%;
-                    }
-                    .label-custom {
-                        width: 100px;
-                        font-size: 12px;
-                    }
-                    .input-capsule {
-                        padding: 7px 12px;
-                        font-size: 13px;
-                    }
-                    .signin-btn {
-                        font-size: 13px;
-                    }
+                    .login-right h2 { font-size: 20px; margin-bottom: 40px; }
+                    .form-container { max-width: 100%; }
+                    .label-custom { width: 100px; font-size: 12px; }
+                    .input-capsule { padding: 7px 12px; font-size: 13px; }
+                    .signin-btn { font-size: 13px; }
                 }
             `}</style>
 
-            {/* Background Decorations - Removed (replaced with CSS gradient) */}
+            {/* ======= DEKORASI LINGKARAN ANIMASI (FIXED) ======= */}
+            {/* Besar - kanan atas, mengambang naik */}
+            <div className="deco-float-up" style={{
+                position: "fixed", top: "-120px", right: "-120px",
+                width: "420px", height: "420px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(102,102,204,0.18) 0%, rgba(0,35,102,0.08) 100%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Sedang - kiri bawah, mengambang turun */}
+            <div className="deco-float-down" style={{
+                position: "fixed", bottom: "-80px", left: "-80px",
+                width: "320px", height: "320px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(102,102,204,0.15) 0%, rgba(0,35,102,0.06) 100%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Kecil - kiri atas */}
+            <div className="deco-float-slow" style={{
+                position: "fixed", top: "60px", left: "40px",
+                width: "160px", height: "160px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(92,95,182,0.13) 0%, transparent 80%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Kecil - kanan bawah */}
+            <div className="deco-float-up" style={{
+                position: "fixed", bottom: "80px", right: "60px",
+                width: "120px", height: "120px", borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(92,95,182,0.12) 0%, transparent 80%)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Outline - tengah kiri */}
+            <div className="deco-float-down" style={{
+                position: "fixed", top: "50%", left: "-60px",
+                transform: "translateY(-50%)",
+                width: "220px", height: "220px", borderRadius: "50%",
+                border: "2px solid rgba(102,102,204,0.15)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Outline - tengah kanan */}
+            <div className="deco-float-slow" style={{
+                position: "fixed", top: "30%", right: "-40px",
+                width: "180px", height: "180px", borderRadius: "50%",
+                border: "2px solid rgba(0,35,102,0.1)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Outline besar - bawah tengah */}
+            <div className="deco-float-up" style={{
+                position: "fixed", bottom: "-160px", left: "50%",
+                transform: "translateX(-50%)",
+                width: "380px", height: "380px", borderRadius: "50%",
+                border: "2px solid rgba(102,102,204,0.1)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Titik solid - atas kanan */}
+            <div className="deco-float-slow" style={{
+                position: "fixed", top: "120px", right: "180px",
+                width: "18px", height: "18px", borderRadius: "50%",
+                background: "rgba(102,102,204,0.25)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Titik solid - bawah kiri */}
+            <div className="deco-float-down" style={{
+                position: "fixed", bottom: "160px", left: "120px",
+                width: "12px", height: "12px", borderRadius: "50%",
+                background: "rgba(0,35,102,0.2)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* Titik sedang - tengah kanan */}
+            <div className="deco-float-up" style={{
+                position: "fixed", top: "55%", right: "140px",
+                width: "28px", height: "28px", borderRadius: "50%",
+                background: "rgba(92,95,182,0.15)",
+                zIndex: 0, pointerEvents: "none",
+            }} />
+            {/* ======= END DEKORASI ======= */}
 
             <div className="login-card">
                 <div className="login-left">
@@ -548,11 +581,8 @@ export default function LoginPage() {
                         src="/assets/register1.png"
                         alt="Characters"
                         style={{
-                            width: "850px",
-                            height: "550px",
-                            position: "absolute",
-                            top: "74px",
-                            marginLeft: "35px",
+                            width: "850px", height: "550px",
+                            position: "absolute", top: "74px", marginLeft: "35px",
                         }}
                     />
                 </div>
@@ -561,65 +591,42 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className="form-container">
                         <div className="form-group-custom">
                             <label className="label-custom">NIP</label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
+                            <div style={{ position: "relative", width: "100%" }}>
                                 <input
                                     type="text"
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.nip}
-                                    onChange={(e) =>
-                                        setData("nip", e.target.value)
-                                    }
+                                    onChange={(e) => setData("nip", e.target.value)}
                                 />
                             </div>
                         </div>
                         <div className="form-group-custom">
                             <label className="label-custom">Password</label>
-                            <div
-                                style={{ position: "relative", width: "100%" }}
-                            >
+                            <div style={{ position: "relative", width: "100%" }}>
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     className="input-capsule"
                                     style={{ width: "100%" }}
                                     value={data.password}
-                                    onChange={(e) =>
-                                        setData("password", e.target.value)
-                                    }
+                                    onChange={(e) => setData("password", e.target.value)}
                                 />
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        setShowPassword(!showPassword)
-                                    }
+                                    onClick={() => setShowPassword(!showPassword)}
                                     style={{
-                                        position: "absolute",
-                                        right: "15px",
-                                        top: "50%",
+                                        position: "absolute", right: "15px", top: "50%",
                                         transform: "translateY(-50%)",
-                                        background: "none",
-                                        border: "none",
-                                        fontSize: "12px",
-                                        cursor: "pointer",
-                                        color: "#2d3269",
-                                        display: "flex",
-                                        alignItems: "center",
+                                        background: "none", border: "none",
+                                        fontSize: "12px", cursor: "pointer",
+                                        color: "#2d3269", display: "flex", alignItems: "center",
                                     }}
                                 >
-                                    <i
-                                        className={`fas ${
-                                            showPassword
-                                                ? "fa-eye-slash"
-                                                : "fa-eye"
-                                        }`}
-                                    ></i>
+                                    <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                                 </button>
                             </div>
                         </div>
 
-                        {/* Remember Me Checkbox */}
                         <div
                             className="remember-me-container"
                             onClick={() => setData("remember", !data.remember)}
@@ -639,17 +646,10 @@ export default function LoginPage() {
                             </label>
                         </div>
 
-                        <button
-                            type="submit"
-                            className="signin-btn"
-                            disabled={processing}
-                        >
+                        <button type="submit" className="signin-btn" disabled={processing}>
                             {processing ? "Loading..." : "Masuk"}
                         </button>
-                        <Link
-                            href="/forgot-password"
-                            className="forgot-password"
-                        >
+                        <Link href="/forgot-password" className="forgot-password">
                             Lupa Password
                         </Link>
                     </form>

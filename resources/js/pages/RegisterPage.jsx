@@ -53,7 +53,6 @@ export default function RegisterPage() {
         }
     }, [JSON.stringify(allErrors)]);
 
-    // Check flash messages for success
     useEffect(() => {
         if (flashMessage.success && flashMessage.email) {
             setSuccessEmail(flashMessage.email);
@@ -76,17 +75,14 @@ export default function RegisterPage() {
             showError("⚠️ Semua field harus diisi");
             return;
         }
-
         if (!/^\d+$/.test(data.nip)) {
             showError("🔢 NIP hanya boleh berisi angka");
             return;
         }
-
         if (!data.email.includes("@")) {
             showError("📧 Email harus mengandung @");
             return;
         }
-
         if (data.password !== data.password_confirmation) {
             showError("🔐 Konfirmasi password tidak cocok");
             return;
@@ -97,6 +93,7 @@ export default function RegisterPage() {
 
     return (
         <div className="register-wrapper">
+            {/* Error Popup */}
             {showErrorPopup && (
                 <div className="error-popup">{errorMessage}</div>
             )}
@@ -134,10 +131,23 @@ export default function RegisterPage() {
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;700;800;900&display=swap');
 
+                @keyframes slideIn {
+                    from { transform: translateY(-30px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+
+                @keyframes floatCircle {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-12px); }
+                }
+
+                @keyframes floatCircleReverse {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(12px); }
+                }
+
                 * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
+                    margin: 0; padding: 0; box-sizing: border-box;
                     font-family: 'Oxanium', sans-serif;
                 }
 
@@ -148,6 +158,8 @@ export default function RegisterPage() {
                     align-items: center;
                     justify-content: center;
                     padding: 40px 20px;
+                    position: relative;
+                    overflow: hidden;
                 }
 
                 .error-popup {
@@ -167,10 +179,8 @@ export default function RegisterPage() {
                 /* Success Modal */
                 .success-modal-overlay {
                     position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
                     background: rgba(0, 0, 0, 0.5);
                     display: flex;
                     align-items: center;
@@ -188,20 +198,8 @@ export default function RegisterPage() {
                     animation: slideIn 0.3s ease-out;
                 }
 
-                @keyframes slideIn {
-                    from {
-                        transform: translateY(-30px);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateY(0);
-                        opacity: 1;
-                    }
-                }
-
                 .success-icon {
-                    width: 80px;
-                    height: 80px;
+                    width: 80px; height: 80px;
                     background: linear-gradient(135deg, #4A569D 0%, #FFCA08 100%);
                     color: white;
                     border-radius: 50%;
@@ -270,9 +268,7 @@ export default function RegisterPage() {
                     transition: background 0.3s;
                 }
 
-                .success-btn:hover {
-                    background: #FFB700;
-                }
+                .success-btn:hover { background: #FFB700; }
 
                 .register-card {
                     width: 950px;
@@ -281,32 +277,29 @@ export default function RegisterPage() {
                     display: flex;
                     overflow: hidden;
                     box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+                    position: relative;
+                    z-index: 5;
                 }
 
-                /* LEFT */
                 .register-left {
                     flex: 1;
                     background: linear-gradient(180deg, #4A569D 0%, #2d3269 100%);
                     position: relative;
                     min-height: 600px;
-
                     display: flex;
                     align-items: flex-end;
                     justify-content: center;
-
                 }
 
-                /* 🔥 FIX FINAL GAMBAR */
                 .character-img {
                     position: absolute;
-                    bottom: -92px; /* turun */
+                    bottom: -92px;
                     left: 50%;
                     transform: translateX(-50%);
-                    height: 105%; /* biar tetap penuh */
+                    height: 105%;
                     object-fit: contain;
                 }
 
-                /* RIGHT */
                 .register-right {
                     flex: 1;
                     padding: 30px 50px;
@@ -400,9 +393,7 @@ export default function RegisterPage() {
                     filter: brightness(1.1);
                 }
 
-                .signup-btn:active {
-                    transform: translateY(0);
-                }
+                .signup-btn:active { transform: translateY(0); }
 
                 .footer-text {
                     margin-top: 20px;
@@ -424,67 +415,192 @@ export default function RegisterPage() {
                     text-decoration: underline;
                 }
 
+                /* Animasi floating dekorasi */
+                .deco-float-up   { animation: floatCircle 6s ease-in-out infinite; }
+                .deco-float-down { animation: floatCircleReverse 7s ease-in-out infinite; }
+                .deco-float-slow { animation: floatCircle 9s ease-in-out infinite; }
+
                 @media (max-width: 768px) {
                     .register-card {
                         flex-direction: column;
                         width: 100%;
                     }
-
-                    .register-left {
-                        display: none;
-                    }
-
-                    .register-right {
-                        padding: 30px 20px;
-                    }
-
-                    .register-right h2 {
-                        font-size: 20px;
-                        margin-bottom: 30px;
-                    }
-
-                    .character-img {
-                        position: relative;
-                        height: 250px;
-                        bottom: 0;
-                    }
-
+                    .register-left { display: none; }
+                    .register-right { padding: 30px 20px; }
+                    .register-right h2 { font-size: 20px; margin-bottom: 30px; }
+                    .character-img { position: relative; height: 250px; bottom: 0; }
                     .form-group-custom {
                         flex-direction: column;
                         align-items: flex-start;
                         margin-bottom: 14px;
                     }
-
-                    .label-custom {
-                        width: 100%;
-                        margin-bottom: 6px;
-                        font-size: 13px;
-                    }
-
-                    .input-wrapper {
-                        width: 100%;
-                    }
-
-                    .input-capsule {
-                        width: 100%;
-                        height: 34px;
-                        font-size: 12px;
-                    }
-
-                    .signup-btn {
-                        font-size: 13px;
-                        padding: 8px 20px;
-                    }
-
-                    .footer-text {
-                        font-size: 12px;
-                    }
-
-                    .regist-here-link {
-                        font-size: 11px;
-                    }
+                    .label-custom { width: 100%; margin-bottom: 6px; font-size: 13px; }
+                    .input-wrapper { width: 100%; }
+                    .input-capsule { width: 100%; height: 34px; font-size: 12px; }
+                    .signup-btn { font-size: 13px; padding: 8px 20px; }
+                    .footer-text { font-size: 12px; }
+                    .regist-here-link { font-size: 11px; }
                 }
             `}</style>
+
+            {/* ======= DEKORASI LINGKARAN BACKGROUND ======= */}
+            {/* Besar - kanan atas */}
+            <div
+                className="deco-float-up"
+                style={{
+                    position: "fixed",
+                    top: "-120px",
+                    right: "-120px",
+                    width: "420px",
+                    height: "420px",
+                    borderRadius: "50%",
+                    background:
+                        "radial-gradient(circle, rgba(74,86,157,0.18) 0%, rgba(45,50,105,0.08) 100%)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Sedang - kiri bawah */}
+            <div
+                className="deco-float-down"
+                style={{
+                    position: "fixed",
+                    bottom: "-80px",
+                    left: "-80px",
+                    width: "320px",
+                    height: "320px",
+                    borderRadius: "50%",
+                    background:
+                        "radial-gradient(circle, rgba(74,86,157,0.15) 0%, rgba(45,50,105,0.06) 100%)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Kecil - kiri atas */}
+            <div
+                className="deco-float-slow"
+                style={{
+                    position: "fixed",
+                    top: "60px",
+                    left: "40px",
+                    width: "160px",
+                    height: "160px",
+                    borderRadius: "50%",
+                    background:
+                        "radial-gradient(circle, rgba(74,86,157,0.13) 0%, transparent 80%)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Kecil - kanan bawah */}
+            <div
+                className="deco-float-up"
+                style={{
+                    position: "fixed",
+                    bottom: "80px",
+                    right: "60px",
+                    width: "120px",
+                    height: "120px",
+                    borderRadius: "50%",
+                    background:
+                        "radial-gradient(circle, rgba(74,86,157,0.12) 0%, transparent 80%)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Outline - tengah kiri */}
+            <div
+                className="deco-float-down"
+                style={{
+                    position: "fixed",
+                    top: "50%",
+                    left: "-60px",
+                    transform: "translateY(-50%)",
+                    width: "220px",
+                    height: "220px",
+                    borderRadius: "50%",
+                    border: "2px solid rgba(74,86,157,0.15)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Outline - tengah kanan */}
+            <div
+                className="deco-float-slow"
+                style={{
+                    position: "fixed",
+                    top: "30%",
+                    right: "-40px",
+                    width: "180px",
+                    height: "180px",
+                    borderRadius: "50%",
+                    border: "2px solid rgba(45,50,105,0.1)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Outline besar - bawah tengah */}
+            <div
+                className="deco-float-up"
+                style={{
+                    position: "fixed",
+                    bottom: "-160px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "380px",
+                    height: "380px",
+                    borderRadius: "50%",
+                    border: "2px solid rgba(74,86,157,0.1)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Titik solid - atas kanan */}
+            <div
+                className="deco-float-slow"
+                style={{
+                    position: "fixed",
+                    top: "120px",
+                    right: "180px",
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    background: "rgba(74,86,157,0.25)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Titik solid - bawah kiri */}
+            <div
+                className="deco-float-down"
+                style={{
+                    position: "fixed",
+                    bottom: "160px",
+                    left: "120px",
+                    width: "12px",
+                    height: "12px",
+                    borderRadius: "50%",
+                    background: "rgba(45,50,105,0.2)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* Titik sedang - tengah kanan */}
+            <div
+                className="deco-float-up"
+                style={{
+                    position: "fixed",
+                    top: "55%",
+                    right: "140px",
+                    width: "28px",
+                    height: "28px",
+                    borderRadius: "50%",
+                    background: "rgba(74,86,157,0.15)",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                }}
+            />
+            {/* ======= END DEKORASI ======= */}
 
             <div className="register-card">
                 <div className="register-left">
@@ -597,7 +713,7 @@ export default function RegisterPage() {
                                 className="signup-btn"
                                 disabled={processing}
                             >
-                                Daftar
+                                {processing ? "Loading..." : "Daftar"}
                             </button>
                         </div>
                     </form>
