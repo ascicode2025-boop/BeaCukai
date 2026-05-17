@@ -9,9 +9,9 @@ import {
     Power,
     InfoCircleFill,
     CheckCircleFill,
-    ExclamationTriangleFill
+    ExclamationTriangleFill,
 } from "react-bootstrap-icons";
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage, router } from "@inertiajs/react";
 
 const KelolaAkun = () => {
     const { props } = usePage();
@@ -24,6 +24,7 @@ const KelolaAkun = () => {
         telepon: "",
         password: "",
     });
+
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedAkun, setSelectedAkun] = useState(null);
     const [showDetail, setShowDetail] = useState(false);
@@ -32,6 +33,9 @@ const KelolaAkun = () => {
     const [formError, setFormError] = useState("");
     const [showFormAlert, setShowFormAlert] = useState(false);
     const [formAlertMessage, setFormAlertMessage] = useState("");
+
+    // Track which account IDs are currently being toggled
+    const [togglingIds, setTogglingIds] = useState(new Set());
 
     useEffect(() => {
         if (props.flash?.warning) {
@@ -43,8 +47,7 @@ const KelolaAkun = () => {
         }
     }, [props.flash?.warning, props.flash?.success]);
 
-    const normalizeText = (value) =>
-        (value ?? "").toString().toLowerCase();
+    const normalizeText = (value) => (value ?? "").toString().toLowerCase();
 
     const formatRole = (role) => {
         if (role === "super_admin") return "Super Admin";
@@ -98,31 +101,52 @@ const KelolaAkun = () => {
         setTimeout(() => setSelectedAkun(null), 300);
     };
 
+    // Use router.post directly (not useForm's post) so it's
+    // completely independent from the form's `processing` state.
     const handleToggleStatus = (akun) => {
-        post(`/admin/kelola-akun/${akun.id}/toggle-status`, {
-            preserveScroll: true,
-            onSuccess: () => {
-                const nextActive = !akun.is_active;
-                setAkunData((prev) =>
-                    prev.map((item) =>
-                        item.id === akun.id
-                            ? { ...item, is_active: nextActive }
-                            : item,
-                    ),
-                );
-                setSelectedAkun((prev) =>
-                    prev && prev.id === akun.id
-                        ? { ...prev, is_active: nextActive }
-                        : prev,
-                );
-                setSuccessMessage(
-                    `Berhasil ${
-                        nextActive ? "mengaktifkan" : "menonaktifkan"
-                    } akun ${akun.nama}.`,
-                );
-                setShowSuccess(true);
+        if (togglingIds.has(akun.id)) return; // prevent double-click
+
+        setTogglingIds((prev) => new Set(prev).add(akun.id));
+
+        router.post(
+            `/admin/kelola-akun/${akun.id}/toggle-status`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    const nextActive = !akun.is_active;
+                    setAkunData((prev) =>
+                        prev.map((item) =>
+                            item.id === akun.id
+                                ? { ...item, is_active: nextActive }
+                                : item,
+                        ),
+                    );
+                    setSelectedAkun((prev) =>
+                        prev && prev.id === akun.id
+                            ? { ...prev, is_active: nextActive }
+                            : prev,
+                    );
+                    setSuccessMessage(
+                        `Berhasil ${nextActive ? "mengaktifkan" : "menonaktifkan"} akun ${akun.nama}.`,
+                    );
+                    setShowSuccess(true);
+                },
+                onError: () => {
+                    setFormAlertMessage(
+                        "Gagal mengubah status akun. Coba lagi.",
+                    );
+                    setShowFormAlert(true);
+                },
+                onFinish: () => {
+                    setTogglingIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(akun.id);
+                        return next;
+                    });
+                },
             },
-        });
+        );
     };
 
     const handleCloseSuccess = () => {
@@ -173,6 +197,31 @@ const KelolaAkun = () => {
         setTimeout(() => setFormAlertMessage(""), 300);
     };
 
+    // Helper: render the toggle button for a given akun
+    const ToggleButton = ({ akun }) => {
+        const isToggling = togglingIds.has(akun.id);
+        const willDeactivate = akun.is_active;
+
+        if (isToggling) {
+            return (
+                <button className="btn-action btn-processing" disabled>
+                    <span className="spinner-tiny" />
+                    Memproses...
+                </button>
+            );
+        }
+
+        return (
+            <button
+                className={`btn-action ${willDeactivate ? "btn-outline-danger" : "btn-outline-success"}`}
+                onClick={() => handleToggleStatus(akun)}
+            >
+                <Power />
+                {willDeactivate ? "Nonaktifkan" : "Aktifkan"}
+            </button>
+        );
+    };
+
     return (
         <NavbarLoginAdmin>
             <div className="kelola-akun-wrapper">
@@ -180,9 +229,16 @@ const KelolaAkun = () => {
                     {/* Header Section */}
                     <div className="header-section">
                         <div>
-                            <h1 className="header-title">Kelola Akun Pengguna</h1>
-                            <p className="header-description">
-                                Pantau dan kelola seluruh entitas pengguna dalam sistem. Anda dapat menambah akun baru, meninjau detail identitas, dan mengatur hak akses.
+                            <h1 className="header-title">
+                                Kelola Akun Pengguna
+                            </h1>
+                            <p
+                                className="header-description"
+                                style={{ marginTop: "8px", maxWidth: "600px" }}
+                            >
+                                Pantau dan kelola seluruh entitas pengguna dalam
+                                sistem. Anda dapat menambah akun baru, meninjau
+                                detail identitas, dan mengatur hak akses.
                             </p>
                         </div>
                     </div>
@@ -195,41 +251,76 @@ const KelolaAkun = () => {
                                     <PlusLg className="form-header-icon" />
                                     <span>Registrasi Akun Baru</span>
                                 </div>
-                                <form className="form-layout" onSubmit={handleCreateAccount}>
+                                <form
+                                    className="form-layout"
+                                    onSubmit={handleCreateAccount}
+                                >
                                     <div className="form-field full-width">
-                                        <label>Nama Lengkap <span className="text-danger">*</span></label>
+                                        <label>
+                                            Nama Lengkap{" "}
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                        </label>
                                         <input
                                             type="text"
                                             value={data.name}
-                                            onChange={(e) => setData("name", e.target.value)}
+                                            onChange={(e) =>
+                                                setData("name", e.target.value)
+                                            }
                                             placeholder="Masukkan nama lengkap"
                                         />
                                     </div>
                                     <div className="form-field">
-                                        <label>NIP / Identitas <span className="text-danger">*</span></label>
+                                        <label>
+                                            NIP / Identitas{" "}
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                        </label>
                                         <input
                                             type="text"
                                             value={data.nip}
-                                            onChange={(e) => setData("nip", e.target.value)}
+                                            onChange={(e) =>
+                                                setData("nip", e.target.value)
+                                            }
                                             placeholder="Nomor Induk Pegawai"
                                         />
                                     </div>
                                     <div className="form-field">
-                                        <label>Hak Akses (Role) <span className="text-danger">*</span></label>
+                                        <label>
+                                            Hak Akses (Role){" "}
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                        </label>
                                         <select
                                             value={data.role}
-                                            onChange={(e) => setData("role", e.target.value)}
+                                            onChange={(e) =>
+                                                setData("role", e.target.value)
+                                            }
                                         >
-                                            <option value="peserta">Peserta</option>
-                                            <option value="admin">Administrator</option>
+                                            <option value="peserta">
+                                                Peserta
+                                            </option>
+                                            <option value="admin">
+                                                Administrator
+                                            </option>
                                         </select>
                                     </div>
                                     <div className="form-field full-width">
-                                        <label>Alamat Email <span className="text-danger">*</span></label>
+                                        <label>
+                                            Alamat Email{" "}
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                        </label>
                                         <input
                                             type="email"
                                             value={data.email}
-                                            onChange={(e) => setData("email", e.target.value)}
+                                            onChange={(e) =>
+                                                setData("email", e.target.value)
+                                            }
                                             placeholder="nama@email.com"
                                         />
                                     </div>
@@ -238,7 +329,12 @@ const KelolaAkun = () => {
                                         <input
                                             type="text"
                                             value={data.unit_kerja}
-                                            onChange={(e) => setData("unit_kerja", e.target.value)}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "unit_kerja",
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="Departemen"
                                         />
                                     </div>
@@ -247,16 +343,31 @@ const KelolaAkun = () => {
                                         <input
                                             type="text"
                                             value={data.telepon}
-                                            onChange={(e) => setData("telepon", e.target.value)}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "telepon",
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="+62 8..."
                                         />
                                     </div>
                                     <div className="form-field full-width">
-                                        <label>Kata Sandi <span className="text-danger">*</span></label>
+                                        <label>
+                                            Kata Sandi{" "}
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                        </label>
                                         <input
                                             type="password"
                                             value={data.password}
-                                            onChange={(e) => setData("password", e.target.value)}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "password",
+                                                    e.target.value,
+                                                )
+                                            }
                                             placeholder="Minimal 6 karakter"
                                         />
                                     </div>
@@ -268,11 +379,13 @@ const KelolaAkun = () => {
                                             </div>
                                         )}
                                         <button
-                                            className="btn-add-primary"
+                                            className="btn-add"
                                             type="submit"
                                             disabled={processing}
                                         >
-                                            {processing ? "Memproses..." : "Simpan Akun Baru"}
+                                            {processing
+                                                ? "Memproses..."
+                                                : "Simpan Akun Baru"}
                                         </button>
                                     </div>
                                 </form>
@@ -289,66 +402,105 @@ const KelolaAkun = () => {
                                         placeholder="Cari Nama, NIP, Email..."
                                         className="search-input"
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={(e) =>
+                                            setSearchTerm(e.target.value)
+                                        }
                                     />
                                 </div>
                             </div>
 
                             {/* Admin Table */}
                             <div className="data-table-card">
-                                <div className="table-header-title">Data Akun Administrator</div>
+                                <div className="table-header-title">
+                                    Data Akun Administrator
+                                </div>
                                 <div className="table-wrapper">
                                     <table className="enterprise-table">
                                         <thead>
                                             <tr>
                                                 <th width="5%">No</th>
-                                                <th width="25%">Nama Lengkap</th>
+                                                <th width="25%">
+                                                    Nama Lengkap
+                                                </th>
                                                 <th width="15%">NIP</th>
                                                 <th width="20%">Kontak</th>
                                                 <th width="10%">Status</th>
-                                                <th width="25%">Tindakan</th>
+                                                <th
+                                                    width="25%"
+                                                    style={{
+                                                        textAlign: "center",
+                                                    }}
+                                                >
+                                                    Tindakan
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {adminData.length > 0 ? (
                                                 adminData.map((akun, index) => (
                                                     <tr key={akun.id}>
-                                                        <td className="text-center text-muted">{index + 1}</td>
+                                                        <td className="text-center text-muted">
+                                                            {index + 1}
+                                                        </td>
                                                         <td>
                                                             <div className="user-info-cell">
-                                                                <div className="user-name">{akun.nama}</div>
-                                                                <div className="user-role badge-role">{akun.role}</div>
+                                                                <div className="user-name">
+                                                                    {akun.nama}
+                                                                </div>
+                                                                <div className="user-role badge-role">
+                                                                    {akun.role}
+                                                                </div>
                                                             </div>
                                                         </td>
-                                                        <td className="font-monospace text-muted">{akun.nip}</td>
-                                                        <td className="text-muted text-sm">{akun.email}</td>
+                                                        <td className="font-monospace text-muted">
+                                                            {akun.nip}
+                                                        </td>
+                                                        <td className="text-muted text-sm">
+                                                            {akun.email}
+                                                        </td>
                                                         <td className="text-center">
-                                                            <span className={`status-pill ${akun.is_active ? "active" : "inactive"}`}>
-                                                                {akun.is_active ? "Aktif" : "Nonaktif"}
+                                                            <span
+                                                                className={`status-pill ${akun.is_active ? "active" : "inactive"}`}
+                                                            >
+                                                                {akun.is_active
+                                                                    ? "Aktif"
+                                                                    : "Nonaktif"}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <div className="action-buttons">
-                                                                <button className="btn-action btn-outline-primary" onClick={() => handleLihat(akun)} title="Lihat Detail">
-                                                                    <EyeFill /> Detail
-                                                                </button>
                                                                 <button
-                                                                    className={`btn-action ${akun.is_active ? 'btn-outline-danger' : 'btn-outline-success'}`}
-                                                                    onClick={() => handleToggleStatus(akun)}
-                                                                    disabled={processing}
+                                                                    className="btn-action btn-outline-primary"
+                                                                    onClick={() =>
+                                                                        handleLihat(
+                                                                            akun,
+                                                                        )
+                                                                    }
+                                                                    title="Lihat Detail"
                                                                 >
-                                                                    <Power /> {akun.is_active ? "Nonaktifkan" : "Aktifkan"}
+                                                                    <EyeFill />{" "}
+                                                                    Detail
                                                                 </button>
+                                                                <ToggleButton
+                                                                    akun={akun}
+                                                                />
                                                             </div>
                                                         </td>
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="6" className="empty-state">
+                                                    <td
+                                                        colSpan="6"
+                                                        className="empty-state"
+                                                    >
                                                         <div className="empty-state-content">
                                                             <Search size={32} />
-                                                            <p>Tidak ada data administrator yang ditemukan</p>
+                                                            <p>
+                                                                Tidak ada data
+                                                                administrator
+                                                                yang ditemukan
+                                                            </p>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -360,58 +512,99 @@ const KelolaAkun = () => {
 
                             {/* Peserta Table */}
                             <div className="data-table-card mt-4">
-                                <div className="table-header-title">Data Akun Pengguna / Peserta</div>
+                                <div className="table-header-title">
+                                    Data Akun Pengguna / Peserta
+                                </div>
                                 <div className="table-wrapper">
                                     <table className="enterprise-table">
                                         <thead>
                                             <tr>
                                                 <th width="5%">No</th>
-                                                <th width="25%">Nama Lengkap</th>
+                                                <th width="25%">
+                                                    Nama Lengkap
+                                                </th>
                                                 <th width="15%">NIP</th>
                                                 <th width="20%">Kontak</th>
                                                 <th width="10%">Status</th>
-                                                <th width="25%">Tindakan</th>
+                                                <th
+                                                    width="25%"
+                                                    style={{
+                                                        textAlign: "center",
+                                                    }}
+                                                >
+                                                    Tindakan
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {pesertaData.length > 0 ? (
-                                                pesertaData.map((akun, index) => (
-                                                    <tr key={akun.id}>
-                                                        <td className="text-center text-muted">{index + 1}</td>
-                                                        <td>
-                                                            <div className="user-info-cell">
-                                                                <div className="user-name">{akun.nama}</div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="font-monospace text-muted">{akun.nip}</td>
-                                                        <td className="text-muted text-sm">{akun.email}</td>
-                                                        <td className="text-center">
-                                                            <span className={`status-pill ${akun.is_active ? "active" : "inactive"}`}>
-                                                                {akun.is_active ? "Aktif" : "Nonaktif"}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <div className="action-buttons">
-                                                                <button className="btn-action btn-outline-primary" onClick={() => handleLihat(akun)} title="Lihat Detail">
-                                                                    <EyeFill /> Detail
-                                                                </button>
-                                                                <button
-                                                                    className={`btn-action ${akun.is_active ? 'btn-outline-danger' : 'btn-outline-success'}`}
-                                                                    onClick={() => handleToggleStatus(akun)}
-                                                                    disabled={processing}
+                                                pesertaData.map(
+                                                    (akun, index) => (
+                                                        <tr key={akun.id}>
+                                                            <td className="text-center text-muted">
+                                                                {index + 1}
+                                                            </td>
+                                                            <td>
+                                                                <div className="user-info-cell">
+                                                                    <div className="user-name">
+                                                                        {
+                                                                            akun.nama
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="font-monospace text-muted">
+                                                                {akun.nip}
+                                                            </td>
+                                                            <td className="text-muted text-sm">
+                                                                {akun.email}
+                                                            </td>
+                                                            <td className="text-center">
+                                                                <span
+                                                                    className={`status-pill ${akun.is_active ? "active" : "inactive"}`}
                                                                 >
-                                                                    <Power /> {akun.is_active ? "Nonaktifkan" : "Aktifkan"}
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
+                                                                    {akun.is_active
+                                                                        ? "Aktif"
+                                                                        : "Nonaktif"}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <div className="action-buttons">
+                                                                    <button
+                                                                        className="btn-action btn-outline-primary"
+                                                                        onClick={() =>
+                                                                            handleLihat(
+                                                                                akun,
+                                                                            )
+                                                                        }
+                                                                        title="Lihat Detail"
+                                                                    >
+                                                                        <EyeFill />{" "}
+                                                                        Detail
+                                                                    </button>
+                                                                    <ToggleButton
+                                                                        akun={
+                                                                            akun
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="6" className="empty-state">
+                                                    <td
+                                                        colSpan="6"
+                                                        className="empty-state"
+                                                    >
                                                         <div className="empty-state-content">
                                                             <Search size={32} />
-                                                            <p>Tidak ada data peserta yang ditemukan</p>
+                                                            <p>
+                                                                Tidak ada data
+                                                                peserta yang
+                                                                ditemukan
+                                                            </p>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -423,71 +616,120 @@ const KelolaAkun = () => {
                         </div>
                     </div>
 
-                    {/* Modals */}
-
                     {/* Detail Modal */}
                     {showDetail && selectedAkun && (
-                        <div className="modal-backdrop" onClick={handleCloseDetail}>
-                            <div className="modal-dialog glass-panel" onClick={(e) => e.stopPropagation()}>
+                        <div
+                            className="modal-backdrop"
+                            onClick={handleCloseDetail}
+                        >
+                            <div
+                                className="modal-dialog glass-panel"
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <div className="modal-header-modern bg-primary-dark">
                                     <div className="modal-header-icon">
                                         <InfoCircleFill size={24} />
                                     </div>
-                                    <h2 className="modal-title-text">Detail Informasi Pengguna</h2>
-                                    <button className="modal-close-btn" onClick={handleCloseDetail}>&times;</button>
+                                    <h2 className="modal-title-text">
+                                        Detail Informasi Pengguna
+                                    </h2>
+                                    <button
+                                        className="modal-close-btn"
+                                        onClick={handleCloseDetail}
+                                    >
+                                        &times;
+                                    </button>
                                 </div>
 
                                 <div className="modal-content-modern">
                                     <div className="profile-header">
                                         <div className="profile-avatar">
-                                            {selectedAkun.nama.charAt(0).toUpperCase()}
+                                            {selectedAkun.nama
+                                                .charAt(0)
+                                                .toUpperCase()}
                                         </div>
                                         <div>
-                                            <h3 className="profile-name">{selectedAkun.nama}</h3>
-                                            <span className={`status-pill ${selectedAkun.is_active ? "active" : "inactive"}`}>
-                                                {selectedAkun.is_active ? "Akun Aktif" : "Akun Ditangguhkan"}
+                                            <h3 className="profile-name">
+                                                {selectedAkun.nama}
+                                            </h3>
+                                            <span
+                                                className={`status-pill ${selectedAkun.is_active ? "active" : "inactive"}`}
+                                            >
+                                                {selectedAkun.is_active
+                                                    ? "Akun Aktif"
+                                                    : "Akun Ditangguhkan"}
                                             </span>
                                         </div>
                                     </div>
 
                                     <div className="detail-grid">
                                         <div className="detail-item">
-                                            <span className="detail-label">NIP / Identitas</span>
-                                            <span className="detail-value font-monospace">{selectedAkun.nip}</span>
+                                            <span className="detail-label">
+                                                NIP / Identitas
+                                            </span>
+                                            <span className="detail-value font-monospace">
+                                                {selectedAkun.nip}
+                                            </span>
                                         </div>
                                         <div className="detail-item">
-                                            <span className="detail-label">Hak Akses</span>
-                                            <span className="detail-value capitalize">{selectedAkun.role}</span>
+                                            <span className="detail-label">
+                                                Hak Akses
+                                            </span>
+                                            <span className="detail-value capitalize">
+                                                {selectedAkun.role}
+                                            </span>
                                         </div>
                                         <div className="detail-item full-width">
-                                            <span className="detail-label">Alamat Email</span>
-                                            <span className="detail-value">{selectedAkun.email}</span>
+                                            <span className="detail-label">
+                                                Alamat Email
+                                            </span>
+                                            <span className="detail-value">
+                                                {selectedAkun.email}
+                                            </span>
                                         </div>
                                         <div className="detail-item">
-                                            <span className="detail-label">Telepon</span>
-                                            <span className="detail-value">{selectedAkun.telepon || "-"}</span>
+                                            <span className="detail-label">
+                                                Telepon
+                                            </span>
+                                            <span className="detail-value">
+                                                {selectedAkun.telepon || "-"}
+                                            </span>
                                         </div>
                                         <div className="detail-item">
-                                            <span className="detail-label">Unit Kerja</span>
-                                            <span className="detail-value">{selectedAkun.unit_kerja || "-"}</span>
+                                            <span className="detail-label">
+                                                Unit Kerja
+                                            </span>
+                                            <span className="detail-value">
+                                                {selectedAkun.unit_kerja || "-"}
+                                            </span>
                                         </div>
                                         <div className="detail-item full-width">
-                                            <span className="detail-label">Terdaftar Sejak</span>
+                                            <span className="detail-label">
+                                                Terdaftar Sejak
+                                            </span>
                                             <span className="detail-value">
                                                 {selectedAkun.created_at
-                                                    ? new Date(selectedAkun.created_at).toLocaleDateString("id-ID", {
-                                                        weekday: "long",
-                                                        day: "2-digit",
-                                                        month: "long",
-                                                        year: "numeric",
-                                                    })
+                                                    ? new Date(
+                                                          selectedAkun.created_at,
+                                                      ).toLocaleDateString(
+                                                          "id-ID",
+                                                          {
+                                                              weekday: "long",
+                                                              day: "2-digit",
+                                                              month: "long",
+                                                              year: "numeric",
+                                                          },
+                                                      )
                                                     : "Informasi tidak tersedia"}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="modal-footer-modern">
-                                    <button className="btn-modern-primary" onClick={handleCloseDetail}>
+                                    <button
+                                        className="btn-modern-primary"
+                                        onClick={handleCloseDetail}
+                                    >
                                         Tutup Panel
                                     </button>
                                 </div>
@@ -497,14 +739,26 @@ const KelolaAkun = () => {
 
                     {/* Success Modal */}
                     {showSuccess && (
-                        <div className="modal-backdrop" onClick={handleCloseSuccess}>
-                            <div className="modal-dialog success-dialog" onClick={(e) => e.stopPropagation()}>
+                        <div
+                            className="modal-backdrop"
+                            onClick={handleCloseSuccess}
+                        >
+                            <div
+                                className="modal-dialog success-dialog"
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <div className="dialog-icon success">
                                     <CheckCircleFill size={48} />
                                 </div>
                                 <h2 className="dialog-title">Berhasil!</h2>
-                                <p className="dialog-message">{successMessage || "Perubahan sistem telah berhasil disimpan."}</p>
-                                <button className="btn-modern-success mt-3" onClick={handleCloseSuccess}>
+                                <p className="dialog-message">
+                                    {successMessage ||
+                                        "Perubahan sistem telah berhasil disimpan."}
+                                </p>
+                                <button
+                                    className="btn-modern-success mt-3"
+                                    onClick={handleCloseSuccess}
+                                >
                                     Mengerti
                                 </button>
                             </div>
@@ -513,14 +767,26 @@ const KelolaAkun = () => {
 
                     {/* Form Alert Modal */}
                     {showFormAlert && (
-                        <div className="modal-backdrop" onClick={handleCloseFormAlert}>
-                            <div className="modal-dialog warning-dialog" onClick={(e) => e.stopPropagation()}>
+                        <div
+                            className="modal-backdrop"
+                            onClick={handleCloseFormAlert}
+                        >
+                            <div
+                                className="modal-dialog warning-dialog"
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <div className="dialog-icon warning">
                                     <ExclamationTriangleFill size={48} />
                                 </div>
                                 <h2 className="dialog-title">Perhatian</h2>
-                                <p className="dialog-message">{formAlertMessage || "Formulir belum lengkap. Harap isi semua parameter wajib."}</p>
-                                <button className="btn-modern-warning mt-3" onClick={handleCloseFormAlert}>
+                                <p className="dialog-message">
+                                    {formAlertMessage ||
+                                        "Formulir belum lengkap. Harap isi semua parameter wajib."}
+                                </p>
+                                <button
+                                    className="btn-modern-warning mt-3"
+                                    onClick={handleCloseFormAlert}
+                                >
                                     Lengkapi Form
                                 </button>
                             </div>

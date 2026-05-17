@@ -1,117 +1,152 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../../css/DonutChart.css";
 
 const DonutChart = ({ title, centerText, legend, layout = "bottom" }) => {
-    const [animatedValue, setAnimatedValue] = useState(0);
+    const [animated, setAnimated] = useState(false);
+    const cardRef = useRef(null);
 
     useEffect(() => {
-        // Trigger animation on mount
-        setTimeout(() => setAnimatedValue(100), 50);
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) setAnimated(true); },
+            { threshold: 0.2 }
+        );
+        if (cardRef.current) observer.observe(cardRef.current);
+        return () => observer.disconnect();
     }, []);
 
-    // Calculate total for percentage
     const total = legend.reduce((sum, item) => sum + item.value, 0);
 
-    // SVG dimensions
     const size = 200;
-    const centerX = size / 2;
-    const centerY = size / 2;
-    const radius = 65;
-    const strokeWidth = 20;
+    const cx = size / 2;
+    const cy = size / 2;
+    const radius = 68;
+    const strokeWidth = 18;
+    const gap = 3; // gap between segments in degrees
     const circumference = 2 * Math.PI * radius;
 
-    // Calculate segments with stroke-dasharray approach
-    let currentOffset = 0;
+    let currentAngle = -90; // start at top
     const segments = legend.map((item) => {
-        const percentage = total > 0 ? (item.value / total) * 100 : 0;
-        const strokeDasharray =
-            Math.max(0, (percentage / 100) * circumference) || 0;
-        const offset = currentOffset;
+        const pct = total > 0 ? (item.value / total) * 100 : 0;
+        const angle = (pct / 100) * 360;
+        const gapAngle = total > 0 ? gap : 0;
+        const arcAngle = Math.max(0, angle - gapAngle);
+        const arcLength = (arcAngle / 360) * circumference;
+        const startAngle = currentAngle + gapAngle / 2;
+        currentAngle += angle;
 
-        currentOffset += strokeDasharray;
+        const toRad = (deg) => (deg * Math.PI) / 180;
+        const x1 = cx + radius * Math.cos(toRad(startAngle));
+        const y1 = cy + radius * Math.sin(toRad(startAngle));
 
         return {
             ...item,
-            percentage,
-            strokeDasharray: isNaN(strokeDasharray) ? 0 : strokeDasharray,
-            strokeDashoffset: -offset,
+            pct,
+            arcLength,
+            circumference,
+            strokeDasharray: `${arcLength} ${circumference - arcLength}`,
+            strokeDashoffset: -(((startAngle + 90) / 360) * circumference),
         };
     });
 
     return (
-        <div className={`donut-card`}>
-            <h3 className="donut-title">{title}</h3>
+        <div className={`donut-card ${animated ? "is-visible" : ""}`} ref={cardRef}>
+            {/* Header strip */}
+            <div className="donut-header">
+                <span className="donut-header-bar" />
+                <h3 className="donut-title">{title}</h3>
+            </div>
 
-            <div className={`donut-content ${layout}`}>
+            <div className={`donut-body layout-${layout}`}>
+                {/* Chart */}
                 <div className="donut-chart-wrapper">
                     <svg
                         width={size}
                         height={size}
                         viewBox={`0 0 ${size} ${size}`}
+                        className="donut-svg"
                     >
-                        {/* Background circle */}
+                        {/* Track ring */}
                         <circle
-                            cx={centerX}
-                            cy={centerY}
-                            r={radius}
+                            cx={cx} cy={cy} r={radius}
                             fill="none"
-                            stroke="#f0f0f0"
+                            stroke="rgba(30,58,138,0.07)"
                             strokeWidth={strokeWidth}
                         />
 
-                        {/* Animated segments */}
-                        {segments.map((segment, idx) => (
+                        {/* Segments */}
+                        {segments.map((seg, idx) => (
                             <circle
                                 key={idx}
-                                cx={centerX}
-                                cy={centerY}
-                                r={radius}
+                                cx={cx} cy={cy} r={radius}
                                 fill="none"
-                                stroke={segment.color}
+                                stroke={seg.color}
                                 strokeWidth={strokeWidth}
-                                strokeDasharray={segment.strokeDasharray}
-                                strokeDashoffset={segment.strokeDashoffset}
+                                strokeLinecap="round"
+                                strokeDasharray={animated ? seg.strokeDasharray : `0 ${circumference}`}
+                                strokeDashoffset={seg.strokeDashoffset}
                                 className="donut-segment"
                                 style={{
-                                    animation: `segmentReveal 1s ease-out ${idx * 0.15}s backwards`,
-                                    strokeLinecap: "round",
+                                    transition: `stroke-dasharray 0.9s cubic-bezier(.4,0,.2,1) ${idx * 0.18}s`,
                                     transform: `rotate(-90deg)`,
-                                    transformOrigin: `${centerX}px ${centerY}px`,
+                                    transformOrigin: `${cx}px ${cy}px`,
+                                    filter: `drop-shadow(0 0 4px ${seg.color}55)`,
                                 }}
                             />
                         ))}
 
+                        {/* Inner white circle for depth */}
+                        <circle
+                            cx={cx} cy={cy}
+                            r={radius - strokeWidth / 2 - 2}
+                            fill="white"
+                            opacity="0.7"
+                        />
+
                         {/* Center text */}
                         <text
-                            x={centerX}
-                            y={centerY}
+                            x={cx} y={cy - 8}
                             textAnchor="middle"
-                            dy="0.3em"
-                            className="donut-center-text"
+                            className="donut-center-value"
                         >
                             {centerText}
                         </text>
+                        <text
+                            x={cx} y={cy + 14}
+                            textAnchor="middle"
+                            className="donut-center-sub"
+                        >
+                            peserta
+                        </text>
                     </svg>
+
+                    {/* Glow ring behind chart */}
+                    <div className="donut-glow" />
                 </div>
 
                 {/* Legend */}
-                <div className={`donut-legend ${layout}`}>
-                    {legend.map((item, idx) => (
-                        <div key={idx} className="legend-item">
-                            <span
-                                className="legend-dot"
-                                style={{ backgroundColor: item.color }}
-                            ></span>
-                            <span className="legend-text">
-                                <span className="legend-value">
-                                    ● {item.value}
-                                </span>
-                                <span className="legend-label">
-                                    {item.label}
-                                </span>
-                            </span>
-                        </div>
-                    ))}
+                <div className={`donut-legend layout-${layout}`}>
+                    {legend.map((item, idx) => {
+                        const pct = total > 0 ? Math.round((item.value / total) * 100) : 0;
+                        return (
+                            <div
+                                key={idx}
+                                className="legend-item"
+                                style={{ animationDelay: `${0.2 + idx * 0.1}s` }}
+                            >
+                                <span
+                                    className="legend-swatch"
+                                    style={{ background: item.color }}
+                                />
+                                <div className="legend-info">
+                                    <span className="legend-label">{item.label}</span>
+                                    <span className="legend-stat">
+                                        <strong>{item.value}</strong>
+                                        <em>{pct}%</em>
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

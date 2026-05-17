@@ -113,7 +113,7 @@ const AdminDashboard = () => {
                             </div>
 
                             <div className="card-1-content">
-                                <p className="card-1-title">
+                                <p className="card-1-title card-title-top">
                                     Total Peserta Terdaftar
                                 </p>
                                 <div className="card-1-stats">
@@ -227,7 +227,7 @@ const AdminDashboard = () => {
                         </div>
 
                         <div className="card-4-right">
-                            <h3 className="card-title">Rata-rata DISC</h3>
+                            <h3 className="card-title-top">Rata-rata DISC</h3>
                             <div className="disc-values-grid">
                                 {Object.entries(stats.disc_averages).map(
                                     ([key, value]) => (
@@ -264,7 +264,7 @@ const AdminDashboard = () => {
                             label: item.label,
                             color: item.color,
                         }))}
-                        layout="bottom"
+                        layout="right"
                     />
                     <DonutChart
                         title="Periode Tes"

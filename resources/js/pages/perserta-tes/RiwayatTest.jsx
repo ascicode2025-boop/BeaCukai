@@ -135,8 +135,7 @@ const RiwayatTest = () => {
 
                 .riwayat-page {
                     min-height: 100vh;
-                    background: linear-gradient(180deg, #EDEDFF 0%, #DFDFFF 100%) !important;
-                    font-family: 'Oxanium', sans-serif;
+                    linear-gradient(180deg, #FFFFFF 0%, #DFDFFF 100%);font-family: 'Oxanium', sans-serif;
                     padding: 48px 24px 80px;
                     display: flex;
                     flex-direction: column;

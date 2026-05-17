@@ -1,12 +1,30 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState, useCallback } from "react";
 import "../../css/GrafikDistribusiDISC.css";
+
+const COLORS = {
+    d: "#0ea5e9",
+    i: "#fdcb02",
+    s: "#10b981",
+    c: "#8b5cf6",
+};
+
+const LABELS = {
+    d: "Dominance",
+    i: "Influence",
+    s: "Steadiness",
+    c: "Compliance",
+};
+
+const DISC_KEYS = ["d", "i", "s", "c"];
 
 const GrafikDistribusiDISC = ({ data }) => {
     const svgRef = useRef(null);
+    const wrapperRef = useRef(null);
+    const [tooltip, setTooltip] = useState(null);
+    const [activeKey, setActiveKey] = useState(null);
 
     const chartData = useMemo(() => {
         const rows = Array.isArray(data) ? data : [];
-
         return rows.map((item, index) => ({
             x: item.x || item.label || `${index + 1}`,
             d: Number(item.d || 0),
@@ -17,10 +35,109 @@ const GrafikDistribusiDISC = ({ data }) => {
         }));
     }, [data]);
 
+    const W = 900;
+    const H = 420;
+    const PAD = { top: 52, right: 44, bottom: 62, left: 66 };
+    const plotW = W - PAD.left - PAD.right;
+    const plotH = H - PAD.top - PAD.bottom;
+
+    const maxVal = Math.max(
+        1,
+        ...chartData.flatMap((item) => DISC_KEYS.map((k) => item[k])),
+    );
+    const maxY = Math.ceil(maxVal / 5) * 5 || 5;
+    const maxX = Math.max(chartData.length - 1, 1);
+
+    const getX = (i) => PAD.left + (i / maxX) * plotW;
+    const getY = (v) => H - PAD.bottom - (v / maxY) * plotH;
+
+    const generatePath = (key) => {
+        if (!chartData.length) return "";
+        const pts = chartData.map((d, i) => ({ x: getX(i), y: getY(d[key]) }));
+        let p = `M ${pts[0].x} ${pts[0].y}`;
+        for (let i = 1; i < pts.length; i++) {
+            const prev = pts[i - 1],
+                curr = pts[i],
+                next = pts[i + 1];
+            const cp1x = prev.x + (curr.x - prev.x) / 3;
+            const cp1y = prev.y + (curr.y - prev.y) / 3;
+            const cp2x = curr.x - (next ? (next.x - prev.x) / 3 : 0);
+            const cp2y = curr.y - (next ? (next.y - prev.y) / 3 : 0);
+            p += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+        }
+        return p;
+    };
+
+    const generateArea = (key) => {
+        const line = generatePath(key);
+        if (!line || !chartData.length) return "";
+        const base = H - PAD.bottom;
+        if (chartData.length === 1) {
+            const x = getX(0);
+            const y = getY(chartData[0][key]);
+            return `M ${x} ${y} L ${x} ${base} Z`;
+        }
+        return `${line} L ${getX(chartData.length - 1)} ${base} L ${getX(0)} ${base} Z`;
+    };
+
+    const yTicks = Array.from({ length: 6 }, (_, i) => i * (maxY / 5));
+    const hasData = chartData.some(
+        (d) => d.total > 0 || DISC_KEYS.some((k) => d[k] > 0),
+    );
+
+    // Totals for stats bar
+    const totals = useMemo(() => {
+        const t = {};
+        DISC_KEYS.forEach((k) => {
+            t[k] = chartData.reduce((sum, d) => sum + d[k], 0);
+        });
+        return t;
+    }, [chartData]);
+
+    // Tooltip handler
+    const handleMouseMove = useCallback(
+        (e) => {
+            const wrapper = wrapperRef.current;
+            const svg = svgRef.current;
+            if (!wrapper || !svg || !chartData.length) return;
+
+            const rect = wrapper.getBoundingClientRect();
+            const svgRect = svg.getBoundingClientRect();
+            const scaleX = W / svgRect.width;
+            const mouseX = (e.clientX - svgRect.left) * scaleX;
+
+            let closest = 0;
+            let minDist = Infinity;
+            chartData.forEach((_, i) => {
+                const d = Math.abs(getX(i) - mouseX);
+                if (d < minDist) {
+                    minDist = d;
+                    closest = i;
+                }
+            });
+
+            if (minDist > (plotW / chartData.length) * 0.75) {
+                setTooltip(null);
+                return;
+            }
+
+            const d = chartData[closest];
+            const ptX = getX(closest);
+            const pxX = (ptX / W) * svgRect.width + svgRect.left - rect.left;
+
+            setTooltip({
+                x: pxX,
+                svgX: ptX,
+                label: d.x,
+                values: DISC_KEYS.map((k) => ({ key: k, value: d[k] })),
+            });
+        },
+        [chartData, W, plotW],
+    );
+
     const handleExport = () => {
         const svg = svgRef.current;
         if (!svg) return;
-
         const serializer = new XMLSerializer();
         const source = serializer.serializeToString(svg);
         const svgBlob = new Blob([source], {
@@ -28,421 +145,393 @@ const GrafikDistribusiDISC = ({ data }) => {
         });
         const url = URL.createObjectURL(svgBlob);
         const image = new Image();
-
         image.onload = () => {
             const canvas = document.createElement("canvas");
-            canvas.width = width * 2;
-            canvas.height = height * 2;
-
-            const context = canvas.getContext("2d");
-            context.fillStyle = "#ffffff";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
+            canvas.width = W * 2;
+            canvas.height = H * 2;
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
             URL.revokeObjectURL(url);
-
             canvas.toBlob((blob) => {
                 if (!blob) return;
-                const downloadUrl = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = downloadUrl;
-                link.download = `grafik-distribusi-disc-${new Date()
-                    .toISOString()
-                    .slice(0, 10)}.png`;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `disc-distribusi-${new Date().toISOString().slice(0, 10)}.png`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
             }, "image/png");
         };
-
         image.src = url;
     };
 
-    const width = 900;
-    const height = 400;
-    const padding = { top: 40, right: 40, bottom: 50, left: 60 };
-    const plotWidth = width - padding.left - padding.right;
-    const plotHeight = height - padding.top - padding.bottom;
-
-    // Min and Max values
-    const maxDataValue = Math.max(
-        0,
-        ...chartData.flatMap((item) => [item.d, item.i, item.s, item.c]),
-    );
-    const maxY = Math.max(5, Math.ceil(maxDataValue / 5) * 5);
-    const minY = 0;
-    const effectiveMaxY = maxY === minY ? minY + 1 : maxY;
-    const maxX = Math.max(chartData.length - 1, 1);
-
-    // Convert data to SVG coordinates
-    const getX = (index) => padding.left + (index / maxX) * plotWidth;
-    const getY = (value) =>
-        height - padding.bottom - ((value - minY) / (effectiveMaxY - minY)) * plotHeight;
-
-    // Generate smooth path using bezier curves
-    const generateSmoothPath = (dataKey) => {
-        if (chartData.length === 0) return "";
-
-        const points = chartData.map((d, i) => ({
-            x: getX(i),
-            y: getY(d[dataKey]),
-        }));
-
-        let path = `M ${points[0].x} ${points[0].y}`;
-        if (points.length === 1) return path;
-
-        for (let i = 1; i < points.length; i++) {
-            const prev = points[i - 1];
-            const curr = points[i];
-            const next = points[i + 1];
-
-            // Calculate control points for smooth bezier curve
-            const cp1x = prev.x + (curr.x - prev.x) / 3;
-            const cp1y = prev.y + (curr.y - prev.y) / 3;
-
-            const cp2x = curr.x - (next ? (next.x - prev.x) / 3 : 0);
-            const cp2y = curr.y - (next ? (next.y - prev.y) / 3 : 0);
-
-            path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
-        }
-
-        return path;
-    };
-
-    const generateAreaPath = (dataKey) => {
-        const line = generateSmoothPath(dataKey);
-        if (!line) return "";
-
-        const firstX = getX(0);
-        const lastX = getX(chartData.length - 1);
-        const baseY = height - padding.bottom;
-
-        if (chartData.length === 1) {
-            const y = getY(chartData[0][dataKey]);
-            return `M ${firstX} ${y} L ${firstX} ${baseY} L ${firstX} ${baseY} Z`;
-        }
-
-        return `${line} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
-    };
-
-    // Colors for each series
-    const colors = {
-        d: "#00d9ff", // Cyan
-        i: "#ffb800", // Orange
-        s: "#00ffaa", // Green
-        c: "#9d4edd", // Purple
-    };
-
-    const labels = {
-        d: "Dominance D",
-        i: "Influence I",
-        s: "Steadiness S",
-        c: "Compliance C",
-    };
-
-    const hasData = chartData.some((item) => item.total > 0);
-    const yTicks = Array.from(
-        { length: Math.max(6, Math.round(effectiveMaxY) + 1) },
-        (_, index) => index,
-    );
-
-    const getSeriesPoints = (dataKey) =>
-        chartData.map((d, i) => ({
-            x: getX(i),
-            y: getY(d[dataKey]),
-            value: d[dataKey],
-        }));
-
     return (
-        <div className="grafik-container">
-            <div className="grafik-header">
-                <h3 className="grafik-title">Grafik Distribusi DISC</h3>
-                <button className="btn-export" onClick={handleExport}>
+        <div className="gdsc-container">
+            {/* Header */}
+            <div className="gdsc-header">
+                <div className="gdsc-title-group">
+                    <span className="gdsc-title-bar" />
+                    <h3 className="gdsc-title">Grafik Distribusi DISC</h3>
+                    <span className="gdsc-badge">Live</span>
+                </div>
+                <button className="gdsc-btn-export" onClick={handleExport}>
+                    <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
                     Export PNG
                 </button>
             </div>
 
-            <div className="grafik-legend">
-                {Object.entries(labels).map(([key, label]) => (
-                    <div key={key} className="legend-item">
+            {/* Legend */}
+            <div className="gdsc-legend">
+                {DISC_KEYS.map((key) => (
+                    <button
+                        key={key}
+                        className={`gdsc-legend-item ${activeKey && activeKey !== key ? "dim" : ""}`}
+                        onMouseEnter={() => setActiveKey(key)}
+                        onMouseLeave={() => setActiveKey(null)}
+                    >
                         <span
-                            className="legend-color"
-                            style={{ backgroundColor: colors[key] }}
-                        ></span>
-                        <span className="legend-label">{label}</span>
-                    </div>
+                            className="gdsc-legend-line"
+                            style={{ background: COLORS[key] }}
+                        />
+                        <span
+                            className="gdsc-legend-dot"
+                            style={{ background: COLORS[key] }}
+                        />
+                        <span
+                            className="gdsc-legend-key"
+                            style={{ color: COLORS[key] }}
+                        >
+                            {key.toUpperCase()}
+                        </span>
+                        <span className="gdsc-legend-name">{LABELS[key]}</span>
+                    </button>
                 ))}
             </div>
 
-            <div className="grafik-wrapper">
+            {/* Chart wrapper */}
+            <div
+                className="gdsc-wrapper"
+                ref={wrapperRef}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setTooltip(null)}
+            >
                 <svg
                     ref={svgRef}
-                    className="grafik-svg"
-                    width={width}
-                    height={height}
-                    viewBox={`0 0 ${width} ${height}`}
+                    className="gdsc-svg"
+                    width={W}
+                    height={H}
+                    viewBox={`0 0 ${W} ${H}`}
                     preserveAspectRatio="xMidYMid meet"
                 >
-                    {/* Background */}
                     <defs>
-                        <linearGradient
-                            id="bgGradient"
-                            x1="0%"
-                            y1="0%"
-                            x2="0%"
-                            y2="100%"
-                        >
-                            <stop offset="0%" stopColor="#FFFFFF" />
-                            <stop offset="100%" stopColor="#002366" />
-                        </linearGradient>
+                        {/* Area fill gradients */}
+                        {DISC_KEYS.map((k) => (
+                            <linearGradient
+                                key={k}
+                                id={`area-${k}`}
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
+                            >
+                                <stop
+                                    offset="0%"
+                                    stopColor={COLORS[k]}
+                                    stopOpacity="0.22"
+                                />
+                                <stop
+                                    offset="100%"
+                                    stopColor={COLORS[k]}
+                                    stopOpacity="0.01"
+                                />
+                            </linearGradient>
+                        ))}
 
-                        {/* Area gradients for each series */}
-                        <linearGradient
-                            id="areaDGradient"
-                            x1="0%"
-                            y1="0%"
-                            x2="0%"
-                            y2="100%"
+                        {/* Glow filter */}
+                        <filter
+                            id="glow"
+                            x="-20%"
+                            y="-20%"
+                            width="140%"
+                            height="140%"
                         >
-                            <stop
-                                offset="0%"
-                                stopColor="#00d9ff"
-                                stopOpacity="0.4"
-                            />
-                            <stop
-                                offset="100%"
-                                stopColor="#00d9ff"
-                                stopOpacity="0.1"
-                            />
-                        </linearGradient>
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
 
-                        <linearGradient
-                            id="areaIGradient"
-                            x1="0%"
-                            y1="0%"
-                            x2="0%"
-                            y2="100%"
-                        >
-                            <stop
-                                offset="0%"
-                                stopColor="#ffb800"
-                                stopOpacity="0.4"
+                        {/* Clip to plot area */}
+                        <clipPath id="gdsc-clip">
+                            <rect
+                                x={PAD.left}
+                                y={PAD.top}
+                                width={plotW}
+                                height={plotH}
                             />
-                            <stop
-                                offset="100%"
-                                stopColor="#ffb800"
-                                stopOpacity="0.1"
-                            />
-                        </linearGradient>
-
-                        <linearGradient
-                            id="areaSGradient"
-                            x1="0%"
-                            y1="0%"
-                            x2="0%"
-                            y2="100%"
-                        >
-                            <stop
-                                offset="0%"
-                                stopColor="#00ffaa"
-                                stopOpacity="0.4"
-                            />
-                            <stop
-                                offset="100%"
-                                stopColor="#00ffaa"
-                                stopOpacity="0.1"
-                            />
-                        </linearGradient>
-
-                        <linearGradient
-                            id="areaCGradient"
-                            x1="0%"
-                            y1="0%"
-                            x2="0%"
-                            y2="100%"
-                        >
-                            <stop
-                                offset="0%"
-                                stopColor="#9d4edd"
-                                stopOpacity="0.4"
-                            />
-                            <stop
-                                offset="100%"
-                                stopColor="#9d4edd"
-                                stopOpacity="0.1"
-                            />
-                        </linearGradient>
+                        </clipPath>
                     </defs>
 
-                    {/* Background rectangle */}
+                    {/* Subtle plot area panel */}
                     <rect
-                        width={width}
-                        height={height}
-                        fill="url(#bgGradient)"
+                        x={PAD.left}
+                        y={PAD.top}
+                        width={plotW}
+                        height={plotH}
+                        fill="rgba(255,255,255,0.02)"
+                        rx="6"
                     />
 
                     {/* Grid lines */}
-                    {yTicks.map((i) => {
-                        const y =
-                            height -
-                            padding.bottom -
-                            (((i * maxY) / 5 - minY) / (maxY - minY)) *
-                                plotHeight;
+                    {yTicks.map((v, i) => {
+                        const y = getY(v);
                         return (
-                            <line
-                                key={`h-grid-${i}`}
-                                x1={padding.left}
-                                y1={y}
-                                x2={width - padding.right}
-                                y2={y}
-                                stroke="#e0e0e0"
-                                strokeDasharray="4,4"
-                                strokeWidth="1"
-                            />
-                        );
-                    })}
-
-                    {/* Y-axis */}
-                    <line
-                        x1={padding.left}
-                        y1={padding.top}
-                        x2={padding.left}
-                        y2={height - padding.bottom}
-                        stroke="#333"
-                        strokeWidth="2"
-                    />
-
-                    {/* X-axis */}
-                    <line
-                        x1={padding.left}
-                        y1={height - padding.bottom}
-                        x2={width - padding.right}
-                        y2={height - padding.bottom}
-                        stroke="#333"
-                        strokeWidth="2"
-                    />
-
-                    {/* Y-axis labels */}
-                    {yTicks.map((i) => {
-                        const value = (i * maxY) / 5;
-                        const y =
-                            height -
-                            padding.bottom -
-                            (value / (maxY - minY)) * plotHeight;
-                        return (
-                            <g key={`y-label-${i}`}>
+                            <g key={i}>
+                                <line
+                                    x1={PAD.left}
+                                    y1={y}
+                                    x2={W - PAD.right}
+                                    y2={y}
+                                    stroke={
+                                        i === 0
+                                            ? "rgba(255,255,255,0.20)"
+                                            : "rgba(255,255,255,0.08)"
+                                    }
+                                    strokeWidth={i === 0 ? 1.5 : 1}
+                                    strokeDasharray={i === 0 ? "none" : "4,6"}
+                                />
                                 <text
-                                    x={padding.left - 15}
-                                    y={y + 5}
-                                    fontSize="12"
-                                    fill="#666"
+                                    x={PAD.left - 14}
+                                    y={y + 4}
+                                    fontSize="11"
+                                    fill="rgba(15,27,61,0.7)"
                                     textAnchor="end"
+                                    fontFamily="Oxanium, sans-serif"
+                                    fontWeight="600"
                                 >
-                                    {Math.round(value)}
+                                    {Math.round(v)}
                                 </text>
                             </g>
                         );
                     })}
 
-                    {/* X-axis labels */}
+                    {/* X-axis labels & ticks */}
                     {chartData.map((d, i) => (
-                        <text
-                            key={`x-label-${i}`}
-                            x={getX(i)}
-                            y={height - padding.bottom + 20}
-                            fontSize="12"
-                            fill="#666"
-                            textAnchor="middle"
-                        >
-                            {d.x}
-                        </text>
+                        <g key={i}>
+                            <line
+                                x1={getX(i)}
+                                y1={H - PAD.bottom}
+                                x2={getX(i)}
+                                y2={H - PAD.bottom + 5}
+                                stroke="rgba(255,255,255,0.15)"
+                                strokeWidth="1"
+                            />
+                            <text
+                                x={getX(i)}
+                                y={H - PAD.bottom + 22}
+                                fontSize="11"
+                                fill="rgba(255,255,255,0.4)"
+                                textAnchor="middle"
+                                fontFamily="Oxanium, sans-serif"
+                                fontWeight="600"
+                            >
+                                {d.x}
+                            </text>
+                        </g>
                     ))}
 
+                    {/* Axis lines */}
+                    <line
+                        x1={PAD.left}
+                        y1={PAD.top}
+                        x2={PAD.left}
+                        y2={H - PAD.bottom}
+                        stroke="rgba(255,255,255,0.15)"
+                        strokeWidth="1.5"
+                    />
+                    <line
+                        x1={PAD.left}
+                        y1={H - PAD.bottom}
+                        x2={W - PAD.right}
+                        y2={H - PAD.bottom}
+                        stroke="rgba(255,255,255,0.15)"
+                        strokeWidth="1.5"
+                    />
+
+                    {/* No data message */}
                     {!hasData && (
                         <text
-                            x={width / 2}
-                            y={height / 2}
-                            fontSize="18"
-                            fill="#64748b"
+                            x={W / 2}
+                            y={H / 2}
+                            fontSize="16"
+                            fill="rgba(255,255,255,0.3)"
                             textAnchor="middle"
-                            fontWeight="700"
+                            fontFamily="Oxanium, sans-serif"
+                            fontWeight="600"
+                            letterSpacing="1"
                         >
                             Belum ada data tes DISC
                         </text>
                     )}
 
-                    {/* Area paths - smooth curves */}
-                    <path
-                        d={generateAreaPath("s")}
-                        fill="url(#areaSGradient)"
-                        opacity="0.6"
-                    />
-                    <path
-                        d={generateAreaPath("d")}
-                        fill="url(#areaDGradient)"
-                        opacity="0.6"
-                    />
-                    <path
-                        d={generateAreaPath("c")}
-                        fill="url(#areaCGradient)"
-                        opacity="0.6"
-                    />
-                    <path
-                        d={generateAreaPath("i")}
-                        fill="url(#areaIGradient)"
-                        opacity="0.6"
-                    />
-
-                    {/* Line paths - smooth curves */}
-                    <path
-                        d={generateSmoothPath("d")}
-                        stroke={colors.d}
-                        strokeWidth="3"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                    <path
-                        d={generateSmoothPath("i")}
-                        stroke={colors.i}
-                        strokeWidth="3"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                    <path
-                        d={generateSmoothPath("s")}
-                        stroke={colors.s}
-                        strokeWidth="3"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                    <path
-                        d={generateSmoothPath("c")}
-                        stroke={colors.c}
-                        strokeWidth="3"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-
-                    {/* Dots for data points to make single-value trends visible */}
-                    {['d', 'i', 's', 'c'].flatMap((key) =>
-                        getSeriesPoints(key).map((point, idx) => (
-                            <circle
-                                key={`${key}-${idx}`}
-                                cx={point.x}
-                                cy={point.y}
-                                r={4}
-                                fill={colors[key]}
-                                stroke="#ffffff"
-                                strokeWidth="1.5"
+                    {/* Clipped plot content */}
+                    <g clipPath="url(#gdsc-clip)">
+                        {/* Area fills */}
+                        {DISC_KEYS.map((k) => (
+                            <path
+                                key={k}
+                                d={generateArea(k)}
+                                fill={`url(#area-${k})`}
+                                opacity={
+                                    activeKey && activeKey !== k ? 0.08 : 0.9
+                                }
+                                style={{ transition: "opacity 0.25s" }}
                             />
-                        )),
-                    )}
+                        ))}
+
+                        {/* Lines */}
+                        {DISC_KEYS.map((k) => (
+                            <path
+                                key={k}
+                                d={generatePath(k)}
+                                stroke={COLORS[k]}
+                                strokeWidth={
+                                    activeKey === k
+                                        ? 3.5
+                                        : activeKey
+                                          ? 1.5
+                                          : 2.5
+                                }
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                filter={activeKey === k ? "url(#glow)" : "none"}
+                                opacity={
+                                    activeKey && activeKey !== k ? 0.2 : 1
+                                }
+                                style={{
+                                    transition:
+                                        "stroke-width 0.2s, opacity 0.25s",
+                                }}
+                            />
+                        ))}
+
+                        {/* Data point dots — outer ring + inner dot */}
+                        {DISC_KEYS.flatMap((k) =>
+                            chartData.map((d, i) => (
+                                <g key={`${k}-${i}`}>
+                                    {/* Outer glow ring */}
+                                    <circle
+                                        cx={getX(i)}
+                                        cy={getY(d[k])}
+                                        r={6}
+                                        fill={COLORS[k]}
+                                        opacity={
+                                            activeKey && activeKey !== k
+                                                ? 0
+                                                : 0.18
+                                        }
+                                        style={{ transition: "opacity 0.25s" }}
+                                    />
+                                    {/* Inner dot */}
+                                    <circle
+                                        cx={getX(i)}
+                                        cy={getY(d[k])}
+                                        r={activeKey === k ? 5 : 4}
+                                        fill={COLORS[k]}
+                                        stroke="rgba(10,18,50,0.8)"
+                                        strokeWidth="1.5"
+                                        opacity={
+                                            activeKey && activeKey !== k
+                                                ? 0.15
+                                                : 1
+                                        }
+                                        style={{
+                                            transition: "r 0.2s, opacity 0.25s",
+                                        }}
+                                    />
+                                </g>
+                            )),
+                        )}
+
+                        {/* Tooltip vertical line */}
+                        {tooltip && (
+                            <line
+                                x1={tooltip.svgX}
+                                y1={PAD.top}
+                                x2={tooltip.svgX}
+                                y2={H - PAD.bottom}
+                                stroke="rgba(255,255,255,0.3)"
+                                strokeWidth="1"
+                                strokeDasharray="4,4"
+                            />
+                        )}
+                    </g>
                 </svg>
+
+                {/* HTML Tooltip */}
+                {tooltip && (
+                    <div className="gdsc-tooltip" style={{ left: tooltip.x }}>
+                        <div className="gdsc-tooltip-header">
+                            {tooltip.label}
+                        </div>
+                        <div className="gdsc-tooltip-rows">
+                            {tooltip.values.map(({ key, value }) => (
+                                <div key={key} className="gdsc-tooltip-row">
+                                    <span
+                                        className="gdsc-tooltip-dot"
+                                        style={{ background: COLORS[key] }}
+                                    />
+                                    <span className="gdsc-tooltip-key">
+                                        {LABELS[key]}
+                                    </span>
+                                    <span
+                                        className="gdsc-tooltip-val"
+                                        style={{ color: COLORS[key] }}
+                                    >
+                                        {value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Stats bar */}
+            <div className="gdsc-stats">
+                {DISC_KEYS.map((k) => (
+                    <div className="gdsc-stat" key={k}>
+                        <div
+                            className="gdsc-stat-label"
+                            style={{ color: COLORS[k] }}
+                        >
+                            {LABELS[k]}
+                        </div>
+                        <div
+                            className="gdsc-stat-val"
+                            style={{ color: COLORS[k] }}
+                        >
+                            {totals[k]}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

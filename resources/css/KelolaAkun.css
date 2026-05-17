@@ -50,10 +50,10 @@
     letter-spacing: -0.5px;
 }
 
-.header-description {
+.header-description p{
     font-size: 14px;
     color: #64748b;
-    line-height: 1.6;
+    line-height: 2;
     margin: 0;
     max-width: 700px;
 }
@@ -164,8 +164,8 @@
     border-left: 3px solid #ef4444;
 }
 
-.btn-add-primary {
-    background: #2563eb;
+.btn-add {
+    background: linear-gradient(180deg, rgba(253, 203, 2, 0.85) 0%, #002366 100%);
     color: white;
     border: none;
     padding: 12px;
@@ -188,6 +188,41 @@
 .btn-add-primary:disabled {
     background: #94a3b8;
     cursor: not-allowed;
+}
+
+/* ============ TOGGLE BUTTON: MEMPROSES STATE ============ */
+.btn-processing {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(100, 116, 139, 0.12);
+    color: #64748b;
+    border: 1px solid rgba(100, 116, 139, 0.25);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: not-allowed;
+    font-family: 'Oxanium', sans-serif;
+    white-space: nowrap;
+    opacity: 0.85;
+    transition: none;
+}
+
+/* ============ SPINNER KECIL ============ */
+.spinner-tiny {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(100, 116, 139, 0.3);
+    border-top-color: #64748b;
+    border-radius: 50%;
+    animation: spinTiny 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spinTiny {
+    to { transform: rotate(360deg); }
 }
 
 /* ============ TABLES & DATA SECTION (RIGHT COLUMN) ============ */

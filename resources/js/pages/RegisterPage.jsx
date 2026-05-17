@@ -605,15 +605,16 @@ export default function RegisterPage() {
             <div className="register-card">
                 <div className="register-left">
                     <img
-                        src="/assets/register1.png"
+                        src="/assets/LogoRegisterDanLogin.png"
                         alt="Characters"
                         style={{
-                            width: "800px",
-                            height: "550px",
-                            position: "absolute",
-                            top: "139px",
-                            marginLeft: "35px",
+                            width: "542px",
+                            height: "auto",
+                            maxHeight: "660px",
                             objectFit: "contain",
+                            position: "absolute",
+                            top: "-30px",
+                            marginLeft: "35px",
                         }}
                     />
                 </div>

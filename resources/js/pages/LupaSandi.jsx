@@ -294,7 +294,7 @@ export default function LupaSandi() {
                 }
 
                 .forgot-password-card {
-                    width: 950px;
+                    width: 750px;
                     background: white;
                     border: 1px solid rgba(0,0,0,0.1);
                     border-radius: 20px;
@@ -474,11 +474,11 @@ export default function LupaSandi() {
             <div className="forgot-password-card">
                 <div className="login-left">
                     <img
-                        src="/assets/register1.png"
+                        src="/assets/LogoRegisterDanLogin.png"
                         alt="Characters"
                         style={{
-                            width: "766px",
-                            height: "498px",
+                            width: "432px",
+                            height: "520px",
                             position: "absolute",
                             top:
                                 step === 1
@@ -486,7 +486,7 @@ export default function LupaSandi() {
                                     : step === 2
                                       ? "50px"
                                       : "40px",
-                            marginLeft: "-240px",
+                            marginLeft: "-130px",
                         }}
                     />
                 </div>

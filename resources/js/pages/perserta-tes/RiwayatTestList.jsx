@@ -125,10 +125,11 @@ const RiwayatTestList = () => {
             <div className="riwayat-list-container">
                 {/* Header Section */}
                 <div className="header-section">
-                    <div className="header-accent"></div>
-                    <h1 className="header-title">
-                        Riwayat DISC Self-Assessment
-                    </h1>
+                    <div className="header-left">
+                        <h1 className="header-title">
+                            Riwayat DISC Self-Assessment
+                        </h1>
+                    </div>
                     <p className="header-description">
                         Pilih riwayat tes yang ingin Anda lihat hasilnya
                     </p>

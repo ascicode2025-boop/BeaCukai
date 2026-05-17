@@ -5,6 +5,37 @@ import Footer from "../../components/Footer";
 import { Search, Plus } from "react-bootstrap-icons";
 import { router, usePage } from "@inertiajs/react";
 
+/* Small colored badge for DISC values in the table */
+const DiscBadge = ({ value, type }) => {
+    const colors = {
+        D: { bg: "#fff3ea", text: "#c2410c", border: "#fed7aa" },
+        I: { bg: "#f0fdf4", text: "#15803d", border: "#bbf7d0" },
+        S: { bg: "#eff6ff", text: "#1d4ed8", border: "#bfdbfe" },
+        C: { bg: "#fefce8", text: "#a16207", border: "#fde68a" },
+    };
+    const c = colors[type] || { bg: "#f1f5f9", text: "#475569", border: "#e2e8f0" };
+    return (
+        <span
+            style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 42,
+                padding: "4px 10px",
+                borderRadius: 6,
+                background: c.bg,
+                color: c.text,
+                border: `1px solid ${c.border}`,
+                fontFamily: "'DM Mono', monospace",
+                fontWeight: 600,
+                fontSize: 13,
+            }}
+        >
+            {value}
+        </span>
+    );
+};
+
 const KelolaJabatan = () => {
     const { props } = usePage();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,25 +86,17 @@ const KelolaJabatan = () => {
         );
     }, [props.jobStandards]);
 
-    // Filter data berdasarkan search term
     const filteredData = jabatanData.filter((jabatan) =>
         jabatan.nama.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     const handleEdit = (jabatan) => {
         setSelectedJabatan(jabatan);
-        setStandardValues({
-            D: jabatan.D,
-            I: jabatan.I,
-            S: jabatan.S,
-            C: jabatan.C,
-        });
+        setStandardValues({ D: jabatan.D, I: jabatan.I, S: jabatan.S, C: jabatan.C });
         setShowEditModal(true);
     };
 
-    const handleAddJabatan = () => {
-        setShowAddModal(true);
-    };
+    const handleAddJabatan = () => setShowAddModal(true);
 
     const handleNewJabatanChange = (field, value) => {
         setNewJabatan((prev) => ({
@@ -83,25 +106,12 @@ const KelolaJabatan = () => {
     };
 
     const handleTambahJabatan = () => {
-        if (!newJabatan.job_code.trim()) {
-            alert("Kode jabatan tidak boleh kosong!");
-            return;
-        }
-        if (!newJabatan.nama.trim()) {
-            alert("Nama jabatan tidak boleh kosong!");
-            return;
-        }
+        if (!newJabatan.job_code.trim()) { alert("Kode jabatan tidak boleh kosong!"); return; }
+        if (!newJabatan.nama.trim()) { alert("Nama jabatan tidak boleh kosong!"); return; }
         setIsSubmitting(true);
         router.post(
             "/admin/manage-positions",
-            {
-                job_code: newJabatan.job_code,
-                job_title: newJabatan.nama,
-                d: newJabatan.D,
-                i: newJabatan.I,
-                s: newJabatan.S,
-                c: newJabatan.C,
-            },
+            { job_code: newJabatan.job_code, job_title: newJabatan.nama, d: newJabatan.D, i: newJabatan.I, s: newJabatan.S, c: newJabatan.C },
             {
                 preserveScroll: true,
                 onFinish: () => setIsSubmitting(false),
@@ -114,47 +124,27 @@ const KelolaJabatan = () => {
     };
 
     const handleStandardChange = (key, value) => {
-        setStandardValues((prev) => ({
-            ...prev,
-            [key]: parseInt(value) || 0,
-        }));
+        setStandardValues((prev) => ({ ...prev, [key]: parseInt(value) || 0 }));
     };
 
     const handleSimpan = () => {
-        if (!selectedJabatan) {
-            return;
-        }
-
+        if (!selectedJabatan) return;
         setIsSubmitting(true);
         router.post(
             `/admin/manage-positions/${selectedJabatan.id}`,
-            {
-                _method: "put",
-                job_title: selectedJabatan.nama,
-                d: standardValues.D,
-                i: standardValues.I,
-                s: standardValues.S,
-                c: standardValues.C,
-            },
+            { _method: "put", job_title: selectedJabatan.nama, d: standardValues.D, i: standardValues.I, s: standardValues.S, c: standardValues.C },
             {
                 preserveScroll: true,
                 onFinish: () => setIsSubmitting(false),
-                onSuccess: () => {
-                    setSelectedJabatan(null);
-                    setShowEditModal(false);
-                },
+                onSuccess: () => { setSelectedJabatan(null); setShowEditModal(false); },
             },
         );
     };
 
-    const handleHapus = (jabatan) => {
-        setDeleteTarget(jabatan);
-        setShowDeleteModal(true);
-    };
+    const handleHapus = (jabatan) => { setDeleteTarget(jabatan); setShowDeleteModal(true); };
 
     const handleConfirmDelete = () => {
         if (!deleteTarget) return;
-
         setIsSubmitting(true);
         router.post(
             `/admin/manage-positions/${deleteTarget.id}`,
@@ -162,11 +152,7 @@ const KelolaJabatan = () => {
             {
                 preserveScroll: true,
                 onFinish: () => setIsSubmitting(false),
-                onSuccess: () => {
-                    setSelectedJabatan(null);
-                    setShowDeleteModal(false);
-                    setDeleteTarget(null);
-                },
+                onSuccess: () => { setSelectedJabatan(null); setShowDeleteModal(false); setDeleteTarget(null); },
             },
         );
     };
@@ -178,39 +164,28 @@ const KelolaJabatan = () => {
                 <div className="header-section">
                     <div className="header-accent"></div>
                     <h1 className="header-title">Kelola Standar Jabatan</h1>
-                    <p className="header-description">
-                        Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of
-                        "de Finibus Bonorum et Malorum" (The Extremes of Good
-                        and Evil) by Cicero.
+                    <p className="header-description" style={{maxWidth: "600px"}}>
+                        Kelola kode jabatan beserta nilai standar DISC untuk setiap posisi dalam organisasi Anda.
                     </p>
                 </div>
 
                 <div className="kelola-jabatan-layout">
-                    {/* Left: Search & Table Section */}
                     <div className="kelola-jabatan-left">
                         <div className="table-section">
                             {/* Search Bar & Add Button */}
                             <div className="search-header">
-                                <div
-                                    className="search-container"
-                                    style={{ marginBottom: "10px" }}
-                                >
+                                <div className="search-container">
+                                    <Search className="search-icon" size={16} />
                                     <input
                                         type="text"
-                                        placeholder="Search nama jabatan"
+                                        placeholder="Cari nama jabatan..."
                                         className="search-input"
                                         value={searchTerm}
-                                        onChange={(e) =>
-                                            setSearchTerm(e.target.value)
-                                        }
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                     />
-                                    <Search className="search-icon" size={20} />
                                 </div>
-                                <button
-                                    className="btn-tambah-jabatan"
-                                    onClick={handleAddJabatan}
-                                >
-                                    <Plus size={18} /> Tambahkan Jabatan
+                                <button className="btn-tambah-jabatan" onClick={handleAddJabatan}>
+                                    <Plus size={16} /> Tambahkan Jabatan
                                 </button>
                             </div>
 
@@ -234,35 +209,27 @@ const KelolaJabatan = () => {
                                                 <tr key={jabatan.id}>
                                                     <td>{index + 1}</td>
                                                     <td className="nama-jabatan-cell">
-                                                        {jabatan.nama}
+                                                        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                                            <span>{jabatan.nama}</span>
+                                                            {jabatan.job_code && (
+                                                                <span style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono', monospace", fontWeight: 500 }}>
+                                                                    {jabatan.job_code}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </td>
-                                                    <td className="disc-cell">
-                                                        {jabatan.D}
-                                                    </td>
-                                                    <td className="disc-cell">
-                                                        {jabatan.I}
-                                                    </td>
-                                                    <td className="disc-cell">
-                                                        {jabatan.S}
-                                                    </td>
-                                                    <td className="disc-cell">
-                                                        {jabatan.C}
-                                                    </td>
+                                                    <td className="disc-cell"><DiscBadge value={jabatan.D} type="D" /></td>
+                                                    <td className="disc-cell"><DiscBadge value={jabatan.I} type="I" /></td>
+                                                    <td className="disc-cell"><DiscBadge value={jabatan.S} type="S" /></td>
+                                                    <td className="disc-cell"><DiscBadge value={jabatan.C} type="C" /></td>
                                                     <td className="aksi-cell">
                                                         <div className="action-buttons">
-                                                            <button
-                                                                className="btn-edit"
-                                                                onClick={() =>
-                                                                    handleEdit(jabatan)
-                                                                }
-                                                            >
+                                                            <button className="btn-edit" onClick={() => handleEdit(jabatan)}>
                                                                 Edit
                                                             </button>
                                                             <button
                                                                 className="btn-hapus"
-                                                                onClick={() =>
-                                                                    handleHapus(jabatan)
-                                                                }
+                                                                onClick={() => handleHapus(jabatan)}
                                                                 disabled={isSubmitting}
                                                             >
                                                                 Hapus
@@ -274,7 +241,7 @@ const KelolaJabatan = () => {
                                         ) : (
                                             <tr>
                                                 <td colSpan="7" className="no-data">
-                                                    Tidak ada data jabatan
+                                                    {searchTerm ? `Tidak ada jabatan yang cocok dengan "${searchTerm}"` : "Belum ada data jabatan"}
                                                 </td>
                                             </tr>
                                         )}
@@ -285,287 +252,137 @@ const KelolaJabatan = () => {
                     </div>
                 </div>
 
-                {/* Modal Tambah Jabatan */}
+                {/* ===== MODAL TAMBAH ===== */}
                 {showAddModal && (
                     <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="modal-header">
+                            <div className="modal-header" style={{background: "linear-gradient(90deg, rgba(253, 203, 2, 0.79) 0%, #002366 50%)"}}>
                                 <h2 className="modal-title">Tambahkan Jabatan Baru</h2>
-                                <button className="modal-close" onClick={() => setShowAddModal(false)}>
-                                    ×
-                                </button>
+                                <button className="modal-close" onClick={() => setShowAddModal(false)}>×</button>
                             </div>
 
                             <div className="modal-body">
-                                {/* Kode Jabatan & Nama Jabatan in 2-column grid */}
                                 <div className="form-row-grid">
-                                    {/* Kode Jabatan */}
                                     <div className="form-group">
                                         <label>Kode Jabatan</label>
                                         <input
                                             type="text"
                                             placeholder="Cth: MGR001"
                                             value={newJabatan.job_code}
-                                            onChange={(e) =>
-                                                handleNewJabatanChange(
-                                                    "job_code",
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleNewJabatanChange("job_code", e.target.value)}
                                             className="form-input"
                                         />
                                     </div>
-
-                                    {/* Nama Jabatan */}
                                     <div className="form-group">
                                         <label>Nama Jabatan</label>
                                         <input
                                             type="text"
                                             placeholder="Masukkan nama jabatan"
                                             value={newJabatan.nama}
-                                            onChange={(e) =>
-                                                handleNewJabatanChange(
-                                                    "nama",
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleNewJabatanChange("nama", e.target.value)}
                                             className="form-input"
                                         />
                                     </div>
                                 </div>
 
-                                {/* DISC Values Grid */}
-                                <div className="disc-input-grid">
-                                    {/* Dominance */}
-                                    <div className="form-group">
-                                        <label>Dominance (D)</label>
-                                        <input
-                                            type="number"
-                                            placeholder="0"
-                                            value={newJabatan.D}
-                                            onChange={(e) =>
-                                                handleNewJabatanChange(
-                                                    "D",
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="form-input"
-                                        />
-                                    </div>
-
-                                    {/* Influence */}
-                                    <div className="form-group">
-                                        <label>Influence (I)</label>
-                                        <input
-                                            type="number"
-                                            placeholder="0"
-                                            value={newJabatan.I}
-                                            onChange={(e) =>
-                                                handleNewJabatanChange(
-                                                    "I",
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="form-input"
-                                        />
-                                    </div>
-
-                                    {/* Steadiness */}
-                                    <div className="form-group">
-                                        <label>Steadiness (S)</label>
-                                        <input
-                                            type="number"
-                                            placeholder="0"
-                                            value={newJabatan.S}
-                                            onChange={(e) =>
-                                                handleNewJabatanChange(
-                                                    "S",
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="form-input"
-                                        />
-                                    </div>
-
-                                    {/* Compliance */}
-                                    <div className="form-group">
-                                        <label>Compliance (C)</label>
-                                        <input
-                                            type="number"
-                                            placeholder="0"
-                                            value={newJabatan.C}
-                                            onChange={(e) =>
-                                                handleNewJabatanChange(
-                                                    "C",
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="form-input"
-                                        />
+                                <div>
+                                    <p style={{ margin: "0 0 14px 0", fontSize: 11.5, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.7px" }}>
+                                        Nilai Standar DISC
+                                    </p>
+                                    <div className="disc-input-grid">
+                                        {[
+                                            { key: "D", label: "Dominance (D)" },
+                                            { key: "I", label: "Influence (I)" },
+                                            { key: "S", label: "Steadiness (S)" },
+                                            { key: "C", label: "Compliance (C)" },
+                                        ].map(({ key, label }) => (
+                                            <div className="form-group" key={key}>
+                                                <label>{label}</label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    value={newJabatan[key]}
+                                                    onChange={(e) => handleNewJabatanChange(key, e.target.value)}
+                                                    className="form-input"
+                                                    style={{ fontFamily: "'DM Mono', monospace" }}
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
                             <div className="modal-footer">
-                                <button
-                                    className="btn-batal"
-                                    onClick={() => setShowAddModal(false)}
-                                >
-                                    Batal
-                                </button>
-                                <button
-                                    className="btn-submit"
-                                    onClick={handleTambahJabatan}
-                                    disabled={isSubmitting}
-                                >
-                                    Simpan Jabatan
+                                <button className="btn-batal" onClick={() => setShowAddModal(false)}>Batal</button>
+                                <button className="btn-submit" onClick={handleTambahJabatan} disabled={isSubmitting}>
+                                    {isSubmitting ? "Menyimpan..." : "Simpan Jabatan"}
                                 </button>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Modal Edit Jabatan */}
+                {/* ===== MODAL EDIT ===== */}
                 {showEditModal && selectedJabatan && (
                     <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="modal-header">
-                                <h2 className="modal-title">Kelola Nilai Standar Jabatan</h2>
-                                <button className="modal-close" onClick={() => setShowEditModal(false)}>
-                                    ×
-                                </button>
+                            <div className="modal-header"  style={{background: "linear-gradient(90deg, rgba(253, 203, 2, 0.79) 0%, #002366 50%)"}}>
+                                <h2 className="modal-title">Edit Nilai Standar Jabatan</h2>
+                                <button className="modal-close" onClick={() => setShowEditModal(false)}>×</button>
                             </div>
 
                             <div className="modal-body">
-                                {/* Jabatan Info */}
                                 <div className="jabatan-info-modal">
                                     <h3 className="jabatan-info-title">Jabatan</h3>
-                                    <p className="jabatan-info-name">
-                                        {selectedJabatan.nama}
-                                    </p>
+                                    <p className="jabatan-info-name">{selectedJabatan.nama}</p>
                                     {selectedJabatan.job_code && (
-                                        <p
-                                            style={{
-                                                fontSize: "12px",
-                                                fontWeight: 600,
-                                                color: "#475569",
-                                                margin: 0,
-                                            }}
-                                        >
-                                            Kode: {selectedJabatan.job_code}
+                                        <p style={{ fontSize: 12, fontWeight: 600, color: "#475569", margin: 0, fontFamily: "'DM Mono', monospace" }}>
+                                            {selectedJabatan.job_code}
                                         </p>
                                     )}
                                 </div>
 
-                                {/* Standard Values */}
                                 <div className="standard-values-modal">
-                                    <h3 className="standard-values-title">Nilai Standar</h3>
+                                    <h3 className="standard-values-title">Nilai Standar DISC</h3>
                                     <div className="standard-grid">
-                                        {/* Dominance */}
-                                        <div className="standard-group">
-                                            <label>
-                                                Dominance (Dominasi)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={standardValues.D}
-                                                onChange={(e) =>
-                                                    handleStandardChange(
-                                                        "D",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="standard-input"
-                                            />
-                                        </div>
-
-                                        {/* Influence */}
-                                        <div className="standard-group">
-                                            <label>
-                                                Influence (Pengaruh)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={standardValues.I}
-                                                onChange={(e) =>
-                                                    handleStandardChange(
-                                                        "I",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="standard-input"
-                                            />
-                                        </div>
-
-                                        {/* Steadiness */}
-                                        <div className="standard-group">
-                                            <label>
-                                                Steadiness (Kestabilan)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={standardValues.S}
-                                                onChange={(e) =>
-                                                    handleStandardChange(
-                                                        "S",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="standard-input"
-                                            />
-                                        </div>
-
-                                        {/* Conscientiousness */}
-                                        <div className="standard-group">
-                                            <label>
-                                                Compliance (Kehati-hatian)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={standardValues.C}
-                                                onChange={(e) =>
-                                                    handleStandardChange(
-                                                        "C",
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="standard-input"
-                                            />
-                                        </div>
+                                        {[
+                                            { key: "D", label: "Dominance" },
+                                            { key: "I", label: "Influence" },
+                                            { key: "S", label: "Steadiness" },
+                                            { key: "C", label: "Compliance" },
+                                        ].map(({ key, label }) => (
+                                            <div className="standard-group" key={key}>
+                                                <label>{label}</label>
+                                                <input
+                                                    type="number"
+                                                    value={standardValues[key]}
+                                                    onChange={(e) => handleStandardChange(key, e.target.value)}
+                                                    className="standard-input"
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
                             <div className="modal-footer">
-                                <button
-                                    className="btn-batal"
-                                    onClick={() => setShowEditModal(false)}
-                                >
-                                    Batal
-                                </button>
-                                <button
-                                    className="btn-submit"
-                                    onClick={handleSimpan}
-                                    disabled={isSubmitting}
-                                >
-                                    Simpan Perubahan
+                                <button className="btn-batal" onClick={() => setShowEditModal(false)}>Batal</button>
+                                <button className="btn-submit" onClick={handleSimpan} disabled={isSubmitting}>
+                                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                                 </button>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Modal Konfirmasi Hapus */}
+                {/* ===== MODAL HAPUS ===== */}
                 {showDeleteModal && deleteTarget && (
                     <div className="modal-overlay" onClick={() => !isSubmitting && setShowDeleteModal(false)}>
                         <div className="delete-modal-content" onClick={(e) => e.stopPropagation()}>
                             <div className="delete-modal-icon">
-                                <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                                    <circle cx="30" cy="30" r="28" stroke="#ef4444" strokeWidth="2"/>
-                                    <path d="M30 16V44" stroke="#ef4444" strokeWidth="3" strokeLinecap="round"/>
-                                    <path d="M20 30H40" stroke="#ef4444" strokeWidth="3" strokeLinecap="round"/>
+                                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                                    <circle cx="28" cy="28" r="27" stroke="#ef4444" strokeWidth="2" fill="#fef2f2" />
+                                    <path d="M21 35L35 21M21 21L35 35" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" />
                                 </svg>
                             </div>
                             <h2 className="delete-modal-title">Hapus Jabatan</h2>
@@ -576,18 +393,10 @@ const KelolaJabatan = () => {
                                 ⚠️ Tindakan ini tidak bisa dibatalkan.
                             </p>
                             <div className="delete-modal-footer">
-                                <button
-                                    className="btn-delete-cancel"
-                                    onClick={() => setShowDeleteModal(false)}
-                                    disabled={isSubmitting}
-                                >
+                                <button className="btn-delete-cancel" onClick={() => setShowDeleteModal(false)} disabled={isSubmitting}>
                                     Batalkan
                                 </button>
-                                <button
-                                    className="btn-delete-confirm"
-                                    onClick={handleConfirmDelete}
-                                    disabled={isSubmitting}
-                                >
+                                <button className="btn-delete-confirm" onClick={handleConfirmDelete} disabled={isSubmitting}>
                                     {isSubmitting ? "Menghapus..." : "Ya, Hapus"}
                                 </button>
                             </div>

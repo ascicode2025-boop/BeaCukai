@@ -238,7 +238,8 @@ export default function LandingPage() {
           display: flex;
           align-items: center;
           margin-left: auto;
-          margin-right: 50px;
+          margin-right: 30px;
+          width: 100px;
         }
 
         .logo-main {
@@ -360,8 +361,8 @@ export default function LandingPage() {
           position: absolute;
           width: 646px;
           height: 523px;
-          top: -15px;
-          left: -120px;
+          top: -5px;
+          left: -40px;
           border-radius: 10px;
           overflow: hidden;
           transform: rotate(11.17deg);
@@ -1032,11 +1033,9 @@ export default function LandingPage() {
           .nav-capsule { display: none !important; }
 
           .logo-container {
-            margin-left: auto;
-            margin-right: 0;
+            margin-left: 230px;
+            width: 80px;
           }
-
-            .logo-main { width: 70px; }
 
           /* Hero – stack vertikal, sembunyikan gambar rotated */
           .hero-section {
