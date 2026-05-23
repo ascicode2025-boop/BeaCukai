@@ -13,7 +13,7 @@
     justify-content: center;
 }
 
-/* ─── Section Wrapper (shared max-width + spacing) ───────────────────────── */
+/* ─── Section Wrapper ────────────────────────────────────────────────────── */
 .hasil-ringkas-header,
 .hasil-ringkas-info-cards,
 .hasil-ringkas-chart-card,
@@ -153,7 +153,7 @@
     fill: #dbeafe;
 }
 
-/* ─── Bottom Grid (summary + JPM) ────────────────────────────────────────── */
+/* ─── Bottom Grid ────────────────────────────────────────────────────────── */
 .hasil-ringkas-bottom-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -161,7 +161,6 @@
     margin-bottom: 20px;
 }
 
-/* Override: three-column cards row */
 .hasil-ringkas-bottom-grid.cards-only {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -175,6 +174,7 @@
     border-radius: 16px;
     padding: 20px;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: visible;
 }
 
 .ringkas-main-type:hover,
@@ -187,7 +187,10 @@
 /* ─── Summary Card ───────────────────────────────────────────────────────── */
 .ringkas-summary-card {
     border-top: 5px solid #facc15;
-    min-height: 180px;
+    min-height: 200px;
+    overflow: visible;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .summary-label {
@@ -201,22 +204,29 @@
 .trait-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 14px;
+    overflow: visible;
+    align-items: center;
 }
 
 .trait-badge {
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 900;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    line-height: 1.3;
+    letter-spacing: 0.2px;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    min-width: 165px;
+    white-space: nowrap;
 }
 
 .trait-badge-primary {
-    color: #7c2d12;
     background: #5850ec;
     border: 1.5px solid #fcd34d;
     color: white;
@@ -284,7 +294,7 @@
     position: relative;
     height: 140px;
     border: 1.5px solid #e0e8f8;
-    background: linear-gradient(to top, #f0fdf4 0%, #f7fee7 50%, #fef3c7 100%);
+    background: linear-gradient(to top, #fef2f2 0%, #fef9f3 50%, #fef3c7 100%);
     overflow: hidden;
     border-radius: 8px;
 }
@@ -303,6 +313,22 @@
     font-weight: 900;
     border-radius: 6px;
     opacity: 0.9;
+}
+
+.jpm-note {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f0f4ff;
+    border-left: 3px solid #4a569d;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #4a569d;
+    font-weight: 600;
+}
+
+.jpm-note small {
+    display: block;
+    line-height: 1.4;
 }
 
 /* ─── List Boxes ─────────────────────────────────────────────────────────── */
@@ -400,17 +426,19 @@
     }
 
     .hasil-ringkas-bottom-grid {
+        display: grid;
         grid-template-columns: 1fr;
-        gap: 14px;
-        margin-bottom: 14px;
+        gap: 20px;
+        margin-bottom: 20px;
     }
 
-    .hasil-ringkas-bottom-grid.cards-only {
-        grid-template-columns: 1fr;
+    .ringkas-main-type {
+        width: 100%;
     }
 
     .ringkas-jpm-card {
         min-height: unset;
+        width: 100%;
     }
 
     .jpm-meter-scale,
@@ -435,4 +463,182 @@
         padding: 13px 24px;
         font-size: 14px;
     }
+}
+
+/* ─── Job Standard Comparison Card ──────────────────────────────────────── */
+.ringkas-comparison-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
+    border: 2px solid #4a569d;
+    border-radius: 16px;
+    padding: 28px;
+    grid-column: 1 / -1;
+    min-width: 0; /* ← FIX */
+}
+
+.ringkas-comparison-card h4 {
+    margin: 0 0 16px;
+    color: #0f1729;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+    border-bottom: 3px solid #facc15;
+    padding-bottom: 12px;
+}
+
+.job-standard-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #4a569d;
+    margin-bottom: 20px;
+    padding: 10px 14px;
+    background: rgba(74, 86, 157, 0.08);
+    border-radius: 8px;
+    border-left: 4px solid #4a569d;
+}
+
+.fitness-overall {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e8f8;
+}
+
+.fitness-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5a6b7f;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.fitness-percentage {
+    display: block;
+    font-size: 32px;
+    font-weight: 900;
+    color: #4a569d;
+    margin-bottom: 12px;
+}
+
+.fitness-meter {
+    width: 100%;
+    height: 20px;
+    background: #e0e8f8;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.fitness-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a569d 0%, #6b7db8 100%);
+    border-radius: 10px;
+    transition: width 0.6s ease-out;
+}
+
+.trait-fitness-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.trait-fitness-item {
+    background: white;
+    border: 1.5px solid #e0e8f8;
+    border-radius: 12px;
+    padding: 16px;
+    min-width: 0; /* ← FIX */
+}
+
+.trait-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.trait-label-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0; /* ← FIX: jangan compress icon */
+}
+
+.trait-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #5a6b7f;
+    word-break: break-word; /* ← FIX */
+}
+
+.trait-scores {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.score-row {
+    flex: 1;
+    padding: 8px;
+    background: #f9fbff;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.score-label {
+    font-weight: 600;
+    color: #7a8fa8;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.score-value {
+    font-weight: 900;
+    color: #0f1729;
+    font-size: 16px;
+}
+
+.fitness-bar {
+    width: 100%;
+    height: 14px;
+    background: #e0e8f8;
+    border-radius: 7px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.fitness-bar-fill {
+    height: 100%;
+    border-radius: 7px;
+    transition: width 0.5s ease-out;
+}
+
+.fitness-text {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #5a6b7f;
+}
+
+.comparison-note {
+    background: #fffbeb;
+    border-left: 4px solid #facc15;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    color: #5a6b7f;
+    line-height: 1.6;
+}
+
+.comparison-note p {
+    margin: 0;
 }

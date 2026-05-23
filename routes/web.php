@@ -15,131 +15,251 @@ use App\Http\Controllers\DiscController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DiscResult;
 use App\Models\User;
+use App\Models\JobStandard;
+
+// ─── Helper: transform DiscResult ke format yang dipakai frontend ─────────────
+// Dipakai oleh route peserta DAN admin agar data selalu konsisten
+function transformDiscResult($result): ?array
+{
+    if (!$result) return null;
+
+    $reportData = $result->report_data ?? [];
+    $graph3     = $result->graph_scores_change ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0];
+
+    // JPM: pakai completion_percentage (sudah tersimpan di DB saat submit)
+    // fallback hitung dari graph3 jika completion_percentage juga null
+    $jpmValue = $result->completion_percentage !== null
+        ? (int) round((float) $result->completion_percentage)
+        : (int) round(((max(
+            $graph3['D'] ?? 0,
+            $graph3['I'] ?? 0,
+            $graph3['S'] ?? 0,
+            $graph3['C'] ?? 0
+          ) - (-8)) / 16) * 100);
+
+    return [
+        'id'                  => $result->id,
+        'user_id'             => $result->user_id,
+        'submitted_at'        => $result->test_date,
+        'test_date'           => $result->test_date,
+        'graph_scores'        => [
+            'Graph_1' => $result->graph_scores_most  ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
+            'Graph_2' => $result->graph_scores_least ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
+            'Graph_3' => $graph3,
+        ],
+        'graph_scores_most'   => $result->graph_scores_most  ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
+        'graph_scores_least'  => $result->graph_scores_least ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
+        'graph_scores_change' => $graph3,
+        'report_data'         => $reportData,
+        'report'              => $reportData,
+        'primary_type'        => $result->primary_type,
+        'primary_trait'       => $reportData['primary_trait'] ?? $result->primary_type,
+        'secondary_trait'     => $reportData['secondary_trait'] ?? null,
+        'personality_profile' => $result->personality_profile,
+        'summary'             => $reportData['summary'] ?? $result->summary,
+        'jpm'                 => [
+            'percentage' => $jpmValue,
+        ],
+    ];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 Route::get('/', function () {
     return Inertia::render('landingPage');
 });
 
-// Login route - perlu nama 'login' untuk Laravel auth middleware
+// Login route
 Route::get('/login', function () {
     return Inertia::render('LoginPage', [
         'success' => session('success'),
         'warning' => session('warning'),
-        'info' => session('info'),
-        'errors' => session('errors') ? session('errors')->getBag('default')->getMessages() : [],
+        'info'    => session('info'),
+        'errors'  => session('errors')
+            ? session('errors')->getBag('default')->getMessages()
+            : [],
     ]);
 })->middleware('guest.custom')->name('login');
 
-// Guest routes - hanya bisa diakses jika BELUM login
+// Guest routes
 Route::middleware('guest.custom')->group(function () {
     Route::get('/register', function () {
         return Inertia::render('RegisterPage', [
-            'errors' => session('errors') ? session('errors')->getBag('default')->getMessages() : [],
+            'errors'       => session('errors')
+                ? session('errors')->getBag('default')->getMessages()
+                : [],
+            'jobStandards' => JobStandard::all(),
         ]);
     });
 
     Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+    Route::post('/login',    [LoginController::class,    'store'])->name('login.store');
 
-    // Forgot Password routes
-    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('forgot-password');
-    Route::post('/forgot-password/send-code', [ForgotPasswordController::class, 'sendCode'])->name('forgot-password.send-code');
+    Route::get('/forgot-password',              [ForgotPasswordController::class, 'showForm'])->name('forgot-password');
+    Route::post('/forgot-password/send-code',   [ForgotPasswordController::class, 'sendCode'])->name('forgot-password.send-code');
     Route::post('/forgot-password/verify-code', [ForgotPasswordController::class, 'verifyCode'])->name('forgot-password.verify-code');
-    Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('forgot-password.reset');
+    Route::post('/forgot-password/reset',       [ForgotPasswordController::class, 'resetPassword'])->name('forgot-password.reset');
 });
 
-// Protected routes - harus login + session timeout
+// Protected routes
 Route::middleware(['auth', 'session.timeout'])->group(function () {
-    // Peserta dashboard
+
     Route::get('/perserta-tes/dashboard', function () {
-        $user = Auth::user();
-        return Inertia::render('perserta-tes/Dashboard', [
-            'user' => $user,
-        ]);
+        return Inertia::render('perserta-tes/Dashboard', ['user' => Auth::user()]);
     });
 
-    // Pengerjaan soal
     Route::get('/perserta-tes/soal', function () {
-        $user = Auth::user();
-        return Inertia::render('perserta-tes/PengerjaanSoal', [
-            'user' => $user,
-        ]);
+        return Inertia::render('perserta-tes/PengerjaanSoal', ['user' => Auth::user()]);
     })->name('pengerjaan-soal');
 
     // Generate Hasil
-    Route::get('/perserta-tes/hasil', function () {
-        $user = Auth::user();
+    Route::get('/perserta-tes/hasil', function (Request $request) {
+        $user   = Auth::user();
+        $testId = $request->query('id');
+
+        $result = $testId
+            ? DiscResult::where('id', $testId)->where('user_id', $user->id)->first()
+            : DiscResult::where('user_id', $user->id)->latest('test_date')->first();
+
         return Inertia::render('perserta-tes/GenerateHasil', [
-            'user' => $user,
+            'user'          => $user,
+            'jobStandards'  => JobStandard::all(),
+            'discResultData' => transformDiscResult($result),
         ]);
     })->name('generate-hasil');
 
-    // Ringkasan hasil sebelum halaman PDF
-    Route::get('/perserta-tes/hasil-ringkas', function () {
-        $user = Auth::user();
+    // Ringkasan Hasil
+    Route::get('/perserta-tes/hasil-ringkas', function (Request $request) {
+        $user   = Auth::user();
+        $testId = $request->query('id');
+
+        $result = $testId
+            ? DiscResult::where('id', $testId)->where('user_id', $user->id)->first()
+            : DiscResult::where('user_id', $user->id)->latest('test_date')->first();
+
         return Inertia::render('perserta-tes/HasilRingkas', [
-            'user' => $user,
+            'user'           => $user,
+            'jobStandards'   => JobStandard::all(),
+            'discResultData' => transformDiscResult($result),
         ]);
     })->name('hasil-ringkas');
 
+    // Debug endpoint
+    Route::get('/api/debug/hasil-data', function () {
+        $user = Auth::user();
+        if (!$user) return response()->json(['error' => 'Not authenticated'], 401);
+
+        $result = DiscResult::where('user_id', $user->id)->latest('test_date')->first();
+        if (!$result) return response()->json(['error' => 'No DISC result found'], 404);
+
+        return response()->json([
+            'user'          => $user,
+            'discResultData' => transformDiscResult($result),
+        ]);
+    });
+
     // Riwayat Tes
     Route::get('/perserta-tes/riwayat', function () {
-        $user = Auth::user();
-        return Inertia::render('perserta-tes/RiwayatTest', [
-            'user' => $user,
-        ]);
+        return Inertia::render('perserta-tes/RiwayatTest', ['user' => Auth::user()]);
     })->name('riwayat-tes');
 
-    // DISC Test API Endpoint (Hitung Skor)
-    Route::post('/api/submit-disc', [DiscController::class, 'calculateScore'])
-        ->name('submit.disc');
+    // DISC Test API
+    Route::post('/api/submit-disc', [DiscController::class, 'calculateScore'])->name('submit.disc');
 
-    // Riwayat List Tes
+    // Riwayat List
     Route::get('/perserta-tes/riwayat-list', function () {
         $user = Auth::user();
+
+        $generateDynamicDescription = function ($primaryType, $secondaryType, $graph3, $baseDescription) {
+            if (!$primaryType) return $baseDescription;
+
+            $combos = [
+                'DI' => 'Tipe Dominance dengan Influencing: Pemimpin yang karismatik dan persuasif.',
+                'DS' => 'Tipe Dominance dengan Steadiness: Pemimpin yang tegas namun stabil.',
+                'DC' => 'Tipe Dominance dengan Conscientiousness: Pemimpin yang sistematis dan efisien.',
+                'ID' => 'Tipe Influencing dengan Dominance: Diplomat yang ambisius.',
+                'IS' => 'Tipe Influencing dengan Steadiness: Diplomat yang hangat dan konsisten.',
+                'IC' => 'Tipe Influencing dengan Conscientiousness: Diplomat yang terstruktur.',
+                'SI' => 'Tipe Steadiness dengan Influencing: Mitra yang menyenangkan dan dapat diandalkan.',
+                'SD' => 'Tipe Steadiness dengan Dominance: Mitra yang stabil namun tegas.',
+                'SC' => 'Tipe Steadiness dengan Conscientiousness: Mitra yang metodis dan teliti.',
+                'CI' => 'Tipe Conscientiousness dengan Influencing: Ahli yang komunikatif.',
+                'CS' => 'Tipe Conscientiousness dengan Steadiness: Ahli yang dapat diandalkan.',
+                'CD' => 'Tipe Conscientiousness dengan Dominance: Ahli yang berdeterminasi.',
+            ];
+
+            $comboKey    = $primaryType . ($secondaryType ?: '');
+            $comboDesc   = $combos[$comboKey] ?? null;
+            $primaryScore = $graph3[$primaryType] ?? 0;
+            $intensity   = $primaryScore > 4 ? 'sangat kuat' : ($primaryScore > 0 ? 'cukup dominan' : 'moderat');
+
+            return $comboDesc
+                ? "{$comboDesc} Karakteristik ini ditunjukkan dengan intensitas {$intensity} dalam profil Anda."
+                : $baseDescription;
+        };
+
+        $testHistory = DiscResult::where('user_id', $user->id)
+            ->orderBy('test_date', 'desc')
+            ->get()
+            ->map(function ($result) use ($generateDynamicDescription) {
+                $graph3        = $result->graph_scores_change;
+                $sorted        = collect($graph3)->sort()->reverse();
+                $sortedTraits  = $sorted->keys()->toArray();
+                $primaryTrait  = $sortedTraits[0] ?? null;
+                $secondaryTrait = $sortedTraits[1] ?? null;
+
+                return [
+                    'id'                 => $result->id,
+                    'submitted_at'       => $result->test_date,
+                    'test_date'          => $result->test_date,
+                    'graph_scores'       => [
+                        'Graph_1' => $result->graph_scores_most,
+                        'Graph_2' => $result->graph_scores_least,
+                        'Graph_3' => $graph3,
+                    ],
+                    'report_data'        => $result->report_data,
+                    'primary_type'       => $result->primary_type,
+                    'secondary_type'     => $secondaryTrait,
+                    'summary'            => $result->summary,
+                    'dynamicDescription' => $generateDynamicDescription(
+                        $primaryTrait, $secondaryTrait, $graph3, $result->summary
+                    ),
+                    'user_id'            => $result->user_id,
+                ];
+            });
+
         return Inertia::render('perserta-tes/RiwayatTestList', [
-            'user' => $user,
+            'user'        => $user,
+            'testHistory' => $testHistory,
         ]);
     })->name('riwayat-tes-list');
 
-    // Profile page
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-
-    // Update profile
+    Route::get('/profile',         [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-
-    // Serve profile photo (fallback if public/storage missing)
     Route::get('/profile/photo/{id}', [ProfileController::class, 'photo'])->name('profile.photo');
-
-    // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
-// Admin routes - harus login + admin role + session timeout
+// Admin routes
 Route::prefix('admin')->middleware(['admin', 'session.timeout'])->group(function () {
+
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    // Use ResultController to render admin data peserta (list + detail)
     Route::get('/data-peserta', [ResultController::class, 'hasil'])->name('admin.data-peserta');
-    Route::get('/manage-positions', [KelolaJabatanController::class, 'index'])
-        ->name('admin.manage-positions');
-    Route::post('/manage-positions', [KelolaJabatanController::class, 'store'])
-        ->name('admin.manage-positions.store');
-    Route::put('/manage-positions/{jobStandard}', [KelolaJabatanController::class, 'update'])
-        ->name('admin.manage-positions.update');
-    Route::delete('/manage-positions/{jobStandard}', [KelolaJabatanController::class, 'destroy'])
-        ->name('admin.manage-positions.destroy');
+
+    Route::get('/manage-positions', [KelolaJabatanController::class, 'index'])->name('admin.manage-positions');
+    Route::post('/manage-positions', [KelolaJabatanController::class, 'store'])->name('admin.manage-positions.store');
+    Route::put('/manage-positions/{jobStandard}', [KelolaJabatanController::class, 'update'])->name('admin.manage-positions.update');
+    Route::delete('/manage-positions/{jobStandard}', [KelolaJabatanController::class, 'destroy'])->name('admin.manage-positions.destroy');
+
     Route::get('/add-jabatan', function () {
         return Inertia::render('admin/AddJabatan');
     })->name('admin.add-jabatan');
-    Route::get('/kelola-akun', [KelolaAkunController::class, 'index'])
-        ->name('admin.kelola-akun');
-    Route::post('/kelola-akun', [KelolaAkunController::class, 'store'])
-        ->name('admin.kelola-akun.store');
-    Route::post('/kelola-akun/{user}/toggle-status', [KelolaAkunController::class, 'toggleStatus'])
-        ->name('admin.kelola-akun.toggle-status');
-    // Admin hasil list / view
-    // /admin/hasil route removed; use /admin/data-peserta for listing and detail
 
+    Route::get('/kelola-akun', [KelolaAkunController::class, 'index'])->name('admin.kelola-akun');
+    Route::post('/kelola-akun', [KelolaAkunController::class, 'store'])->name('admin.kelola-akun.store');
+    Route::post('/kelola-akun/{user}/toggle-status', [KelolaAkunController::class, 'toggleStatus'])->name('admin.kelola-akun.toggle-status');
+
+    // Admin lihat hasil ringkas peserta — struktur sama persis dengan route peserta
     Route::get('/hasil-ringkas', function (Request $request) {
         $userId = $request->query('user_id');
 
@@ -152,37 +272,14 @@ Route::prefix('admin')->middleware(['admin', 'session.timeout'])->group(function
             return redirect('/admin/data-peserta')->with('error', 'Peserta tidak ditemukan');
         }
 
-        $latestResult = DiscResult::where('user_id', $userId)
+        $result = DiscResult::where('user_id', $userId)
             ->latest('test_date')
             ->first();
 
-        $discResultData = null;
-        if ($latestResult) {
-            $discResultData = [
-                'graph_scores' => [
-                    'Graph_1' => $latestResult->graph_scores_most ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
-                    'Graph_2' => $latestResult->graph_scores_least ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
-                    'Graph_3' => $latestResult->graph_scores_change ?? ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0],
-                ],
-                'report' => [
-                    'summary' => $latestResult->report_data['summary'] ?? $latestResult->summary ?? null,
-                ],
-                'jpm' => [
-                    'percentage' => $latestResult->completion_percentage !== null
-                        ? round($latestResult->completion_percentage)
-                        : null,
-                ],
-                'submitted_at' => optional($latestResult->test_date)->toIso8601String() ?? now()->toIso8601String(),
-            ];
-
-            if (!empty($latestResult->report_data)) {
-                $discResultData['report'] = $latestResult->report_data;
-            }
-        }
-
         return Inertia::render('perserta-tes/HasilRingkas', [
-            'user' => $peserta,
-            'discResultData' => $discResultData,
+            'user'           => $peserta,
+            'jobStandards'   => JobStandard::all(),
+            'discResultData' => transformDiscResult($result),
         ]);
     })->name('admin.hasil-ringkas');
 });

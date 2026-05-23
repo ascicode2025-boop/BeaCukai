@@ -192,14 +192,25 @@ const PengerjaanSoal = () => {
             });
 
             if (response.data.status === "success") {
+                // Prefer saved_result (database) untuk sinkronisasi
+                const saved = response.data.saved_result || null;
+
+                if (!saved) {
+                    // Jika backend tidak menyimpan, jangan redirect — beri tahu pengguna
+                    console.error("Backend berhasil memproses tapi tidak menyimpan result:", response.data);
+                    alert("Hasil dihitung tetapi gagal disimpan ke server. Silakan coba lagi atau hubungi administrator.");
+                    return;
+                }
+
+                // Simpan salinan hasil yang sama seperti di DB ke localStorage untuk kompatibilitas UI
                 const storedResult = {
-                    ...response.data.data,
+                    ...saved,
                     submitted_at: new Date().toISOString(),
                     user_id: user?.id || null,
                     user_email: user?.email || null,
                 };
 
-                const entryId = `disc_${Date.now()}`;
+                const entryId = `disc_${saved.id}_${Date.now()}`;
                 const historyEntry = { id: entryId, ...storedResult };
 
                 localStorage.setItem(storageKey, JSON.stringify(storedResult));
@@ -222,10 +233,11 @@ const PengerjaanSoal = () => {
                 localStorage.setItem(historyKey, JSON.stringify(historyList));
                 localStorage.setItem(selectedKey, entryId);
 
+                // Redirect ke hasil ringkas yang akan mengambil data terbaru dari backend
                 window.location.href = "/perserta-tes/hasil-ringkas";
             }
         } catch (error) {
-            console.error("Terjadi kesalahan:", error);
+            console.error("Terjadi kesalahan saat submit DISC:", error?.response?.data || error.message || error);
             alert("Gagal memproses tes. Pastikan koneksi aman dan coba lagi.");
         }
     };

@@ -4,12 +4,59 @@ import NavbarLogin from "../../components/NavbarLogin";
 import Footer from "../../components/Footer";
 import { router, usePage } from "@inertiajs/react";
 
+const TRAITS = {
+    D: "Dominance",
+    I: "Influencing",
+    S: "Steadiness",
+    C: "Conscientiousness",
+};
+
 const RiwayatTestList = () => {
     const { props } = usePage();
     const user = props.user;
+    const testHistory = props.testHistory || [];
     const [riwayatTests, setRiwayatTests] = useState([]);
 
     useEffect(() => {
+        // Priority 1: Use database data from props
+        if (testHistory && testHistory.length > 0) {
+            const mapped = testHistory.map((item) => {
+                const dateLabel = item.submitted_at
+                    ? new Date(item.submitted_at).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                      })
+                    : "-";
+
+                // Get primary type from database
+                const primaryType = item.primary_type || "?";
+                const secondaryType = item.secondary_type || "?";
+                const traitName = TRAITS[primaryType] || primaryType;
+                const secondaryName = TRAITS[secondaryType] || secondaryType;
+
+                // Use dynamic description from backend
+                const description = item.dynamicDescription || item.summary || "";
+
+                return {
+                    id: item.id,
+                    date: dateLabel,
+                    type: "DISC Self-Assessment",
+                    status: "Selesai",
+                    primaryType,
+                    secondaryType,
+                    traitName,
+                    secondaryName,
+                    description,
+                    graph3: item.graph_scores?.Graph_3 || null,
+                };
+            });
+
+            setRiwayatTests(mapped);
+            return;
+        }
+
+        // Priority 2: Fallback ke localStorage jika database kosong
         const storageKey = user?.id
             ? `discResultData_${user.id}`
             : "discResultData";
@@ -87,28 +134,39 @@ const RiwayatTestList = () => {
                   })
                 : "-";
 
+            // Get primary type from localStorage data
+            const primaryType = item.primary_type || "?";
+            const secondaryType = item.secondary_type || "?";
+            const traitName = TRAITS[primaryType] || primaryType;
+            const secondaryName = TRAITS[secondaryType] || secondaryType;
+
+            // Get description - support both formats
+            const description = item.summary || item.report?.summary || "";
+
             return {
                 id: item.id,
                 date: dateLabel,
                 type: "DISC Self-Assessment",
                 status: "Selesai",
-                summary: item.report?.summary || "",
+                primaryType,
+                secondaryType,
+                traitName,
+                secondaryName,
+                description,
+                graph3: item.graph_scores?.Graph_3 || null,
             };
         });
 
         setRiwayatTests(mapped);
-    }, [user?.id]);
+    }, [user?.id, testHistory]);
 
     const handleKembali = () => {
         router.visit("/perserta-tes/riwayat");
     };
 
     const handleCardClick = (test) => {
-        const selectedKey = user?.id
-            ? `discResultSelected_${user.id}`
-            : "discResultSelected";
-        localStorage.setItem(selectedKey, test.id);
-        router.visit("/perserta-tes/hasil");
+        // Navigate dengan test ID sebagai query parameter
+        router.visit(`/perserta-tes/hasil?id=${test.id}`);
     };
 
     const handleMulaiTes = () => {
@@ -159,9 +217,30 @@ const RiwayatTestList = () => {
                                             {test.date}
                                         </span>
                                     </div>
-                                    {test.summary && (
+                                    {test.primaryType && (
+                                        <div className="riwayat-card-type-badge">
+                                            <span className="trait-badge">{test.primaryType}</span>
+                                            <span className="trait-name">{test.traitName}</span>
+                                            {test.secondaryType && test.secondaryType !== "?" && (
+                                                <>
+                                                    <span className="trait-separator">+</span>
+                                                    <span className="trait-badge secondary">{test.secondaryType}</span>
+                                                    <span className="trait-name">{test.secondaryName}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                    {test.graph3 && (
+                                        <div className="riwayat-card-scores">
+                                            <span className="score-item">D: {typeof test.graph3.D === 'number' ? test.graph3.D.toFixed(1) : test.graph3.D}</span>
+                                            <span className="score-item">I: {typeof test.graph3.I === 'number' ? test.graph3.I.toFixed(1) : test.graph3.I}</span>
+                                            <span className="score-item">S: {typeof test.graph3.S === 'number' ? test.graph3.S.toFixed(1) : test.graph3.S}</span>
+                                            <span className="score-item">C: {typeof test.graph3.C === 'number' ? test.graph3.C.toFixed(1) : test.graph3.C}</span>
+                                        </div>
+                                    )}
+                                    {test.description && (
                                         <div className="riwayat-card-summary">
-                                            {test.summary}
+                                            {test.description}
                                         </div>
                                     )}
                                     <div className="riwayat-card-footer">

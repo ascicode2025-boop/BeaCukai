@@ -15,6 +15,12 @@ import { useForm, usePage, router } from "@inertiajs/react";
 
 const KelolaAkun = () => {
     const { props } = usePage();
+    const jobStandards = props.jobStandards || {};
+    const jobStandardsList = Object.entries(jobStandards).map(([id, title]) => ({
+        id: parseInt(id),
+        title
+    }));
+
     const { post, processing, setData, reset, data } = useForm({
         name: "",
         nip: "",
@@ -325,9 +331,8 @@ const KelolaAkun = () => {
                                         />
                                     </div>
                                     <div className="form-field">
-                                        <label>Unit Kerja</label>
-                                        <input
-                                            type="text"
+                                        <label>Unit Kerja (Jabatan)</label>
+                                        <select
                                             value={data.unit_kerja}
                                             onChange={(e) =>
                                                 setData(
@@ -335,8 +340,14 @@ const KelolaAkun = () => {
                                                     e.target.value,
                                                 )
                                             }
-                                            placeholder="Departemen"
-                                        />
+                                        >
+                                            <option value="">-- Pilih Jabatan --</option>
+                                            {jobStandardsList.map((job) => (
+                                                <option key={job.id} value={job.title}>
+                                                    {job.title}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="form-field">
                                         <label>Nomor Telepon</label>

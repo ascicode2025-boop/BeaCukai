@@ -98,7 +98,7 @@
 /* ---- PDF PAGE ---- */
 .pdf-page {
     width: 794px;
-    padding: 50px 60px;
+    padding: 40px 50px;
     background-color: #ffffff;
     box-sizing: border-box;
     position: relative;
@@ -178,28 +178,28 @@
 }
 
 .section-title {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     color: #1e1b4b;
     border-bottom: 2px solid #5850ec;
-    padding-bottom: 6px;
-    margin-bottom: 15px;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
     text-transform: uppercase;
 }
 
 .overview-box {
     background: #f8f7ff;
-    padding: 15px;
+    padding: 12px;
     border-left: 4px solid #5850ec;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .info-grid-3col {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 8px;
+    margin-bottom: 18px;
 }
 
 .info-card {
@@ -224,16 +224,16 @@
 
 .section-primary {
     background: #fffdf5;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 6px;
     border: 1px solid #fef3c7;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 
 .primary-badge-group {
     display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
 }
 
@@ -261,185 +261,209 @@
 }
 
 .primary-summary {
-    font-size: 11px;
-    line-height: 1.6;
+    font-size: 10px;
+    line-height: 1.5;
     color: #4b5563;
+    margin-bottom: 0;
 }
 
 .chart-status-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
 .chart-status-card {
     background: #fff;
     border: 1px solid #e5e7eb;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 6px;
+    border-radius: 4px;
+    page-break-inside: avoid;
 }
 
 .status-title {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .status-subtitle {
-    font-size: 8px;
+    font-size: 7px;
     color: #6b7280;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .status-values {
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    font-size: 7px;
     font-weight: 700;
 }
 
 .charts-grid-3col {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 8px;
+    margin-top: 10px;
 }
 
 .chart-item-pdf {
     background: #f8f7ff;
-    padding: 10px;
+    padding: 6px;
     border-radius: 6px;
     text-align: center;
+    page-break-inside: avoid;
 }
 
 .chart-item-label {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .profiles-stack {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .profile-card-pdf {
     border: 1px solid #e5e7eb;
     border-radius: 6px;
+    page-break-inside: avoid;
 }
 
 .profile-header-pdf {
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: #f9fafb;
 }
 
 .profile-type-pdf {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
 }
 
 .profile-body-pdf {
-    padding: 12px;
+    padding: 8px 10px;
 }
 
 .profile-summary-pdf {
-    font-size: 10px;
-    margin-bottom: 10px;
-    line-height: 1.5;
+    font-size: 9px;
+    margin-bottom: 6px;
+    line-height: 1.4;
 }
 
 .profile-cols {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 10px;
 }
 
 .profile-col-title {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     border-bottom: 1px solid #eee;
 }
 
 .profile-list {
-    padding-left: 12px;
+    padding-left: 10px;
     margin: 0;
-    font-size: 9px;
+    font-size: 8px;
     list-style-type: disc;
 }
 
 .profile-list li {
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .char-grid-3col {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 14px;
 }
 
 .char-box {
     background: #f9fafb;
-    padding: 12px;
+    padding: 8px;
     border-radius: 6px;
+    page-break-inside: avoid;
 }
 
 .char-title {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .char-list {
-    padding-left: 12px;
+    padding-left: 10px;
     margin: 0;
-    font-size: 9px;
+    font-size: 8px;
     list-style-type: circle;
+}
+
+.char-list li {
+    margin-bottom: 1px;
 }
 
 .rec-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
 }
 
 .rec-item {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     background: #f8f7ff;
-    padding: 10px;
+    padding: 6px;
     border-radius: 6px;
     align-items: flex-start;
+    page-break-inside: avoid;
 }
 
 .rec-number {
     background: #5850ec;
     color: white;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
+    font-size: 8px;
     flex-shrink: 0;
 }
 
 .rec-text {
-    font-size: 9px;
+    font-size: 8px;
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .pdf-footer {
     text-align: center;
-    padding-top: 20px;
+    padding-top: 10px;
     border-top: 1px solid #eee;
-    margin-top: 20px;
-    font-size: 8px;
+    margin-top: 12px;
+    font-size: 7px;
     color: #9ca3af;
+}
+
+/* ============================================================
+   CHARTS SECTION
+   ============================================================ */
+.section-charts {
+    margin-top: 8px;
+    padding-top: 4px;
+    page-break-inside: avoid;
+}
+
+.section-charts .section-title {
+    margin-bottom: 8px;
 }
 
 /* ============================================================
@@ -643,3 +667,122 @@
         font-size: 12px;
     }
 }
+
+/* ============================================================
+   JOB STANDARD COMPARISON SECTION
+   ============================================================ */
+.job-standard-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 100%);
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    page-break-inside: avoid;
+}
+
+.job-standard-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 8px;
+}
+
+.job-standard-subtitle {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 16px;
+}
+
+.fitness-summary-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fitness-overall {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.fitness-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    min-width: 140px;
+}
+
+.fitness-bar-container {
+    flex: 1;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 150px;
+}
+
+.fitness-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 12px;
+}
+
+.fitness-percent {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    min-width: 45px;
+    text-align: right;
+}
+
+.trait-fitness-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.trait-fitness-item {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    text-align: center;
+    page-break-inside: avoid;
+}
+
+.trait-fitness-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.trait-fitness-score {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.trait-fitness-percent {
+    font-size: 16px;
+    font-weight: 700;
+    color: #059669;
+}
+
+@media (max-width: 768px) {
+    .job-standard-section {
+        padding: 16px;
+        margin-top: 24px;
+    }
+
+    .trait-fitness-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fitness-label {
+        min-width: 110px;
+        font-size: 12px;
+    }
+}
+

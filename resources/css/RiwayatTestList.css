@@ -206,6 +206,71 @@ body {
     font-weight: 500;
 }
 
+/* ---- Type Badge ---- */
+.riwayat-card-type-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%);
+    border: 1px solid #d8cef8;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.trait-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+}
+
+.trait-badge.secondary {
+    background: linear-gradient(135deg, #d8cef8, #ede9fe);
+    color: #6d28d9;
+    border: 1.5px solid #c4b5fd;
+}
+
+.trait-name {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.trait-separator {
+    font-size: 14px;
+    color: #c4b5fd;
+    font-weight: 700;
+}
+
+/* ---- Graph Scores ---- */
+.riwayat-card-scores {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 10px;
+    background: #fafafa;
+    border: 1px solid #f0edfb;
+    border-radius: 8px;
+}
+
+.score-item {
+    text-align: center;
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+    padding: 6px;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
 /* ---- Summary ---- */
 .riwayat-card-summary {
     font-size: 12.5px;

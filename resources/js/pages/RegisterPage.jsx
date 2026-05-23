@@ -9,9 +9,12 @@ export default function RegisterPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successEmail, setSuccessEmail] = useState("");
+    const [showJabatanDropdown, setShowJabatanDropdown] = useState(false);
+    const [jabatanSearch, setJabatanSearch] = useState("");
     const { props } = usePage();
     const initialErrors = props?.errors || {};
     const flashMessage = props?.flash || {};
+    const jobStandards = props?.jobStandards || [];
 
     const { data, setData, post, processing, errors } = useForm({
         name: "",
@@ -24,6 +27,17 @@ export default function RegisterPage() {
     });
 
     const allErrors = { ...initialErrors, ...errors };
+
+    // Filter jabatan berdasarkan search
+    const filteredJabatan = jobStandards.filter((job) =>
+        job.job_title.toLowerCase().includes(jabatanSearch.toLowerCase())
+    );
+
+    const handleJabatanSelect = (jobTitle) => {
+        setData("unit_kerja", jobTitle);
+        setShowJabatanDropdown(false);
+        setJabatanSearch("");
+    };
 
     const showError = (message) => {
         setErrorMessage(message);
@@ -60,6 +74,21 @@ export default function RegisterPage() {
         }
     }, [flashMessage]);
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            const dropdownElement = document.querySelector('.jabatan-dropdown-wrapper');
+            if (dropdownElement && !dropdownElement.contains(e.target)) {
+                setShowJabatanDropdown(false);
+            }
+        };
+
+        if (showJabatanDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [showJabatanDropdown]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -72,7 +101,7 @@ export default function RegisterPage() {
             !data.password ||
             !data.password_confirmation
         ) {
-            showError("⚠️ Semua field harus diisi");
+            showError("⚠️ Semua field wajib diisi");
             return;
         }
         if (!/^\d+$/.test(data.nip)) {
@@ -348,9 +377,76 @@ export default function RegisterPage() {
                     box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
                 }
 
+                .input-capsule[type="text"],
+                .input-capsule[type="email"],
+                .input-capsule[type="password"] {
+                    font-family: 'Oxanium', sans-serif;
+                }
+
+                select.input-capsule {
+                    appearance: none;
+                    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b3168' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                    background-repeat: no-repeat;
+                    background-position: right 10px center;
+                    background-size: 20px;
+                    padding-right: 40px;
+                    font-family: 'Oxanium', sans-serif;
+                }
+
+                select.input-capsule:focus {
+                    border: 1px solid #4A569D;
+                    background-color: #f2f2f2;
+                }
+
                 .input-capsule:focus {
                     border: 1px solid #4A569D;
                     background: #f2f2f2;
+                }
+
+                .jabatan-dropdown-wrapper {
+                    position: relative !important;
+                }
+
+                .jabatan-dropdown-button {
+                    cursor: pointer;
+                    user-select: none;
+                }
+
+                .jabatan-dropdown-button:hover {
+                    background: #f0f0f0;
+                }
+
+                .jabatan-dropdown-menu {
+                    animation: slideDown 0.2s ease-out;
+                }
+
+                .jabatan-dropdown-menu::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .jabatan-dropdown-menu::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 10px;
+                }
+
+                .jabatan-dropdown-menu::-webkit-scrollbar-thumb {
+                    background: #c0c0c0;
+                    border-radius: 10px;
+                }
+
+                .jabatan-dropdown-menu::-webkit-scrollbar-thumb:hover {
+                    background: #999;
+                }
+
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-8px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
                 }
 
                 .toggle-password {
@@ -627,7 +723,6 @@ export default function RegisterPage() {
                             ["Nama", "name", "text"],
                             ["NIP", "nip", "text"],
                             ["Email", "email", "email"],
-                            ["Unit Kerja", "unit_kerja", "text"],
                             ["Telepon", "telepon", "text"],
                         ].map(([label, key, type]) => (
                             <div className="form-group-custom" key={key}>
@@ -645,6 +740,120 @@ export default function RegisterPage() {
                                 </div>
                             </div>
                         ))}
+
+                        {/* Unit Kerja / Jabatan Dropdown */}
+                        <div className="form-group-custom">
+                            <label className="label-custom">Unit Kerja</label>
+                            <div className="input-wrapper jabatan-dropdown-wrapper" style={{ position: "relative" }}>
+                                <div
+                                    className="input-capsule jabatan-dropdown-button"
+                                    onClick={() => setShowJabatanDropdown(!showJabatanDropdown)}
+                                    style={{
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        color: data.unit_kerja ? "#2b3168" : "#999",
+                                    }}
+                                >
+                                    <span>{data.unit_kerja || "Pilih Jabatan Anda"}</span>
+                                    <span style={{ fontSize: "12px", marginLeft: "10px" }}>
+                                        {showJabatanDropdown ? "▲" : "▼"}
+                                    </span>
+                                </div>
+
+                                {showJabatanDropdown && (
+                                    <div
+                                        className="jabatan-dropdown-menu"
+                                        style={{
+                                            position: "absolute",
+                                            top: "100%",
+                                            left: 0,
+                                            right: 0,
+                                            background: "white",
+                                            border: "1px solid #d0d0d0",
+                                            borderRadius: "12px",
+                                            marginTop: "8px",
+                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                            zIndex: 1000,
+                                            overflow: "hidden",
+                                        }}
+                                    >
+                                        <div style={{ padding: "10px" }}>
+                                            <input
+                                                type="text"
+                                                placeholder="Cari jabatan..."
+                                                value={jabatanSearch}
+                                                onChange={(e) => setJabatanSearch(e.target.value)}
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{
+                                                    width: "100%",
+                                                    padding: "8px 12px",
+                                                    border: "1px solid #e0e0e0",
+                                                    borderRadius: "8px",
+                                                    fontSize: "13px",
+                                                    fontFamily: "'Oxanium', sans-serif",
+                                                    outline: "none",
+                                                }}
+                                                onFocus={(e) => (e.target.style.borderColor = "#4A569D")}
+                                                onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
+                                            />
+                                        </div>
+
+                                        <div
+                                            style={{
+                                                maxHeight: "200px",
+                                                overflowY: "auto",
+                                                borderTop: "1px solid #e0e0e0",
+                                            }}
+                                        >
+                                            {filteredJabatan.length > 0 ? (
+                                                filteredJabatan.map((jabatan) => (
+                                                    <div
+                                                        key={jabatan.id}
+                                                        onClick={() => handleJabatanSelect(jabatan.job_title)}
+                                                        style={{
+                                                            padding: "12px 15px",
+                                                            cursor: "pointer",
+                                                            background: data.unit_kerja === jabatan.job_title ? "#f0f0f0" : "white",
+                                                            borderBottom: "1px solid #f0f0f0",
+                                                            fontSize: "13px",
+                                                            fontFamily: "'Oxanium', sans-serif",
+                                                            transition: "background 0.2s",
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            if (data.unit_kerja !== jabatan.job_title) {
+                                                                e.target.style.background = "#f9f9f9";
+                                                            }
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            if (data.unit_kerja !== jabatan.job_title) {
+                                                                e.target.style.background = "white";
+                                                            }
+                                                        }}
+                                                    >
+                                                        <div style={{ fontWeight: 600, color: "#2b3168" }}>
+                                                            {jabatan.job_title}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div
+                                                    style={{
+                                                        padding: "15px",
+                                                        textAlign: "center",
+                                                        color: "#999",
+                                                        fontSize: "13px",
+                                                    }}
+                                                >
+                                                    Tidak ada jabatan yang cocok
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         <div className="form-group-custom">
                             <label className="label-custom">Password</label>

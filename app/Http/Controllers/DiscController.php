@@ -304,35 +304,48 @@ class DiscController extends Controller
         $sortedTraits = array_keys($sortedGraph3);
         $primaryTrait = $sortedTraits[0] ?? null; // Mendapatkan Tipe (D, I, S, C)
         $secondaryTrait = $sortedTraits[1] ?? null;
-        $reportData = $profileDescriptions[$primaryTrait];
+        $reportData = $profileDescriptions[$primaryTrait] ?? [];
 
-        // 9b. Nilai JPM (dinormalisasi 0-100 dari skor Graph 3 tertinggi)
-        $primaryGraphScore = $graph3[$primaryTrait] ?? 0;
-        $minGraph = -8;
-        $maxGraph = 8;
-        $jpmPercentage = (int) round((($primaryGraphScore - $minGraph) / ($maxGraph - $minGraph)) * 100);
+        $reportDataFull = [
+            'primaryType' => $reportData['primaryType'] ?? null,
+            'summary' => $reportData['summary'] ?? null,
+            'strengths' => $reportData['strengths'] ?? [],
+            'weaknesses' => $reportData['weaknesses'] ?? [],
+            'workCharacteristics' => $reportData['workCharacteristics'] ?? [],
+            'recommendations' => $reportData['recommendations'] ?? [],
+            'primary_trait' => $primaryTrait,
+            'secondary_trait' => $secondaryTrait,
+            'secondaryType' => $secondaryTrait ? ($profileDescriptions[$secondaryTrait]['primaryType'] ?? null) : null,
+            'all_profiles' => $profileDescriptions,
+        ];
+
+        // 9b. Nilai JPM (dinormalisasi 0-100 dari skor Graph 3 MAKSIMAL - KONSISTEN dengan ResultController)
+        // Formula: ((maxScore - (-8)) / 16) * 100, di mana 16 = 8 - (-8)
+        $maxScore = max($graph3['D'] ?? 0, $graph3['I'] ?? 0, $graph3['S'] ?? 0, $graph3['C'] ?? 0);
+        $jpmPercentage = (int) round(((($maxScore ?? 0) - (-8)) / 16) * 100);
         $jpmPercentage = max(0, min(100, $jpmPercentage));
 
-        // 10. SIMPAN KE DATABASE
+        // 10. SIMPAN KE DATABASE — gunakan transaction; jika gagal, kembalikan error ke client
         try {
-            $discResult = DiscResult::create([
-                'user_id' => Auth::id(),
-                'raw_scores_most' => $rawMost,
-                'raw_scores_least' => $rawLeast,
-                'raw_scores_change' => $graph3_Raw,
-                'graph_scores_most' => $graph1,
-                'graph_scores_least' => $graph2,
-                'graph_scores_change' => $graph3,
-                'primary_type' => $primaryTrait,
-                'personality_profile' => $primaryTrait . ' - ' . $reportData['primaryType'],
-                'summary' => $reportData['summary'],
-                'report_data' => $reportData,
-                'total_questions' => count($answers),
-                'completion_percentage' => $jpmPercentage,
-                'test_date' => now(),
-            ]);
+            $discResult = DB::transaction(function () use ($rawMost, $rawLeast, $graph3_Raw, $graph1, $graph2, $graph3, $primaryTrait, $reportData, $reportDataFull, $answers, $jpmPercentage) {
+                $discResult = DiscResult::create([
+                    'user_id' => Auth::id(),
+                    'raw_scores_most' => $rawMost,
+                    'raw_scores_least' => $rawLeast,
+                    'raw_scores_change' => $graph3_Raw,
+                    'graph_scores_most' => $graph1,
+                    'graph_scores_least' => $graph2,
+                    'graph_scores_change' => $graph3,
+                    'primary_type' => $primaryTrait,
+                    'personality_profile' => $primaryTrait . ' - ' . ($reportData['primaryType'] ?? ''),
+                    'summary' => $reportData['summary'] ?? null,
+                    'report_data' => $reportDataFull,
+                    'total_questions' => count($answers),
+                    'completion_percentage' => $jpmPercentage,
+                    'jpm' => $jpmPercentage,
+                    'test_date' => now(),
+                ]);
 
-            if ($discResult) {
                 $answerRows = [];
                 foreach ($answers as $qNum => $choices) {
                     $mostChoice = $choices['M'];
@@ -356,13 +369,19 @@ class DiscController extends Controller
                 if (!empty($answerRows)) {
                     DB::table('disc_answers')->insert($answerRows);
                 }
-            }
+
+                return $discResult;
+            });
         } catch (\Exception $e) {
             Log::error('Error saving DISC result: ' . $e->getMessage());
-            // Continue even if save fails - don't block user
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan hasil ke database',
+                'error' => $e->getMessage(),
+            ], 500);
         }
 
-        // 11. RETURN RESPONSE JSON
+        // 11. RETURN RESPONSE JSON (sertakan saved_result untuk keperluan sinkronisasi frontend)
         return response()->json([
             'status' => 'success',
             'message' => 'Skor DISC berhasil dihitung dengan konversi grafik dan profil',
@@ -377,16 +396,17 @@ class DiscController extends Controller
                     'Graph_2' => $graph2,
                     'Graph_3' => $graph3
                 ],
-                'report' => $reportData,
+                'report' => $reportDataFull,
                 'all_profiles' => $profileDescriptions,
                 'sorted_traits' => $sortedTraits,
                 'jpm' => [
                     'percentage' => $jpmPercentage,
-                    'graph3_score' => $primaryGraphScore,
+                    'graph3_score' => $maxScore,
                     'primary_trait' => $primaryTrait,
                     'secondary_trait' => $secondaryTrait,
                 ]
             ],
+            'saved_result' => isset($discResult) ? $discResult->toArray() : null,
             'processing_info' => [
                 'total_questions' => count($answers),
                 'formula' => 'Change = Raw Most - Raw Least',

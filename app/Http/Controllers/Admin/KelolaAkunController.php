@@ -38,9 +38,13 @@ class KelolaAkunController extends Controller
                 'created_at',
             ]);
 
+        // Get list of job standards for unit_kerja dropdown
+        $jobStandards = \App\Models\JobStandard::orderBy('job_title')->pluck('job_title', 'id');
+
         return Inertia::render('admin/KelolaAkun', [
             'admin' => $admin,
             'accounts' => $accounts,
+            'jobStandards' => $jobStandards, // Add this for unit_kerja dropdown
         ]);
     }
 

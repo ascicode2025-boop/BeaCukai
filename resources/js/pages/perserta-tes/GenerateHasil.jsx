@@ -12,11 +12,20 @@ const TRAITS = {
     C: { name: "Conscientiousness" },
 };
 
+const TRAIT_DESCRIPTIONS = {
+    D: `Anda adalah tipe Dominance - Pemimpin yang berorientasi pada hasil. Anda memiliki kebutuhan kuat untuk kontrol, kecepatan dalam pengambilan keputusan, dan pencapaian tujuan. Dalam bekerja, Anda cenderung langsung ke inti masalah, mengambil risiko yang diperhitungkan, dan memimpin dengan tegas. Anda kompetitif, percaya diri, dan fokus pada tantangan baru. Kekuatan Anda adalah kemampuan memotivasi tim menuju hasil yang terukur. Untuk pengembangan, Anda perlu meningkatkan empati dan mendengarkan perspektif orang lain lebih dalam.`,
+    I: `Anda adalah tipe Influence - Diplomat yang bersemangat dan komunikatif. Anda memiliki energi tinggi, antusiasme yang menular, dan kemampuan luar biasa dalam membangun hubungan interpersonal. Anda adalah orang yang optimis, kreatif dalam ide, dan suka menjadi pusat perhatian. Dalam kolaborasi, Anda adalah penggerak suasana yang mampu menginspirasi tim dan membangun kepercayaan dengan cepat. Kekuatan utama Anda adalah persuasi dan kemampuan mengkomunikasikan visi dengan cara yang menarik. Untuk pengembangan, tingkatkan fokus pada detail, konsistensi eksekusi, dan analisis data sebelum mengambil keputusan.`,
+    S: `Anda adalah tipe Steadiness - Mitra yang stabil dan penuh dukungan. Anda memiliki pendekatan yang tenang, menyukai rutinitas yang dapat diprediksi, dan sangat loyal terhadap tim dan organisasi. Anda adalah pendengar yang baik, empatik, dan selalu siap membantu rekan kerja. Kekuatan Anda adalah konsistensi, stabilitas emosional, dan kemampuan menjaga keharmonisan tim. Anda bekerja dengan metode yang terukur dan dapat diandalkan dalam jangka panjang. Untuk pengembangan, berani mengambil inisiatif, adaptif terhadap perubahan, dan tingkatkan asertivitas dalam mengungkapkan pendapat.`,
+    C: `Anda adalah tipe Conscientiousness - Ahli yang berfokus pada kualitas dan akurasi. Anda memiliki standar tinggi, perhatian terhadap detail yang luar biasa, dan komitmen kuat pada keunggulan. Anda metodis, analitis, dan selalu mencari informasi lengkap sebelum membuat keputusan. Dalam pekerjaan, Anda adalah pengawas kualitas yang dapat diandalkan, selalu memastikan setiap detail sesuai dengan standar. Kekuatan Anda adalah presisi, perencanaan matang, dan kontrol kualitas yang ketat. Untuk pengembangan, kurangi perfeksionisme yang berlebihan, lebih fleksibel terhadap perubahan, dan percayakan kepada orang lain untuk berbagi beban kerja.`,
+};
+
 const TRAIT_ORDER = ["D", "I", "S", "C"];
 
 const GenerateHasil = () => {
     const { props } = usePage();
     const user = props.user;
+    const discResultData = props.discResultData;
+    const jobStandards = props.jobStandards || [];
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [apiData, setApiData] = useState(null);
     const hasTriggeredAutoDownload = useRef(false);
@@ -26,6 +35,13 @@ const GenerateHasil = () => {
     const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
+        // Priority 1: Use props data from database
+        if (discResultData) {
+            setApiData(discResultData);
+            return;
+        }
+
+        // Priority 2: Fallback to localStorage
         const storageKey = user?.id
             ? `discResultData_${user.id}`
             : "discResultData";
@@ -79,7 +95,7 @@ const GenerateHasil = () => {
                 setApiData(null);
             }
         }
-    }, [user?.id]);
+    }, [user?.id, discResultData]);
 
     useEffect(() => {
         const shouldAutoDownload =
@@ -128,10 +144,18 @@ const GenerateHasil = () => {
             Object.entries(graph3)
                 .sort((a, b) => b[1] - a[1])
                 .map(([trait]) => trait);
-        const primaryTrait = sortedTraits[0] || "-";
-        const secondaryTrait = sortedTraits[1] || "-";
+
+        // Ambil data dari database (sudah dihitung saat test)
+        const reportData = apiData.report_data || apiData.report || {};
+
+        // Primary & secondary trait dari database atau fallback ke sorting
+        const primaryTrait = apiData.primary_trait || reportData.primary_trait || sortedTraits[0] || "-";
+        const secondaryTrait = apiData.secondary_trait || reportData.secondary_trait || sortedTraits[1] || "-";
+
         const minGraph = -8;
         const maxGraph = 8;
+
+        // JPM dari backend (sudah dihitung dengan benar)
         const jpm =
             apiData.jpm?.percentage ??
             Math.round(
@@ -139,15 +163,53 @@ const GenerateHasil = () => {
                     (maxGraph - minGraph)) *
                     100,
             );
-        const primaryScore = graph3[primaryTrait] ?? 0;
-        const secondaryScore = graph3[secondaryTrait] ?? 0;
-        const secondaryDiff = Math.abs(primaryScore - secondaryScore);
-        const traitNarrative =
-            primaryTrait !== "-" && secondaryTrait !== "-"
-                ? `Profil Anda paling menonjol pada ${formatTraitBadge(primaryTrait)} dan didukung ${formatTraitBadge(secondaryTrait)}. Selisih keduanya ${secondaryDiff} poin pada Graph 3, menunjukkan kombinasi gaya yang cukup ${secondaryDiff <= 2 ? "seimbang" : "tegas"} sesuai pola jawaban Anda.`
-                : "";
-        const longSummary =
-            `${apiData.report?.summary || ""} ${traitNarrative}`.trim();
+
+        // Summary dari database (bukan hardcoded)
+        const longSummary = apiData.summary || reportData.summary || TRAIT_DESCRIPTIONS[primaryTrait] || "";
+
+        // ═══ Perbandingan dengan Standar Jabatan ═══
+        const jobStandard = jobStandards.find(
+            (job) =>
+                job.job_title?.toLowerCase() === user?.unit_kerja?.toLowerCase()
+        );
+
+        let jobStandardComparison = null;
+        if (jobStandard) {
+            const traitComparison = {};
+            const traitFitness = {};
+            let totalFitness = 0;
+
+            TRAIT_ORDER.forEach((trait) => {
+                const userScore = graph3[trait] ?? 0;
+                const standardScore = jobStandard[trait.toLowerCase()] ?? 0;
+                const difference = Math.abs(userScore - standardScore);
+                const fitnessPercentage = Math.max(
+                    0,
+                    100 - (difference / 16) * 100
+                );
+
+                traitComparison[trait] = {
+                    userScore,
+                    standardScore,
+                    difference,
+                    fitnessPercentage: Math.round(fitnessPercentage),
+                };
+
+                traitFitness[trait] = Math.round(fitnessPercentage);
+                totalFitness += fitnessPercentage;
+            });
+
+            const overallFitness = Math.round(totalFitness / 4);
+
+            jobStandardComparison = {
+                jobTitle: jobStandard.job_title,
+                jobCode: jobStandard.job_code,
+                traitComparison,
+                traitFitness,
+                overallFitness,
+                hasStandard: true,
+            };
+        }
 
         return {
             graph1,
@@ -158,8 +220,9 @@ const GenerateHasil = () => {
             secondaryTrait,
             jpm,
             longSummary,
-            report: apiData.report,
-            allProfiles: apiData.all_profiles,
+            report: reportData,
+            allProfiles: reportData.all_profiles || apiData.all_profiles,
+            jobStandardComparison,
         };
     }, [apiData]);
 
@@ -179,6 +242,7 @@ const GenerateHasil = () => {
     }
 
     const discResult = {
+        id: apiData?.id,
         name: user?.name || "Peserta",
         nip: user?.nip || "-",
         unit_kerja: user?.unit_kerja || "-",
@@ -212,6 +276,7 @@ const GenerateHasil = () => {
         jpm: summary.jpm,
         allProfiles: summary.allProfiles || {},
         sortedTraits: summary.sortedTraits || TRAIT_ORDER,
+        jobStandardComparison: summary.jobStandardComparison,
     };
 
     const graph1 = summary.graph1;
@@ -476,7 +541,13 @@ const GenerateHasil = () => {
         handleClosePreview();
     };
 
-    const handleLihatDetail = () => router.visit("/perserta-tes/hasil-ringkas");
+    const handleLihatDetail = () => {
+        if (discResult.id) {
+            router.visit(`/perserta-tes/hasil-ringkas?id=${discResult.id}`);
+        } else {
+            router.visit("/perserta-tes/hasil-ringkas");
+        }
+    };
     const handleKembali = () => router.visit("/perserta-tes/dashboard");
 
     const pdfFilename = `DISC_Assessment_${discResult.name.replace(/\s+/g, "_")}.pdf`;
@@ -607,9 +678,6 @@ const GenerateHasil = () => {
                                 <p className="primary-summary">
                                     {discResult.summary}
                                 </p>
-                                <div className="jpm-inline">
-                                    JPM: {discResult.jpm}%
-                                </div>
                             </div>
 
                             <div className="section-charts no-break">
@@ -696,6 +764,54 @@ const GenerateHasil = () => {
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* JOB STANDARD COMPARISON SECTION */}
+                                {discResult.jobStandardComparison?.hasStandard && (
+                                    <div className="job-standard-section mt-5">
+                                        <h3 className="job-standard-title">
+                                            Kesesuaian dengan Standar Jabatan
+                                        </h3>
+                                        <p className="job-standard-subtitle">
+                                            Posisi: <strong>{discResult.jobStandardComparison.jobTitle}</strong>
+                                        </p>
+                                        <div className="fitness-summary-box">
+                                            <div className="fitness-overall">
+                                                <span className="fitness-label">Kesesuaian Keseluruhan</span>
+                                                <div className="fitness-bar-container">
+                                                    <div
+                                                        className="fitness-bar-fill"
+                                                        style={{
+                                                            width: `${discResult.jobStandardComparison.overallFitness}%`,
+                                                            backgroundColor: discResult.jobStandardComparison.overallFitness >= 80 ? '#10b981' :
+                                                                              discResult.jobStandardComparison.overallFitness >= 60 ? '#f59e0b' :
+                                                                              discResult.jobStandardComparison.overallFitness >= 40 ? '#fd8235' : '#ef4444'
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span className="fitness-percent">
+                                                    {discResult.jobStandardComparison.overallFitness}%
+                                                </span>
+                                            </div>
+                                            <div className="trait-fitness-grid">
+                                                {["D", "I", "S", "C"].map((trait) => {
+                                                    const tc = discResult.jobStandardComparison.traitComparison[trait];
+                                                    if (!tc) return null;
+                                                    return (
+                                                        <div key={trait} className="trait-fitness-item">
+                                                            <p className="trait-fitness-label">{trait}</p>
+                                                            <p className="trait-fitness-score">
+                                                                {tc.userScore} vs {tc.standardScore}
+                                                            </p>
+                                                            <p className="trait-fitness-percent">
+                                                                {tc.fitnessPercentage}%
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -709,7 +825,44 @@ const GenerateHasil = () => {
                                     {discResult.sortedTraits.map((trait) => {
                                         const profile =
                                             discResult.allProfiles[trait];
-                                        if (!profile) return null;
+
+                                        // Fallback jika allProfiles tidak ada - gunakan TRAIT_DESCRIPTIONS
+                                        if (!profile) {
+                                            const traitName = TRAITS[trait]?.name || trait;
+                                            const description = TRAIT_DESCRIPTIONS[trait] || "";
+                                            if (!description) return null;
+
+                                            return (
+                                                <div
+                                                    key={trait}
+                                                    className="profile-card-pdf no-break"
+                                                >
+                                                    <div
+                                                        className="profile-header-pdf"
+                                                        style={{
+                                                            borderLeft: `5px solid ${getTraitColor(trait)}`,
+                                                        }}
+                                                    >
+                                                        <h3
+                                                            className="profile-type-pdf"
+                                                            style={{
+                                                                color: getTraitColor(
+                                                                    trait,
+                                                                ),
+                                                            }}
+                                                        >
+                                                            {trait} - {traitName}
+                                                        </h3>
+                                                    </div>
+                                                    <div className="profile-body-pdf">
+                                                        <p className="profile-summary-pdf">
+                                                            {description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+
                                         return (
                                             <div
                                                 key={trait}
