@@ -112,10 +112,7 @@ export default function LupaSandi() {
             return;
         }
 
-        console.log("Verifying OTP:", {
-            email: data.email,
-            otp: data.verification_code,
-        });
+        // OTP verification in progress
 
         setProcessing(true);
         try {
@@ -161,7 +158,7 @@ export default function LupaSandi() {
             return;
         }
 
-        console.log("Resetting password...");
+        // Resetting password
 
         setProcessing(true);
         try {

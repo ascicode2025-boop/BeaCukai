@@ -11,7 +11,7 @@ const DISC_META = {
     D: { label: "Dominance", name: "Dominance", color: "#ef4444" },
     I: { label: "Influence", name: "Influencing", color: "#f59e0b" },
     S: { label: "Steadiness", name: "Steadiness", color: "#10b981" },
-    C: { label: "Compliance", name: "Conscientiousness", color: "#3b82f6" },
+    C: { label: "Compliance", name: "Compliance", color: "#3b82f6" },
 };
 const DISC_ORDER = ["D", "I", "S", "C"];
 
@@ -222,14 +222,14 @@ const PdfContent = ({ peserta, discResult, jobStandards }) => {
                     </div>
                 </div>
 
-                <div className="section-primary no-break">
+                    <div className="section-primary no-break">
                     <h2 className="section-title">Tipe Kepribadian Utama</h2>
                     <div className="primary-badge-group">
                         <span className="primary-badge">{primaryType}</span>
                         <span className="secondary-badge">{secondaryType}</span>
                     </div>
                     <p className="primary-summary">{summary}</p>
-                    <div className="jpm-inline">JPM: {jpm}%</div>
+                    <div className="jpm-inline">{jobFitness ? `Kesesuaian Jabatan: ${jpm}%` : `JPM: ${jpm}%`}</div>
                 </div>
 
                 <div className="section-charts no-break">
@@ -256,6 +256,39 @@ const PdfContent = ({ peserta, discResult, jobStandards }) => {
                             <div className="chart-item-pdf" key={label}>
                                 <p className="chart-item-label">{label}</p>
                                 <ChartSVG graphData={data} color={color} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="pdf-page pdf-page-break">
+                <div className="section-characteristics">
+                    <h2 className="section-title">Karakteristik</h2>
+                    <div className="char-grid-3col">
+                        <div className="char-box no-break">
+                            <h4 className="char-title">Tampilan Kerja</h4>
+                            <ul className="char-list">
+                                {workChar.length > 0 ? workChar.map((c, i) => <li key={i}>{c}</li>) : <li style={{ color: "#9ca3af" }}>-</li>}
+                            </ul>
+                        </div>
+                        <div className="char-box no-break">
+                            <h4 className="char-title">Kekuatan</h4>
+                            <ul className="char-list">{strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>
+                        </div>
+                        <div className="char-box no-break">
+                            <h4 className="char-title">Area Pengembangan</h4>
+                            <ul className="char-list">{weaknesses.map((w, i) => <li key={i}>{w}</li>)}</ul>
+                        </div>
+                    </div>
+                </div>
+                <div className="section-recommendations">
+                    <h2 className="section-title">Rekomendasi Pengembangan</h2>
+                    <div className="rec-grid">
+                        {recommendations.map((rec, idx) => (
+                            <div key={idx} className="rec-item no-break">
+                                <span className="rec-number">{idx + 1}</span>
+                                <p className="rec-text">{rec}</p>
                             </div>
                         ))}
                     </div>
@@ -298,39 +331,6 @@ const PdfContent = ({ peserta, discResult, jobStandards }) => {
                                 </div>
                             );
                         })}
-                    </div>
-                </div>
-            </div>
-
-            <div className="pdf-page pdf-page-break">
-                <div className="section-characteristics">
-                    <h2 className="section-title">Karakteristik</h2>
-                    <div className="char-grid-3col">
-                        <div className="char-box no-break">
-                            <h4 className="char-title">Tampilan Kerja</h4>
-                            <ul className="char-list">
-                                {workChar.length > 0 ? workChar.map((c, i) => <li key={i}>{c}</li>) : <li style={{ color: "#9ca3af" }}>-</li>}
-                            </ul>
-                        </div>
-                        <div className="char-box no-break">
-                            <h4 className="char-title">Kekuatan</h4>
-                            <ul className="char-list">{strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>
-                        </div>
-                        <div className="char-box no-break">
-                            <h4 className="char-title">Area Pengembangan</h4>
-                            <ul className="char-list">{weaknesses.map((w, i) => <li key={i}>{w}</li>)}</ul>
-                        </div>
-                    </div>
-                </div>
-                <div className="section-recommendations">
-                    <h2 className="section-title">Rekomendasi Pengembangan</h2>
-                    <div className="rec-grid">
-                        {recommendations.map((rec, idx) => (
-                            <div key={idx} className="rec-item no-break">
-                                <span className="rec-number">{idx + 1}</span>
-                                <p className="rec-text">{rec}</p>
-                            </div>
-                        ))}
                     </div>
                 </div>
                 <div className="pdf-footer">
@@ -553,11 +553,11 @@ const JabatanComparisonModal = ({ peserta, discResult, jobStandards, onClose }) 
         <div className="jabatan-modal-overlay" onClick={onClose}>
             <div className="jabatan-modal-inner" onClick={(e) => e.stopPropagation()}>
                 <div className="jabatan-modal-header">
-                    <div className="jabatan-modal-header-left">
+                            <div className="jabatan-modal-header-left">
                         <div className="jabatan-modal-icon-wrap"><span className="jabatan-modal-icon">⚖️</span></div>
                         <div>
                             <h2 className="jabatan-modal-title">Rekomendasi Jabatan</h2>
-                            <p className="jabatan-modal-subtitle">Berdasarkan profil DISC & skor JPM · <strong>{name}</strong></p>
+                            <p className="jabatan-modal-subtitle">Berdasarkan profil DISC & {jobFitness ? "Kesesuaian Jabatan" : "skor JPM"} · <strong>{name}</strong></p>
                         </div>
                     </div>
                     <button className="jabatan-modal-close" onClick={onClose}>✕</button>
@@ -583,8 +583,8 @@ const JabatanComparisonModal = ({ peserta, discResult, jobStandards, onClose }) 
                                         <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="7" />
                                         <circle cx="40" cy="40" r="32" fill="none" stroke="white" strokeWidth="7"
                                             strokeDasharray={`${(userJpm / 100) * 201} 201`} strokeLinecap="round" transform="rotate(-90 40 40)" />
-                                        <text x="40" y="37" textAnchor="middle" fontSize="16" fontWeight="900" fill="white">{userJpm}</text>
-                                        <text x="40" y="51" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.65)">JPM%</text>
+                                        <text x="40" y="34" textAnchor="middle" fontSize="16" fontWeight="900" fill="white">{userJpm}</text>
+                                        <text x="40" y="56" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.85)">{jobFitness ? "Kesesuaian" : "JPM%"}</text>
                                     </svg>
                                 </div>
                             </div>

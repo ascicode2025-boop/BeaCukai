@@ -19,8 +19,9 @@ use App\Models\JobStandard;
 
 // ─── Helper: transform DiscResult ke format yang dipakai frontend ─────────────
 // Dipakai oleh route peserta DAN admin agar data selalu konsisten
-function transformDiscResult($result): ?array
-{
+if (! function_exists('transformDiscResult')) {
+    function transformDiscResult($result): ?array
+    {
     if (!$result) return null;
 
     $reportData = $result->report_data ?? [];
@@ -60,7 +61,52 @@ function transformDiscResult($result): ?array
         'jpm'                 => [
             'percentage' => $jpmValue,
         ],
+        // Tambahkan perhitungan perbandingan dengan standar jabatan di server agar konsisten
+        'jobStandardComparison' => (function() use ($result, $graph3) {
+            $jobStd = null;
+            // cari user untuk mendapatkan unit_kerja
+            $user = \App\Models\User::find($result->user_id);
+            $unitKerja = $user?->unit_kerja ?? '';
+            if (!$unitKerja) return null;
+
+            $job = \App\Models\JobStandard::whereRaw('LOWER(job_title) = ?', [strtolower($unitKerja)])->first();
+            if (!$job) return null;
+
+            $traits = ['D','I','S','C'];
+            $traitComparison = [];
+            $traitFitness = [];
+            $totalFitness = 0;
+
+            foreach ($traits as $t) {
+                $userScore = $graph3[$t] ?? 0;
+                $standardScore = $job->{strtolower($t)} ?? 0;
+                $difference = abs($userScore - $standardScore);
+                $fitnessPercentage = max(0, 100 - ($difference / 16) * 100);
+
+                $traitComparison[$t] = [
+                    'userScore' => $userScore,
+                    'standardScore' => $standardScore,
+                    'difference' => $difference,
+                    'fitnessPercentage' => (int) round($fitnessPercentage),
+                ];
+
+                $traitFitness[$t] = (int) round($fitnessPercentage);
+                $totalFitness += $fitnessPercentage;
+            }
+
+            $overallFitness = (int) round($totalFitness / 4);
+
+            return [
+                'jobTitle' => $job->job_title,
+                'jobCode' => $job->job_code,
+                'traitComparison' => $traitComparison,
+                'traitFitness' => $traitFitness,
+                'overallFitness' => $overallFitness,
+                'hasStandard' => true,
+            ];
+        })(),
     ];
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -105,7 +151,12 @@ Route::middleware('guest.custom')->group(function () {
 Route::middleware(['auth', 'session.timeout'])->group(function () {
 
     Route::get('/perserta-tes/dashboard', function () {
-        return Inertia::render('perserta-tes/Dashboard', ['user' => Auth::user()]);
+        $user = Auth::user();
+        $result = DiscResult::where('user_id', $user->id)->latest('test_date')->first();
+        return Inertia::render('perserta-tes/Dashboard', [
+            'user' => $user,
+            'discResultData' => transformDiscResult($result),
+        ]);
     });
 
     Route::get('/perserta-tes/soal', function () {
@@ -160,11 +211,25 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
 
     // Riwayat Tes
     Route::get('/perserta-tes/riwayat', function () {
-        return Inertia::render('perserta-tes/RiwayatTest', ['user' => Auth::user()]);
+        $user = Auth::user();
+        $result = DiscResult::where('user_id', $user->id)->latest('test_date')->first();
+        return Inertia::render('perserta-tes/RiwayatTest', [
+            'user' => $user,
+            'discResultData' => transformDiscResult($result),
+        ]);
     })->name('riwayat-tes');
 
-    // DISC Test API
-    Route::post('/api/submit-disc', [DiscController::class, 'calculateScore'])->name('submit.disc');
+    // DISC Test API (security headers + rate limit)
+    Route::post('/api/submit-disc', [DiscController::class, 'calculateScore'])
+        ->middleware([\App\Http\Middleware\SecurityHeaders::class, 'throttle:5,1'])
+        ->name('submit.disc');
+
+    // Heartbeat: keep session alive while user is taking the test
+    Route::get('/heartbeat', function (Request $request) {
+        // touch session so session timeout middleware sees activity
+        $request->session()->put('last_heartbeat', now());
+        return response()->json(['ok' => true]);
+    })->name('heartbeat');
 
     // Riwayat List
     Route::get('/perserta-tes/riwayat-list', function () {

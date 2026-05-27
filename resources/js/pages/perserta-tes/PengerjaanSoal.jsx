@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight } from "react-bootstrap-icons";
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage, router } from "@inertiajs/react";
 import axios from "axios";
 import NavbarLogin from "../../components/NavbarLogin";
 import Footer from "../../components/Footer";
 
 const PengerjaanSoal = () => {
     const [currentQuestion, setCurrentQuestion] = useState(1);
-    const [timeLeft, setTimeLeft] = useState(7 * 60);
+    const [timeLeft, setTimeLeft] = useState(10 * 60);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showTimeUpModal, setShowTimeUpModal] = useState(false);
     const [errors, setErrors] = useState(
@@ -171,9 +171,7 @@ const PengerjaanSoal = () => {
     const currentData = questionsData[currentQuestion] || questionsData[1];
     const { props } = usePage();
     const user = props.user;
-    const storageKey = user?.id ? `discResultData_${user.id}` : "discResultData";
-    const historyKey = user?.id ? `discResultHistory_${user.id}` : "discResultHistory";
-    const selectedKey = user?.id ? `discResultSelected_${user.id}` : "discResultSelected";
+    // NOTE: localStorage persistence for DISC results removed to enforce server as source-of-truth
 
     const isCurrentQuestionValid = () => {
         const current = answers[currentQuestion];
@@ -202,37 +200,6 @@ const PengerjaanSoal = () => {
                     return;
                 }
 
-                // Simpan salinan hasil yang sama seperti di DB ke localStorage untuk kompatibilitas UI
-                const storedResult = {
-                    ...saved,
-                    submitted_at: new Date().toISOString(),
-                    user_id: user?.id || null,
-                    user_email: user?.email || null,
-                };
-
-                const entryId = `disc_${saved.id}_${Date.now()}`;
-                const historyEntry = { id: entryId, ...storedResult };
-
-                localStorage.setItem(storageKey, JSON.stringify(storedResult));
-
-                const existingHistory = localStorage.getItem(historyKey);
-                let historyList = [];
-                if (existingHistory) {
-                    try {
-                        historyList = JSON.parse(existingHistory) || [];
-                    } catch (err) {
-                        historyList = [];
-                    }
-                }
-
-                historyList = [historyEntry, ...historyList].filter(
-                    (item, index, arr) =>
-                        arr.findIndex((x) => x.id === item.id) === index
-                );
-
-                localStorage.setItem(historyKey, JSON.stringify(historyList));
-                localStorage.setItem(selectedKey, entryId);
-
                 // Redirect ke hasil ringkas yang akan mengambil data terbaru dari backend
                 window.location.href = "/perserta-tes/hasil-ringkas";
             }
@@ -244,6 +211,8 @@ const PengerjaanSoal = () => {
 
     useEffect(() => {
         if (timeLeft <= 0) {
+            // If all questions answered, keep existing behavior (auto-submit prompt)
+            // If not all answered, show time-up error prompting user to retry
             setShowTimeUpModal(true);
             return;
         }
@@ -253,11 +222,39 @@ const PengerjaanSoal = () => {
         return () => clearInterval(timer);
     }, [timeLeft]);
 
+    const handleTimeUpRetry = () => {
+        // Reset answers and errors, restart timer and go to first question
+        setAnswers(Object.fromEntries(Array.from({ length: totalQuestions }, (_, i) => [i + 1, { M: null, L: null }])));
+        setErrors(Object.fromEntries(Array.from({ length: totalQuestions }, (_, i) => [i + 1, ""])));
+        setCurrentQuestion(1);
+        setTimeLeft(10 * 60);
+        setShowTimeUpModal(false);
+    };
+
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
+
+    // Keep-alive ping to prevent unexpected logout while user is working on the test
+    useEffect(() => {
+        let keepAlive = null;
+        const ping = () => {
+            fetch('/heartbeat', {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            }).catch(() => {});
+        };
+
+        // Start immediately and repeat every 4 minutes
+        ping();
+        keepAlive = setInterval(ping, 4 * 60 * 1000);
+
+        return () => {
+            if (keepAlive) clearInterval(keepAlive);
+        };
+    }, []);
 
     const handleAnswerChange = (index, column, value) => {
         const currentAnswer = answers[currentQuestion][column];
@@ -876,10 +873,26 @@ const PengerjaanSoal = () => {
                                 </svg>
                             </div>
                             <h2>Waktu Habis!</h2>
-                            <p>Waktu pengerjaan tes telah berakhir. Jawaban Anda akan dikirim secara otomatis.</p>
-                            <button className="ps-btn-submit" onClick={handleSubmit}>
-                                Lanjutkan
-                            </button>
+                            {allAnswered ? (
+                                <>
+                                    <p>Waktu pengerjaan tes telah berakhir. Jawaban Anda akan dikirim secara otomatis.</p>
+                                    <button className="ps-btn-submit" onClick={handleSubmit}>
+                                        Lanjutkan
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <p>Waktu pengerjaan tes telah berakhir namun beberapa soal belum terisi. Silakan kerjakan kembali.</p>
+                                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                                        <button className="ps-btn-submit" onClick={handleTimeUpRetry}>
+                                            Kerjakan Kembali
+                                        </button>
+                                        <button className="ps-btn-ghost" onClick={() => { setShowTimeUpModal(false); router.visit('/perserta-tes/dashboard'); }}>
+                                            Keluar
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 )}
@@ -993,7 +1006,7 @@ const PengerjaanSoal = () => {
                         {/* Header card */}
                         <div className="ps-header-card">
                             <h1>Pertanyaan {currentQuestion}</h1>
-                            <p>Pilih 2 karakteristik: 1 yang paling cocok (M) dan 1 yang paling tidak cocok (L)</p>
+                            <p>Pilih 2 karakteristik: 1 yang paling cocok (M) dan 1 yang paling tidak cocok (L) dalam diri anda</p>
                         </div>
 
                         {/* Question box */}

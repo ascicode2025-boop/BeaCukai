@@ -38,6 +38,7 @@ class DiscResult extends Model
         'completion_percentage',
         'time_spent_seconds',
         'test_date',
+        'idempotency_key',
     ];
 
     /**

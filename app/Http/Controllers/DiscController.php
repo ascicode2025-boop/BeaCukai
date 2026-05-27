@@ -26,12 +26,35 @@ class DiscController extends Controller
         // 1. Validasi input
         $validated = $request->validate([
             'answers' => 'required|array|min:24',
-            'answers.*' => 'array:M,L',
+            'answers.*' => 'array',
             'answers.*.M' => 'required|string',
             'answers.*.L' => 'required|string',
         ]);
 
         $answers = $validated['answers'];
+
+        // Idempotency: check optional Idempotency-Key header to avoid duplicate submissions
+        $idempotencyKey = $request->header('Idempotency-Key') ?? $request->header('Idempotency_key') ?? null;
+        if ($idempotencyKey) {
+            try {
+                $existing = DiscResult::where('user_id', Auth::id())
+                    ->where('idempotency_key', $idempotencyKey)
+                    ->first();
+
+                if ($existing) {
+                    // Return existing saved result to client — do not create duplicate
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Duplicate submission suppressed (idempotent)',
+                        'data' => null,
+                        'saved_result' => $existing->toArray(),
+                    ], 200);
+                }
+            } catch (\Exception $e) {
+                // log but don't block processing
+                Log::warning('Idempotency lookup failed: ' . $e->getMessage());
+            }
+        }
 
         // 2. SCORING KEY - Mapping jawaban ke skor DISC (LENGKAP 1 - 24)
         $scoringKey = [
@@ -120,6 +143,124 @@ class DiscController extends Controller
             ]
         ];
 
+        // 3b. Jika tersedia, muat mapping canonical yang diimpor (storage/app/disc_conversion.json)
+        try {
+            static $cachedImported = null;
+            static $cachedImportedMTime = 0;
+            $importPath = storage_path('app/disc_conversion.json');
+            if (file_exists($importPath)) {
+                $mtime = @filemtime($importPath) ?: 0;
+                if ($cachedImported === null || $mtime !== $cachedImportedMTime) {
+                    $raw = @file_get_contents($importPath);
+                    $decoded = @json_decode($raw, true);
+                    if (is_array($decoded) && isset($decoded['Most'], $decoded['Least'], $decoded['Change'])) {
+                        $cachedImported = $decoded;
+                        $cachedImportedMTime = $mtime;
+                    } else {
+                        Log::warning('disc_conversion.json found but not in expected format');
+                        $cachedImported = null;
+                    }
+                }
+
+                if (is_array($cachedImported)) {
+                    // Basic validation of structure
+                    $valid = true;
+                    foreach (['Most', 'Least'] as $type) {
+                        foreach (['D','I','S','C'] as $trait) {
+                            if (!isset($cachedImported[$type][$trait]) || !is_array($cachedImported[$type][$trait]) || count($cachedImported[$type][$trait]) < 21) {
+                                $valid = false;
+                                break 2;
+                            }
+                        }
+                    }
+                    foreach (['D','I','S','C'] as $trait) {
+                        if (!isset($cachedImported['Change'][$trait]) || !is_array($cachedImported['Change'][$trait]) || count($cachedImported['Change'][$trait]) < 20) {
+                            $valid = false;
+                            break;
+                        }
+                    }
+                    if ($valid) {
+                        $conversionTable = $cachedImported;
+                        Log::info('disc_conversion.json loaded and will be used for DISC conversion');
+                    } else {
+                        Log::warning('disc_conversion.json failed validation — using built-in conversion table');
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning('Failed to load disc_conversion.json: ' . $e->getMessage());
+        }
+
+        // --- Helper: safe lookup & validation for conversion tables ---
+        $safe_index_lookup = function(array $arr, int $index) {
+            // prefer exact index
+            if (isset($arr[$index])) return $arr[$index];
+            // clamp to valid 0..20 for Most/Least
+            $clamped = max(0, min(20, $index));
+            if (isset($arr[$clamped])) return $arr[$clamped];
+            // fallback to nearest existing index
+            $keys = array_keys($arr);
+            sort($keys, SORT_NUMERIC);
+            $nearest = $keys[0];
+            $minDist = abs($index - $nearest);
+            foreach ($keys as $k) {
+                $d = abs($index - $k);
+                if ($d < $minDist) { $minDist = $d; $nearest = $k; }
+            }
+            return $arr[$nearest];
+        };
+
+        $safe_change_lookup = function(array $map, int $key) {
+            // prefer exact mapping
+            if (isset($map[$key])) return $map[$key];
+            // if not exact, find nearest numeric key available in the full map
+            $keys = array_keys($map);
+            // filter numeric keys
+            $numKeys = array_filter($keys, function($k){ return is_numeric($k); });
+            if (empty($numKeys)) {
+                // fallback: return 0 to avoid breaking
+                return 0;
+            }
+            // convert to ints for comparison
+            $numKeys = array_map('intval', $numKeys);
+            sort($numKeys, SORT_NUMERIC);
+            $nearest = $numKeys[0];
+            $minDist = abs($key - $nearest);
+            foreach ($numKeys as $k) {
+                $d = abs($key - $k);
+                if ($d < $minDist) { $minDist = $d; $nearest = $k; }
+            }
+            $val = $map[$nearest];
+            // ensure converted value sits within expected bounds
+            if (is_numeric($val)) {
+                if ($val > 8) $val = 8;
+                if ($val < -8) $val = -8;
+            }
+            return $val;
+        };
+
+        // Basic sanity checks for conversion table completeness
+        try {
+            // Most/Least arrays should have indices 0..20
+                foreach (['Most','Least'] as $type) {
+                    foreach (['D','I','S','C'] as $trait) {
+                        $arr = $conversionTable[$type][$trait] ?? null;
+                        if (!is_array($arr) || count($arr) < 21) {
+                            Log::warning("Conversion table '{$type}.{$trait}' incomplete (expected 21 entries)");
+                    }
+                }
+            }
+            // Change mapping should have some keys spanning -22..22; warn if missing many
+            foreach (['D','I','S','C'] as $trait) {
+                $map = $conversionTable['Change'][$trait] ?? [];
+                    if (!is_array($map) || count($map) < 30) {
+                    Log::warning("Conversion map Change.{$trait} may be incomplete (found " . count($map) . " entries)");
+                }
+            }
+        } catch (\Exception $e) {
+                Log::warning('Error validating conversionTable: ' . $e->getMessage());
+        }
+
         // 4. Siapkan wadah untuk menghitung skor mentah
         $rawMost = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
         $rawLeast = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, '*' => 0];
@@ -143,17 +284,17 @@ class DiscController extends Controller
         // 6. KONVERSI KE NILAI GRAFIK (Graph 1 & 2)
         // Gunakan min() & max() untuk menjaga index tidak out of bounds
         $graph1 = [
-            'D' => $conversionTable['Most']['D'][min(max($rawMost['D'], 0), 20)],
-            'I' => $conversionTable['Most']['I'][min(max($rawMost['I'], 0), 20)],
-            'S' => $conversionTable['Most']['S'][min(max($rawMost['S'], 0), 20)],
-            'C' => $conversionTable['Most']['C'][min(max($rawMost['C'], 0), 20)]
+            'D' => $safe_index_lookup($conversionTable['Most']['D'], (int) ($rawMost['D'] ?? 0)),
+            'I' => $safe_index_lookup($conversionTable['Most']['I'], (int) ($rawMost['I'] ?? 0)),
+            'S' => $safe_index_lookup($conversionTable['Most']['S'], (int) ($rawMost['S'] ?? 0)),
+            'C' => $safe_index_lookup($conversionTable['Most']['C'], (int) ($rawMost['C'] ?? 0))
         ];
 
         $graph2 = [
-            'D' => $conversionTable['Least']['D'][min(max($rawLeast['D'], 0), 20)],
-            'I' => $conversionTable['Least']['I'][min(max($rawLeast['I'], 0), 20)],
-            'S' => $conversionTable['Least']['S'][min(max($rawLeast['S'], 0), 20)],
-            'C' => $conversionTable['Least']['C'][min(max($rawLeast['C'], 0), 20)]
+            'D' => $safe_index_lookup($conversionTable['Least']['D'], (int) ($rawLeast['D'] ?? 0)),
+            'I' => $safe_index_lookup($conversionTable['Least']['I'], (int) ($rawLeast['I'] ?? 0)),
+            'S' => $safe_index_lookup($conversionTable['Least']['S'], (int) ($rawLeast['S'] ?? 0)),
+            'C' => $safe_index_lookup($conversionTable['Least']['C'], (int) ($rawLeast['C'] ?? 0))
         ];
 
         // 7. GRAPH 3: CHANGE (Raw dan Converted)
@@ -167,10 +308,10 @@ class DiscController extends Controller
         // Fallback (??) digunakan agar jika nilai minus lebih dalam dari -10 (misal -12),
         // sistem tidak error dan mengembalikan nilai mentahnya.
         $graph3 = [
-            'D' => $conversionTable['Change']['D'][$graph3_Raw['D']] ?? $graph3_Raw['D'],
-            'I' => $conversionTable['Change']['I'][$graph3_Raw['I']] ?? $graph3_Raw['I'],
-            'S' => $conversionTable['Change']['S'][$graph3_Raw['S']] ?? $graph3_Raw['S'],
-            'C' => $conversionTable['Change']['C'][$graph3_Raw['C']] ?? $graph3_Raw['C'],
+            'D' => $safe_change_lookup($conversionTable['Change']['D'], (int) ($graph3_Raw['D'] ?? 0)),
+            'I' => $safe_change_lookup($conversionTable['Change']['I'], (int) ($graph3_Raw['I'] ?? 0)),
+            'S' => $safe_change_lookup($conversionTable['Change']['S'], (int) ($graph3_Raw['S'] ?? 0)),
+            'C' => $safe_change_lookup($conversionTable['Change']['C'], (int) ($graph3_Raw['C'] ?? 0)),
         ];
 
         // 8. DESKRIPSI LAPORAN (REPORT DATA)
@@ -327,7 +468,7 @@ class DiscController extends Controller
 
         // 10. SIMPAN KE DATABASE — gunakan transaction; jika gagal, kembalikan error ke client
         try {
-            $discResult = DB::transaction(function () use ($rawMost, $rawLeast, $graph3_Raw, $graph1, $graph2, $graph3, $primaryTrait, $reportData, $reportDataFull, $answers, $jpmPercentage) {
+            $discResult = DB::transaction(function () use ($rawMost, $rawLeast, $graph3_Raw, $graph1, $graph2, $graph3, $primaryTrait, $reportData, $reportDataFull, $answers, $jpmPercentage, $idempotencyKey) {
                 $discResult = DiscResult::create([
                     'user_id' => Auth::id(),
                     'raw_scores_most' => $rawMost,
@@ -336,6 +477,7 @@ class DiscController extends Controller
                     'graph_scores_most' => $graph1,
                     'graph_scores_least' => $graph2,
                     'graph_scores_change' => $graph3,
+                    'idempotency_key' => $idempotencyKey,
                     'primary_type' => $primaryTrait,
                     'personality_profile' => $primaryTrait . ' - ' . ($reportData['primaryType'] ?? ''),
                     'summary' => $reportData['summary'] ?? null,

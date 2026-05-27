@@ -9,14 +9,14 @@ const TRAITS = {
     D: { name: "Dominance" },
     I: { name: "Influencing" },
     S: { name: "Steadiness" },
-    C: { name: "Conscientiousness" },
+    C: { name: "Compliance" },
 };
 
 const TRAIT_DESCRIPTIONS = {
     D: `Anda adalah tipe Dominance - Pemimpin yang berorientasi pada hasil. Anda memiliki kebutuhan kuat untuk kontrol, kecepatan dalam pengambilan keputusan, dan pencapaian tujuan. Dalam bekerja, Anda cenderung langsung ke inti masalah, mengambil risiko yang diperhitungkan, dan memimpin dengan tegas. Anda kompetitif, percaya diri, dan fokus pada tantangan baru. Kekuatan Anda adalah kemampuan memotivasi tim menuju hasil yang terukur. Untuk pengembangan, Anda perlu meningkatkan empati dan mendengarkan perspektif orang lain lebih dalam.`,
     I: `Anda adalah tipe Influence - Diplomat yang bersemangat dan komunikatif. Anda memiliki energi tinggi, antusiasme yang menular, dan kemampuan luar biasa dalam membangun hubungan interpersonal. Anda adalah orang yang optimis, kreatif dalam ide, dan suka menjadi pusat perhatian. Dalam kolaborasi, Anda adalah penggerak suasana yang mampu menginspirasi tim dan membangun kepercayaan dengan cepat. Kekuatan utama Anda adalah persuasi dan kemampuan mengkomunikasikan visi dengan cara yang menarik. Untuk pengembangan, tingkatkan fokus pada detail, konsistensi eksekusi, dan analisis data sebelum mengambil keputusan.`,
     S: `Anda adalah tipe Steadiness - Mitra yang stabil dan penuh dukungan. Anda memiliki pendekatan yang tenang, menyukai rutinitas yang dapat diprediksi, dan sangat loyal terhadap tim dan organisasi. Anda adalah pendengar yang baik, empatik, dan selalu siap membantu rekan kerja. Kekuatan Anda adalah konsistensi, stabilitas emosional, dan kemampuan menjaga keharmonisan tim. Anda bekerja dengan metode yang terukur dan dapat diandalkan dalam jangka panjang. Untuk pengembangan, berani mengambil inisiatif, adaptif terhadap perubahan, dan tingkatkan asertivitas dalam mengungkapkan pendapat.`,
-    C: `Anda adalah tipe Conscientiousness - Ahli yang berfokus pada kualitas dan akurasi. Anda memiliki standar tinggi, perhatian terhadap detail yang luar biasa, dan komitmen kuat pada keunggulan. Anda metodis, analitis, dan selalu mencari informasi lengkap sebelum membuat keputusan. Dalam pekerjaan, Anda adalah pengawas kualitas yang dapat diandalkan, selalu memastikan setiap detail sesuai dengan standar. Kekuatan Anda adalah presisi, perencanaan matang, dan kontrol kualitas yang ketat. Untuk pengembangan, kurangi perfeksionisme yang berlebihan, lebih fleksibel terhadap perubahan, dan percayakan kepada orang lain untuk berbagi beban kerja.`,
+    C: `Anda adalah tipe Compliance - Ahli yang berfokus pada kualitas dan akurasi. Anda memiliki standar tinggi, perhatian terhadap detail yang luar biasa, dan komitmen kuat pada keunggulan. Anda metodis, analitis, dan selalu mencari informasi lengkap sebelum membuat keputusan. Dalam pekerjaan, Anda adalah pengawas kualitas yang dapat diandalkan, selalu memastikan setiap detail sesuai dengan standar. Kekuatan Anda adalah presisi, perencanaan matang, dan kontrol kualitas yang ketat. Untuk pengembangan, kurangi perfeksionisme yang berlebihan, lebih fleksibel terhadap perubahan, dan percayakan kepada orang lain untuk berbagi beban kerja.`,
 };
 
 const TRAIT_ORDER = ["D", "I", "S", "C"];
@@ -35,83 +35,15 @@ const GenerateHasil = () => {
     const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
-        // Priority 1: Use props data from database
+        // Only use server-provided data. Do NOT fallback to localStorage.
         if (discResultData) {
             setApiData(discResultData);
-            return;
-        }
-
-        // Priority 2: Fallback to localStorage
-        const storageKey = user?.id
-            ? `discResultData_${user.id}`
-            : "discResultData";
-        const historyKey = user?.id
-            ? `discResultHistory_${user.id}`
-            : "discResultHistory";
-        const selectedKey = user?.id
-            ? `discResultSelected_${user.id}`
-            : "discResultSelected";
-
-        const selectedId = localStorage.getItem(selectedKey);
-        const savedHistory = localStorage.getItem(historyKey);
-
-        if (savedHistory) {
-            try {
-                const parsedHistory = JSON.parse(savedHistory) || [];
-                const filteredHistory = parsedHistory.filter(
-                    (item) =>
-                        !item.user_id || !user?.id || item.user_id === user.id,
-                );
-                const picked =
-                    filteredHistory.find((item) => item.id === selectedId) ||
-                    filteredHistory.sort(
-                        (a, b) =>
-                            new Date(b.submitted_at) - new Date(a.submitted_at),
-                    )[0];
-                if (picked) {
-                    setApiData(picked);
-                    return;
-                }
-            } catch (err) {
-                console.error("Failed to parse discResultHistory:", err);
-            }
-        }
-
-        const savedData = localStorage.getItem(storageKey);
-        if (savedData) {
-            try {
-                const parsed = JSON.parse(savedData);
-                if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
-                    setApiData(null);
-                    return;
-                }
-                setApiData(parsed);
-            } catch (err) {
-                console.error(
-                    "Failed to parse discResultData from localStorage:",
-                    err,
-                );
-                localStorage.removeItem(storageKey);
-                setApiData(null);
-            }
+        } else {
+            setApiData(null);
         }
     }, [user?.id, discResultData]);
 
-    useEffect(() => {
-        const shouldAutoDownload =
-            localStorage.getItem("discAutoDownload") === "1";
-        if (
-            apiData &&
-            shouldAutoDownload &&
-            !hasTriggeredAutoDownload.current
-        ) {
-            hasTriggeredAutoDownload.current = true;
-            localStorage.removeItem("discAutoDownload");
-            setTimeout(() => {
-                handleDownloadPDF();
-            }, 300);
-        }
-    }, [apiData]);
+    // Auto-download via localStorage removed. Downloads must be triggered explicitly by the user.
 
     const formatTraitBadge = (trait) => {
         if (!TRAITS[trait]) return "-";
@@ -156,13 +88,15 @@ const GenerateHasil = () => {
         const maxGraph = 8;
 
         // JPM dari backend (sudah dihitung dengan benar)
-        const jpm =
+        let jpm =
             apiData.jpm?.percentage ??
             Math.round(
                 ((Math.max(...Object.values(graph3)) - minGraph) /
                     (maxGraph - minGraph)) *
                     100,
             );
+        // safety clamp
+        jpm = Math.max(0, Math.min(100, jpm));
 
         // Summary dari database (bukan hardcoded)
         const longSummary = apiData.summary || reportData.summary || TRAIT_DESCRIPTIONS[primaryTrait] || "";
@@ -173,8 +107,9 @@ const GenerateHasil = () => {
                 job.job_title?.toLowerCase() === user?.unit_kerja?.toLowerCase()
         );
 
-        let jobStandardComparison = null;
-        if (jobStandard) {
+        // Prefer server-provided comparison if available to ensure consistency
+        let jobStandardComparison = apiData.jobStandardComparison || null;
+        if (!jobStandardComparison && jobStandard) {
             const traitComparison = {};
             const traitFitness = {};
             let totalFitness = 0;
@@ -774,48 +709,99 @@ const GenerateHasil = () => {
                                         <p className="job-standard-subtitle">
                                             Posisi: <strong>{discResult.jobStandardComparison.jobTitle}</strong>
                                         </p>
-                                        <div className="fitness-summary-box">
-                                            <div className="fitness-overall">
-                                                <span className="fitness-label">Kesesuaian Keseluruhan</span>
-                                                <div className="fitness-bar-container">
-                                                    <div
-                                                        className="fitness-bar-fill"
-                                                        style={{
-                                                            width: `${discResult.jobStandardComparison.overallFitness}%`,
-                                                            backgroundColor: discResult.jobStandardComparison.overallFitness >= 80 ? '#10b981' :
-                                                                              discResult.jobStandardComparison.overallFitness >= 60 ? '#f59e0b' :
-                                                                              discResult.jobStandardComparison.overallFitness >= 40 ? '#fd8235' : '#ef4444'
-                                                        }}
-                                                    />
+                                            <div className="fitness-summary-box">
+                                                <div className="fitness-overall">
+                                                    <span className="fitness-label">Kesesuaian Keseluruhan</span>
+                                                    <span className="fitness-percent">
+                                                        {discResult.jobStandardComparison.overallFitness}%
+                                                    </span>
                                                 </div>
-                                                <span className="fitness-percent">
-                                                    {discResult.jobStandardComparison.overallFitness}%
-                                                </span>
+                                                <div className="trait-fitness-grid">
+                                                    {["D", "I", "S", "C"].map((trait) => {
+                                                        const tc = discResult.jobStandardComparison.traitComparison[trait];
+                                                        if (!tc) return null;
+                                                        return (
+                                                            <div key={trait} className="trait-fitness-item">
+                                                                <p className="trait-fitness-label">{trait}</p>
+                                                                <p className="trait-fitness-score">
+                                                                    {tc.userScore} vs {tc.standardScore}
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
-                                            <div className="trait-fitness-grid">
-                                                {["D", "I", "S", "C"].map((trait) => {
-                                                    const tc = discResult.jobStandardComparison.traitComparison[trait];
-                                                    if (!tc) return null;
-                                                    return (
-                                                        <div key={trait} className="trait-fitness-item">
-                                                            <p className="trait-fitness-label">{trait}</p>
-                                                            <p className="trait-fitness-score">
-                                                                {tc.userScore} vs {tc.standardScore}
-                                                            </p>
-                                                            <p className="trait-fitness-percent">
-                                                                {tc.fitnessPercentage}%
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* PAGE 3: DESKRIPSI TIPE KEPRIBADIAN */}
+                        {/* PAGE 3: KARAKTERISTIK & REKOMENDASI */}
+                        <div className="pdf-page pdf-page-break">
+                            <div className="section-characteristics">
+                                <h2 className="section-title">Karakteristik</h2>
+                                <div className="char-grid-3col">
+                                    <div className="char-box no-break">
+                                        <h4 className="char-title">
+                                            Tampilan Kerja
+                                        </h4>
+                                        <ul className="char-list">
+                                            {discResult.workCharacteristics.map(
+                                                (c, i) => (
+                                                    <li key={i}>{c}</li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    </div>
+                                    <div className="char-box no-break">
+                                        <h4 className="char-title">Kekuatan</h4>
+                                        <ul className="char-list">
+                                            {discResult.strengths.map(
+                                                (s, i) => (
+                                                    <li key={i}>{s}</li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    </div>
+                                    <div className="char-box no-break">
+                                        <h4 className="char-title">
+                                            Area Pengembangan
+                                        </h4>
+                                        <ul className="char-list">
+                                            {discResult.weaknesses.map(
+                                                (w, i) => (
+                                                    <li key={i}>{w}</li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="section-recommendations">
+                                <h2 className="section-title">
+                                    Rekomendasi Pengembangan
+                                </h2>
+                                <div className="rec-grid">
+                                    {discResult.recommendations.map(
+                                        (rec, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="rec-item no-break"
+                                            >
+                                                <span className="rec-number">
+                                                    {idx + 1}
+                                                </span>
+                                                <p className="rec-text">
+                                                    {rec}
+                                                </p>
+                                            </div>
+                                        ),
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* PAGE 4: DESKRIPSI TIPE KEPRIBADIAN */}
                         <div className="pdf-page pdf-page-break">
                             <div className="section-all-profiles">
                                 <h2 className="section-title">
@@ -938,71 +924,6 @@ const GenerateHasil = () => {
                                             </div>
                                         );
                                     })}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* PAGE 4: KARAKTERISTIK & REKOMENDASI */}
-                        <div className="pdf-page pdf-page-break">
-                            <div className="section-characteristics">
-                                <h2 className="section-title">Karakteristik</h2>
-                                <div className="char-grid-3col">
-                                    <div className="char-box no-break">
-                                        <h4 className="char-title">
-                                            Tampilan Kerja
-                                        </h4>
-                                        <ul className="char-list">
-                                            {discResult.workCharacteristics.map(
-                                                (c, i) => (
-                                                    <li key={i}>{c}</li>
-                                                ),
-                                            )}
-                                        </ul>
-                                    </div>
-                                    <div className="char-box no-break">
-                                        <h4 className="char-title">Kekuatan</h4>
-                                        <ul className="char-list">
-                                            {discResult.strengths.map(
-                                                (s, i) => (
-                                                    <li key={i}>{s}</li>
-                                                ),
-                                            )}
-                                        </ul>
-                                    </div>
-                                    <div className="char-box no-break">
-                                        <h4 className="char-title">
-                                            Area Pengembangan
-                                        </h4>
-                                        <ul className="char-list">
-                                            {discResult.weaknesses.map(
-                                                (w, i) => (
-                                                    <li key={i}>{w}</li>
-                                                ),
-                                            )}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="section-recommendations">
-                                <h2 className="section-title">
-                                    Rekomendasi Pengembangan
-                                </h2>
-                                <div className="rec-grid">
-                                    {discResult.recommendations.map(
-                                        (rec, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="rec-item no-break"
-                                            >
-                                                <span className="rec-number">
-                                                    {idx + 1}
-                                                </span>
-                                                <p className="rec-text">
-                                                    {rec}
-                                                </p>
-                                            </div>
-                                        ),
-                                    )}
                                 </div>
                             </div>
                             <div className="pdf-footer">

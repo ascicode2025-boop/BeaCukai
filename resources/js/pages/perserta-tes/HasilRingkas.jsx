@@ -8,14 +8,14 @@ const TRAITS = {
     D: { name: "Dominance", color: "#facc15" },
     I: { name: "Influencing", color: "#818cf8" },
     S: { name: "Steadiness", color: "#22d3ee" },
-    C: { name: "Conscientiousness", color: "#60a5fa" },
+    C: { name: "Compliance", color: "#60a5fa" },
 };
 
 const TRAIT_DESCRIPTIONS = {
     D: `Anda adalah tipe Dominance - Pemimpin yang berorientasi pada hasil. Anda memiliki kebutuhan kuat untuk kontrol, kecepatan dalam pengambilan keputusan, dan pencapaian tujuan. Dalam bekerja, Anda cenderung langsung ke inti masalah, mengambil risiko yang diperhitungkan, dan memimpin dengan tegas. Anda kompetitif, percaya diri, dan fokus pada tantangan baru. Kekuatan Anda adalah kemampuan memotivasi tim menuju hasil yang terukur. Untuk pengembangan, Anda perlu meningkatkan empati dan mendengarkan perspektif orang lain lebih dalam.`,
     I: `Anda adalah tipe Influence - Diplomat yang bersemangat dan komunikatif. Anda memiliki energi tinggi, antusiasme yang menular, dan kemampuan luar biasa dalam membangun hubungan interpersonal. Anda adalah orang yang optimis, kreatif dalam ide, dan suka menjadi pusat perhatian. Dalam kolaborasi, Anda adalah penggerak suasana yang mampu menginspirasi tim dan membangun kepercayaan dengan cepat. Kekuatan utama Anda adalah persuasi dan kemampuan mengkomunikasikan visi dengan cara yang menarik. Untuk pengembangan, tingkatkan fokus pada detail, konsistensi eksekusi, dan analisis data sebelum mengambil keputusan.`,
     S: `Anda adalah tipe Steadiness - Mitra yang stabil dan penuh dukungan. Anda memiliki pendekatan yang tenang, menyukai rutinitas yang dapat diprediksi, dan sangat loyal terhadap tim dan organisasi. Anda adalah pendengar yang baik, empatik, dan selalu siap membantu rekan kerja. Kekuatan Anda adalah konsistensi, stabilitas emosional, dan kemampuan menjaga keharmonisan tim. Anda bekerja dengan metode yang terukur dan dapat diandalkan dalam jangka panjang. Untuk pengembangan, berani mengambil inisiatif, adaptif terhadap perubahan, dan tingkatkan asertivitas dalam mengungkapkan pendapat.`,
-    C: `Anda adalah tipe Conscientiousness - Ahli yang berfokus pada kualitas dan akurasi. Anda memiliki standar tinggi, perhatian terhadap detail yang luar biasa, dan komitmen kuat pada keunggulan. Anda metodis, analitis, dan selalu mencari informasi lengkap sebelum membuat keputusan. Dalam pekerjaan, Anda adalah pengawas kualitas yang dapat diandalkan, selalu memastikan setiap detail sesuai dengan standar. Kekuatan Anda adalah presisi, perencanaan matang, dan kontrol kualitas yang ketat. Untuk pengembangan, kurangi perfeksionisme yang berlebihan, lebih fleksibel terhadap perubahan, dan percayakan kepada orang lain untuk berbagi beban kerja.`,
+    C: `Anda adalah tipe Compliance - Ahli yang berfokus pada kualitas dan akurasi. Anda memiliki standar tinggi, perhatian terhadap detail yang luar biasa, dan komitmen kuat pada keunggulan. Anda metodis, analitis, dan selalu mencari informasi lengkap sebelum membuat keputusan. Dalam pekerjaan, Anda adalah pengawas kualitas yang dapat diandalkan, selalu memastikan setiap detail sesuai dengan standar. Kekuatan Anda adalah presisi, perencanaan matang, dan kontrol kualitas yang ketat. Untuk pengembangan, kurangi perfeksionisme yang berlebihan, lebih fleksibel terhadap perubahan, dan percayakan kepada orang lain untuk berbagi beban kerja.`,
 };
 
 const TRAIT_ORDER = ["D", "I", "S", "C"];
@@ -40,64 +40,11 @@ const HasilRingkas = () => {
     }
 
     useEffect(() => {
+        // Only respect server-provided result. Do NOT show data from localStorage.
         if (discResultData) {
             setApiData(discResultData);
-            return;
-        }
-
-        const storageKey = user?.id
-            ? `discResultData_${user.id}`
-            : "discResultData";
-        const historyKey = user?.id
-            ? `discResultHistory_${user.id}`
-            : "discResultHistory";
-        const selectedKey = user?.id
-            ? `discResultSelected_${user.id}`
-            : "discResultSelected";
-
-        const selectedId = localStorage.getItem(selectedKey);
-        const savedHistory = localStorage.getItem(historyKey);
-
-        if (savedHistory) {
-            try {
-                const parsedHistory = JSON.parse(savedHistory) || [];
-                const filteredHistory = parsedHistory.filter(
-                    (item) =>
-                        !item.user_id || !user?.id || item.user_id === user.id,
-                );
-                const picked =
-                    filteredHistory.find((item) => item.id === selectedId) ||
-                    filteredHistory.sort(
-                        (a, b) =>
-                            new Date(b.submitted_at) -
-                            new Date(a.submitted_at),
-                    )[0];
-                if (picked) {
-                    setApiData(picked);
-                    return;
-                }
-            } catch (err) {
-                console.error("Failed to parse discResultHistory:", err);
-            }
-        }
-
-        const savedData = localStorage.getItem(storageKey);
-        if (savedData) {
-            try {
-                const parsed = JSON.parse(savedData);
-                if (parsed?.user_id && user?.id && parsed.user_id !== user.id) {
-                    setApiData(null);
-                    return;
-                }
-                setApiData(parsed);
-            } catch (err) {
-                console.error(
-                    "Failed to parse discResultData from localStorage:",
-                    err,
-                );
-                localStorage.removeItem(storageKey);
-                setApiData(null);
-            }
+        } else {
+            setApiData(null);
         }
     }, [user?.id, discResultData]);
 
@@ -173,8 +120,9 @@ const HasilRingkas = () => {
                 job.job_title?.toLowerCase() === user?.unit_kerja?.toLowerCase()
         );
 
-        let jobStandardComparison = null;
-        if (jobStandard) {
+        // Prefer server-provided comparison if available to ensure consistency
+        let jobStandardComparison = apiData.jobStandardComparison || null;
+        if (!jobStandardComparison && jobStandard) {
             // Hitung selisih setiap trait
             const traitComparison = {};
             const traitFitness = {};
@@ -263,7 +211,6 @@ const HasilRingkas = () => {
     };
 
     const handleDownloadNow = () => {
-        localStorage.setItem("discAutoDownload", "1");
         router.visit("/perserta-tes/hasil");
     };
 
@@ -274,10 +221,7 @@ const HasilRingkas = () => {
         return { bg: "#ef4444", text: "#dc2626" }; // Merah
     };
 
-    // Debug log
-    console.log("apiData:", apiData);
-    console.log("discResultData prop:", discResultData);
-    console.log("summary:", summary);
+    // debug logs removed
 
     if (!apiData) {
         return (
@@ -503,18 +447,7 @@ const HasilRingkas = () => {
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="fitness-bar">
-                                                    <div
-                                                        className="fitness-bar-fill"
-                                                        style={{
-                                                            width: `${fitness}%`,
-                                                            background: bgColor,
-                                                        }}
-                                                    />
-                                                </div>
-                                                <span className="fitness-text">
-                                                    {fitness}% fit
-                                                </span>
+                                                {/* removed fitness bar visual per request; showing only numeric values above */}
                                             </div>
                                         );
                                     })}

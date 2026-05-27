@@ -104,6 +104,11 @@
     position: relative;
     overflow: hidden;
     page-break-after: always;
+    text-align: justify;
+}
+
+.section-all-profiles {
+    page-break-inside: auto;  /* bukan avoid */
 }
 
 .pdf-page:last-child {
@@ -265,6 +270,19 @@
     line-height: 1.5;
     color: #4b5563;
     margin-bottom: 0;
+    text-align: justify;
+}
+
+.overview-text {
+    text-align: justify;
+}
+
+.profile-summary-pdf {
+    text-align: justify;
+}
+
+.rec-text {
+    text-align: justify;
 }
 
 .chart-status-row {
@@ -332,6 +350,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     page-break-inside: avoid;
+    break-inside: avoid;
 }
 
 .profile-header-pdf {

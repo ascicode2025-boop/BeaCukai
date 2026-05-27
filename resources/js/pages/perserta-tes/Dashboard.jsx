@@ -15,84 +15,23 @@ const Dashboard = () => {
     const [historyResults, setHistoryResults] = useState([]);
 
     useEffect(() => {
-        const storageKey = user?.id
-            ? `discResultData_${user.id}`
-            : "discResultData";
-        const historyKey = user?.id
-            ? `discResultHistory_${user.id}`
-            : "discResultHistory";
-        const selectedKey = user?.id
-            ? `discResultSelected_${user.id}`
-            : "discResultSelected";
-
-        let historyList = [];
-        const existingHistory = localStorage.getItem(historyKey);
-        if (existingHistory) {
-            try {
-                historyList = JSON.parse(existingHistory) || [];
-            } catch (error) {
-                historyList = [];
-            }
+        // Only use server-provided latest result; do NOT read localStorage.
+        const serverResult = props.discResultData || null;
+        if (serverResult) {
+            // normalize into same shape used by UI
+            const normalized = {
+                id: serverResult.id,
+                submitted_at: serverResult.submitted_at,
+                report: serverResult.report || serverResult.report_data,
+                graph_scores: serverResult.graph_scores,
+                jpm: serverResult.jpm,
+            };
+            setLatestResult(normalized);
+            setHistoryResults([]);
+        } else {
+            setLatestResult(null);
+            setHistoryResults([]);
         }
-
-        if (!historyList.length) {
-            const savedData = localStorage.getItem(storageKey);
-            if (savedData) {
-                try {
-                    const parsed = JSON.parse(savedData);
-                    if (
-                        parsed?.user_id &&
-                        user?.id &&
-                        parsed.user_id !== user.id
-                    ) {
-                        setLatestResult(null);
-                        setHistoryResults([]);
-                        return;
-                    }
-
-                    const updated = {
-                        ...parsed,
-                        submitted_at:
-                            parsed.submitted_at || new Date().toISOString(),
-                        user_id: user?.id || parsed.user_id || null,
-                        user_email: user?.email || parsed.user_email || null,
-                    };
-
-                    const legacyEntry = {
-                        id: `legacy_${Date.now()}`,
-                        ...updated,
-                    };
-
-                    historyList = [legacyEntry];
-                    localStorage.setItem(
-                        historyKey,
-                        JSON.stringify(historyList),
-                    );
-                    localStorage.setItem(selectedKey, legacyEntry.id);
-                    localStorage.setItem(storageKey, JSON.stringify(updated));
-                } catch (error) {
-                    console.error("Failed to parse discResultData:", error);
-                }
-            }
-        }
-
-        const normalizedHistory = historyList
-            .map((item) => ({
-                ...item,
-                submitted_at: item.submitted_at || new Date().toISOString(),
-                user_id: item.user_id || user?.id || null,
-                user_email: item.user_email || user?.email || null,
-            }))
-            .filter(
-                (item) =>
-                    !item.user_id || !user?.id || item.user_id === user.id,
-            )
-            .sort(
-                (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at),
-            );
-
-        setHistoryResults(normalizedHistory);
-        setLatestResult(normalizedHistory[0] || null);
     }, [user?.id]);
 
     const handleStartTest = () => {
@@ -109,12 +48,7 @@ const Dashboard = () => {
     };
 
     const handleShowDetail = () => {
-        if (latestResult?.id) {
-            const selectedKey = user?.id
-                ? `discResultSelected_${user.id}`
-                : "discResultSelected";
-            localStorage.setItem(selectedKey, latestResult.id);
-        }
+        // Navigate to hasil-ringkas (server will pick latest result); do not use localStorage.
         router.visit("/perserta-tes/hasil-ringkas");
     };
 

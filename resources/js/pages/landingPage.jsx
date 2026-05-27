@@ -1344,7 +1344,7 @@ export default function LandingPage() {
                         className={`nav-link-item ${activeNav === "ABOUT US" ? "active" : ""}`}
                         onClick={() => scrollToSection("footer", "ABOUT US")}
                     >
-                        TENTANG KAMI
+                        KONTAK KAMI
                     </button>
                     <Link
                         href="/login"
@@ -1390,7 +1390,7 @@ export default function LandingPage() {
                     className={`nav-link-item ${activeNav === "ABOUT US" ? "active" : ""}`}
                     onClick={() => scrollToSection("footer", "ABOUT US")}
                 >
-                    TENTANG KAMI
+                    KONTAK  KAMI
                 </button>
                 <Link
                     href="/login"
@@ -1632,7 +1632,7 @@ export default function LandingPage() {
                         karakter, cara kerja, komunikasi, dan kecocokan peserta
                         dengan lingkungan kerja Bea Cukai. Tes ini mengukur 4
                         tipe kepribadian: Dominance, Influence, Steadiness, dan
-                        Conscientiousness.
+                        Compliance.
                     </p>
                     <div className="footer-socials">
                         <i className="fab fa-instagram"></i>
@@ -1649,14 +1649,12 @@ export default function LandingPage() {
 
                 <div className="footer-right">
                     <div className="supported-by">
-                        <span className="label">Didukung oleh:</span>
                         <div className="content">
                             Bagian Pengembangan
                             <br />
                             Kepegawaian
                             <br />
-                            <br />
-                            <strong>Sekretaris DJBC</strong>
+                            <strong>Sekretariat DJBC</strong>
                         </div>
                     </div>
                 </div>

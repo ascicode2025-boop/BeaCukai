@@ -86,10 +86,6 @@ const DetailModal = ({
                                         onChange={(e) => {
                                             const nextId = e.target.value;
                                             setSelectedId(nextId);
-                                            const selectedKey = userDetail?.id
-                                                ? `discResultSelected_${userDetail.id}`
-                                                : "discResultSelected";
-                                            localStorage.setItem(selectedKey, nextId);
                                         }}
                                         style={{
                                             padding: "6px 10px",

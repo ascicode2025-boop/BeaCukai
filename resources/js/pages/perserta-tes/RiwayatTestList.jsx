@@ -55,109 +55,14 @@ const RiwayatTestList = () => {
             setRiwayatTests(mapped);
             return;
         }
+        // If no DB history, do not fall back to localStorage — show empty list
+        const mapped = [];
 
-        // Priority 2: Fallback ke localStorage jika database kosong
-        const storageKey = user?.id
-            ? `discResultData_${user.id}`
-            : "discResultData";
-        const historyKey = user?.id
-            ? `discResultHistory_${user.id}`
-            : "discResultHistory";
-        const savedHistory = localStorage.getItem(historyKey);
-
-        let historyList = [];
-        if (savedHistory) {
-            try {
-                historyList = JSON.parse(savedHistory) || [];
-            } catch (error) {
-                historyList = [];
-            }
-        }
-
-        if (!historyList.length) {
-            const savedData = localStorage.getItem(storageKey);
-            if (savedData) {
-                try {
-                    const parsed = JSON.parse(savedData);
-                    if (
-                        parsed?.user_id &&
-                        user?.id &&
-                        parsed.user_id !== user.id
-                    ) {
-                        setRiwayatTests([]);
-                        return;
-                    }
-                    const updated = {
-                        ...parsed,
-                        submitted_at:
-                            parsed.submitted_at || new Date().toISOString(),
-                        user_id: user?.id || parsed.user_id || null,
-                        user_email: user?.email || parsed.user_email || null,
-                    };
-                    const legacyEntry = {
-                        id: `legacy_${Date.now()}`,
-                        ...updated,
-                    };
-                    historyList = [legacyEntry];
-                    localStorage.setItem(
-                        historyKey,
-                        JSON.stringify(historyList),
-                    );
-                    localStorage.setItem(storageKey, JSON.stringify(updated));
-                } catch (error) {
-                    console.error("Failed to parse discResultData:", error);
-                }
-            }
-        }
-
-        const normalizedHistory = historyList
-            .map((item) => ({
-                ...item,
-                submitted_at: item.submitted_at || new Date().toISOString(),
-                user_id: item.user_id || user?.id || null,
-                user_email: item.user_email || user?.email || null,
-            }))
-            .filter(
-                (item) =>
-                    !item.user_id || !user?.id || item.user_id === user.id,
-            )
-            .sort(
-                (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at),
-            );
-
-        const mapped = normalizedHistory.map((item) => {
-            const dateLabel = item.submitted_at
-                ? new Date(item.submitted_at).toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                  })
-                : "-";
-
-            // Get primary type from localStorage data
-            const primaryType = item.primary_type || "?";
-            const secondaryType = item.secondary_type || "?";
-            const traitName = TRAITS[primaryType] || primaryType;
-            const secondaryName = TRAITS[secondaryType] || secondaryType;
-
-            // Get description - support both formats
-            const description = item.summary || item.report?.summary || "";
-
-            return {
-                id: item.id,
-                date: dateLabel,
-                type: "DISC Self-Assessment",
-                status: "Selesai",
-                primaryType,
-                secondaryType,
-                traitName,
-                secondaryName,
-                description,
-                graph3: item.graph_scores?.Graph_3 || null,
-            };
-        });
-
+        // no DB data available -> keep empty mapped list
         setRiwayatTests(mapped);
+        return;
+
+        // NOTE: previously there was a localStorage fallback here; removed per requirements.
     }, [user?.id, testHistory]);
 
     const handleKembali = () => {
