@@ -6,19 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('disc_results', function (Blueprint $table) {
-            $table->json('report_data')->nullable()->after('summary');
+            $table->text('report_data')->nullable()->after('summary');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('disc_results', function (Blueprint $table) {

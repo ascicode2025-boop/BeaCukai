@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('disc_results', function (Blueprint $table) {
@@ -18,49 +15,30 @@ return new class extends Migration
             // Foreign Key
             $table->foreignId('user_id')
                   ->constrained('users')
-                  ->onDelete('cascade')
-                  ->comment('Reference ke user yang mengerjakan tes');
+                  ->onDelete('cascade');
 
-            // Raw Scores
-            $table->json('raw_scores_most')
-                  ->comment('Skor mentah dari jawaban Most (D, I, S, C)');
-            $table->json('raw_scores_least')
-                  ->comment('Skor mentah dari jawaban Least (D, I, S, C)');
-            $table->json('raw_scores_change')
-                  ->comment('Skor perubahan Most - Least');
+            // Raw Scores (ganti json -> text)
+            $table->text('raw_scores_most');
+            $table->text('raw_scores_least');
+            $table->text('raw_scores_change');
 
-            // Graph Scores (Converted)
-            $table->json('graph_scores_most')
-                  ->comment('Skor Graph 1 (Most) setelah konversi');
-            $table->json('graph_scores_least')
-                  ->comment('Skor Graph 2 (Least) setelah konversi');
-            $table->json('graph_scores_change')
-                  ->comment('Skor Graph 3 (Change) setelah konversi');
+            // Graph Scores (ganti json -> text)
+            $table->text('graph_scores_most');
+            $table->text('graph_scores_least');
+            $table->text('graph_scores_change');
 
             // Personality Profile
-            $table->string('primary_type', 5)
-                  ->comment('Tipe kepribadian utama (D, I, S, atau C)');
-            $table->string('personality_profile', 50)
-                  ->comment('Deskripsi profil kepribadian utama');
-            $table->text('summary')
-                  ->nullable()
-                  ->comment('Ringkasan profil/summary dari controller');
+            $table->string('primary_type', 5);
+            $table->string('personality_profile', 50);
+            $table->text('summary')->nullable();
 
             // Processing Metadata
-            $table->integer('total_questions')
-                  ->default(24)
-                  ->comment('Jumlah soal yang dijawab');
-            $table->decimal('completion_percentage', 5, 2)
-                  ->default(100)
-                  ->comment('Persentase penyelesaian tes');
-            $table->integer('time_spent_seconds')
-                  ->nullable()
-                  ->comment('Waktu pengerjaan dalam detik');
+            $table->integer('total_questions')->default(24);
+            $table->decimal('completion_percentage', 5, 2)->default(100);
+            $table->integer('time_spent_seconds')->nullable();
 
             // Timestamps
-            $table->timestamp('test_date')
-                  ->useCurrent()
-                  ->comment('Tanggal & waktu tes dilakukan');
+            $table->timestamp('test_date')->useCurrent();
             $table->timestamps();
 
             // Indexes
@@ -71,9 +49,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('disc_results');
