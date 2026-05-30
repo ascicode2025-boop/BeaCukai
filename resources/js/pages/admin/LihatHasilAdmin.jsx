@@ -1006,7 +1006,6 @@ const JabatanComparisonModal = ({
                                     ),
                                 )}
                                 <span className="jabatan-banner-disc-label">
-                                    Dominan
                                 </span>
                             </div>
                         </div>
