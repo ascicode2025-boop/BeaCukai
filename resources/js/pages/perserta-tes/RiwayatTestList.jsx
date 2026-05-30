@@ -8,7 +8,7 @@ const TRAITS = {
     D: "Dominance",
     I: "Influencing",
     S: "Steadiness",
-    C: "Conscientiousness",
+    C: "Compliance",
 };
 
 const RiwayatTestList = () => {
@@ -36,7 +36,8 @@ const RiwayatTestList = () => {
                 const secondaryName = TRAITS[secondaryType] || secondaryType;
 
                 // Use dynamic description from backend
-                const description = item.dynamicDescription || item.summary || "";
+                const description =
+                    item.dynamicDescription || item.summary || "";
 
                 return {
                     id: item.id,
@@ -124,23 +125,58 @@ const RiwayatTestList = () => {
                                     </div>
                                     {test.primaryType && (
                                         <div className="riwayat-card-type-badge">
-                                            <span className="trait-badge">{test.primaryType}</span>
-                                            <span className="trait-name">{test.traitName}</span>
-                                            {test.secondaryType && test.secondaryType !== "?" && (
-                                                <>
-                                                    <span className="trait-separator">+</span>
-                                                    <span className="trait-badge secondary">{test.secondaryType}</span>
-                                                    <span className="trait-name">{test.secondaryName}</span>
-                                                </>
-                                            )}
+                                            <span className="trait-badge">
+                                                {test.primaryType}
+                                            </span>
+                                            <span className="trait-name">
+                                                {test.traitName}
+                                            </span>
+                                            {test.secondaryType &&
+                                                test.secondaryType !== "?" && (
+                                                    <>
+                                                        <span className="trait-separator">
+                                                            +
+                                                        </span>
+                                                        <span className="trait-badge secondary">
+                                                            {test.secondaryType}
+                                                        </span>
+                                                        <span className="trait-name">
+                                                            {test.secondaryName}
+                                                        </span>
+                                                    </>
+                                                )}
                                         </div>
                                     )}
                                     {test.graph3 && (
                                         <div className="riwayat-card-scores">
-                                            <span className="score-item">D: {typeof test.graph3.D === 'number' ? test.graph3.D.toFixed(1) : test.graph3.D}</span>
-                                            <span className="score-item">I: {typeof test.graph3.I === 'number' ? test.graph3.I.toFixed(1) : test.graph3.I}</span>
-                                            <span className="score-item">S: {typeof test.graph3.S === 'number' ? test.graph3.S.toFixed(1) : test.graph3.S}</span>
-                                            <span className="score-item">C: {typeof test.graph3.C === 'number' ? test.graph3.C.toFixed(1) : test.graph3.C}</span>
+                                            <span className="score-item">
+                                                D:{" "}
+                                                {typeof test.graph3.D ===
+                                                "number"
+                                                    ? test.graph3.D.toFixed(1)
+                                                    : test.graph3.D}
+                                            </span>
+                                            <span className="score-item">
+                                                I:{" "}
+                                                {typeof test.graph3.I ===
+                                                "number"
+                                                    ? test.graph3.I.toFixed(1)
+                                                    : test.graph3.I}
+                                            </span>
+                                            <span className="score-item">
+                                                S:{" "}
+                                                {typeof test.graph3.S ===
+                                                "number"
+                                                    ? test.graph3.S.toFixed(1)
+                                                    : test.graph3.S}
+                                            </span>
+                                            <span className="score-item">
+                                                C:{" "}
+                                                {typeof test.graph3.C ===
+                                                "number"
+                                                    ? test.graph3.C.toFixed(1)
+                                                    : test.graph3.C}
+                                            </span>
                                         </div>
                                     )}
                                     {test.description && (

@@ -7,8 +7,11 @@ import {
     ChevronDown,
     BoxArrowRight,
     PersonCircle,
+    Plus,
 } from "react-bootstrap-icons";
 import { useForm, usePage, router } from "@inertiajs/react";
+import InitialAvatar from "./InitialAvatar";
+import ProfilePhotoWithFallback from "./ProfilePhotoWithFallback";
 
 const NavbarLoginAdmin = ({ children }) => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
@@ -270,20 +273,11 @@ const NavbarLoginAdmin = ({ children }) => {
                                 }}
                                 title="Profil"
                             >
-                                {profilePhotoUrl ? (
-                                    <img
-                                        src={profilePhotoUrl}
-                                        alt="Foto Profil"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            borderRadius: "50%",
-                                        }}
-                                    />
-                                ) : (
-                                    <PersonCircle size={45} color="#002366" />
-                                )}
+                                <ProfilePhotoWithFallback
+                                    photoUrl={profilePhotoUrl}
+                                    user={user}
+                                    size={45}
+                                />
                             </div>
                         </div>
                     </div>
@@ -301,20 +295,11 @@ const NavbarLoginAdmin = ({ children }) => {
                                 }}
                                 title="Profil"
                             >
-                                {profilePhotoUrl ? (
-                                    <img
-                                        src={profilePhotoUrl}
-                                        alt="Foto Profil"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            borderRadius: "50%",
-                                        }}
-                                    />
-                                ) : (
-                                    <PersonCircle size={24} color="#002366" />
-                                )}
+                                <ProfilePhotoWithFallback
+                                    photoUrl={profilePhotoUrl}
+                                    user={user}
+                                    size={24}
+                                />
                                 <ChevronDown
                                     size={16}
                                     style={{
@@ -392,7 +377,7 @@ const NavbarLoginAdmin = ({ children }) => {
                         <button
                             className="dropdown-item"
                             onClick={() => {
-                                router.visit("/kelola-akun");
+                                router.visit("/admin/kelola-akun");
                                 setShowDropdown(false);
                             }}
                         >
@@ -402,12 +387,22 @@ const NavbarLoginAdmin = ({ children }) => {
                         <button
                             className="dropdown-item"
                             onClick={() => {
-                                router.visit("/data-peserta");
+                                router.visit("/admin/data-peserta");
                                 setShowDropdown(false);
                             }}
                         >
                             <Clock size={18} />
                             <span>Data Peserta</span>
+                        </button>
+                        <button
+                            className="dropdown-item"
+                            onClick={() => {
+                                router.visit("/admin/manage-positions");
+                                setShowDropdown(false);
+                            }}
+                        >
+                            <Plus size={18} />
+                            <span>Tambah Jabatan</span>
                         </button>
                         <button
                             className="dropdown-item logout-item"

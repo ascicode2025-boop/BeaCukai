@@ -434,7 +434,7 @@ const KelolaAkun = () => {
                                                     Nama Lengkap
                                                 </th>
                                                 <th width="15%">NIP</th>
-                                                <th width="20%">Kontak</th>
+                                                <th width="20%">Email</th>
                                                 <th width="10%">Status</th>
                                                 <th
                                                     width="25%"
@@ -535,7 +535,7 @@ const KelolaAkun = () => {
                                                     Nama Lengkap
                                                 </th>
                                                 <th width="15%">NIP</th>
-                                                <th width="20%">Kontak</th>
+                                                <th width="20%">Email</th>
                                                 <th width="10%">Status</th>
                                                 <th
                                                     width="25%"

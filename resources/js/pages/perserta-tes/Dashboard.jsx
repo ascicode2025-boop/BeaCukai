@@ -127,6 +127,13 @@ const Dashboard = () => {
 
     return (
         <>
+            <style>{`
+                @media (max-width: 767px) {
+                    .vertical-line-svg {
+                        display: none !important;
+                    }
+                }
+            `}</style>
             <NavbarLogin />
             <div className="container dashboard-container">
                 {/* Background Decor */}
@@ -387,6 +394,7 @@ const Dashboard = () => {
                         >
                             {/* Vertical Line SVG */}
                             <svg
+                                className="vertical-line-svg"
                                 width="7"
                                 height="290"
                                 viewBox="0 0 7 290"
@@ -411,12 +419,12 @@ const Dashboard = () => {
                                 individu dalam lingkungan kerja. Tes ini
                                 mengelompokkan kepribadian ke dalam empat
                                 dimensi utama, yaitu Dominance (D), Influence
-                                (I), Steadiness (S), dan Conscientiousness (C).
-                                Selain itu, hasil tes akan dibandingkan dengan
-                                standar jabatan tertentu untuk melihat tingkat
-                                kecocokan (JPM), sehingga dapat digunakan
-                                sebagai bahan pertimbangan dalam penempatan atau
-                                pengembangan diri.
+                                (I), Steadiness (S), dan Compliance (C). Selain
+                                itu, hasil tes akan dibandingkan dengan standar
+                                jabatan tertentu untuk melihat tingkat kecocokan
+                                (JPM), sehingga dapat digunakan sebagai bahan
+                                pertimbangan dalam penempatan atau pengembangan
+                                diri.
                             </p>
                             <p className="lh-lg" style={{ fontSize: "13px" }}>
                                 DISC Assessment is a personality evaluation
@@ -424,8 +432,8 @@ const Dashboard = () => {
                                 patterns in a work environment. It categorizes
                                 personality into four main dimensions: Dominance
                                 (D), Influence (I), Steadiness (S), and
-                                Conscientiousness (C). In addition, your results
-                                will be compared with specific job standards to
+                                Compliance (C). In addition, your results will
+                                be compared with specific job standards to
                                 determine the level of compatibility (JPM),
                                 which can be used as a reference for job
                                 placement or personal development.

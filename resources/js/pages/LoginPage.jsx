@@ -605,18 +605,56 @@ export default function LoginPage() {
                     .login-card {
                         flex-direction: column;
                         width: 100%;
-                        max-width: 400px;
+                        max-width: 420px;
+                        border-radius: 20px;
+                        margin-top: 1rem;
                     }
                     .login-left { display: none; }
                     .login-right {
-                        padding: 40px 20px;
-                        padding-top: 60px;
+                        padding: 40px 28px 36px 28px;
                     }
-                    .login-right h2 { font-size: 20px; margin-bottom: 40px; }
+                    .login-right h2 {
+                        font-size: 22px;
+                        margin-bottom: 28px;
+                    }
                     .form-container { max-width: 100%; }
-                    .label-custom { width: 100px; font-size: 12px; }
-                    .input-capsule { padding: 7px 12px; font-size: 13px; }
-                    .signin-btn { font-size: 13px; }
+                    .form-group-custom { margin-bottom: 18px; }
+                    .label-custom {
+                        font-size: 13px;
+                    }
+                    .input-capsule {
+                        padding: 10px 16px;
+                        font-size: 14px;
+                        border-radius: 20px;
+                    }
+                    .signin-btn {
+                        font-size: 14px;
+                        padding: 12px 24px;
+                        min-height: 46px;
+                        margin-top: 8px;
+                        margin-bottom: 14px;
+                    }
+                    .remember-me-container {
+                        margin-bottom: 16px;
+                        margin-top: 8px;
+                    }
+                    .remember-me-label { font-size: 13px; }
+                    .remember-me-checkbox {
+                        width: 20px;
+                        height: 20px;
+                        min-width: 20px;
+                        min-height: 20px;
+                    }
+                    .forgot-password { font-size: 12px; }
+                    .footer-text {
+                        margin-top: 20px;
+                        font-size: 12px;
+                        gap: 4px;
+                    }
+                    .regist-here-link {
+                        font-size: 12px;
+                        margin-left: -2px;
+                    }
                 }
             `}</style>
 

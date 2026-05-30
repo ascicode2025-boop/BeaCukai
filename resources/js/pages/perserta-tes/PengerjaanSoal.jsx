@@ -10,13 +10,14 @@ const PengerjaanSoal = () => {
     const [timeLeft, setTimeLeft] = useState(10 * 60);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [showTimeUpModal, setShowTimeUpModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState(
-        Object.fromEntries(Array.from({ length: 24 }, (_, i) => [i + 1, ""]))
+        Object.fromEntries(Array.from({ length: 24 }, (_, i) => [i + 1, ""])),
     );
     const [answers, setAnswers] = useState(
         Object.fromEntries(
-            Array.from({ length: 24 }, (_, i) => [i + 1, { M: null, L: null }])
-        )
+            Array.from({ length: 24 }, (_, i) => [i + 1, { M: null, L: null }]),
+        ),
     );
 
     const totalQuestions = 24;
@@ -107,7 +108,10 @@ const PengerjaanSoal = () => {
             { id: "14D", text: "Tegas, berani" },
         ],
         15: [
-            { id: "15A", text: "Menghabiskan waktu berharga dengan orang lain" },
+            {
+                id: "15A",
+                text: "Menghabiskan waktu berharga dengan orang lain",
+            },
             { id: "15B", text: "Merencanakan masa depan, menyiapkan diri" },
             { id: "15C", text: "Perjalanan menuju petualangan baru" },
             { id: "15D", text: "Mendapat penghargaan jika mencapai tujuan" },
@@ -132,7 +136,10 @@ const PengerjaanSoal = () => {
         ],
         19: [
             { id: "19A", text: "Tidak mudah dikalahkan" },
-            { id: "19B", text: "Akan melakukan sesuai perintah, mengikuti pimpinan" },
+            {
+                id: "19B",
+                text: "Akan melakukan sesuai perintah, mengikuti pimpinan",
+            },
             { id: "19C", text: "Riang Ceria" },
             { id: "19D", text: "Ingin segalanya teratur, Rapi" },
         ],
@@ -175,7 +182,9 @@ const PengerjaanSoal = () => {
 
     const isCurrentQuestionValid = () => {
         const current = answers[currentQuestion];
-        return current.M !== null && current.L !== null && current.M !== current.L;
+        return (
+            current.M !== null && current.L !== null && current.M !== current.L
+        );
     };
 
     const allAnswered = Object.keys(answers).every((key) => {
@@ -184,6 +193,7 @@ const PengerjaanSoal = () => {
     });
 
     const handleSubmit = async () => {
+        setIsSubmitting(true);
         try {
             const response = await axios.post("/api/submit-disc", {
                 answers: answers,
@@ -195,8 +205,14 @@ const PengerjaanSoal = () => {
 
                 if (!saved) {
                     // Jika backend tidak menyimpan, jangan redirect — beri tahu pengguna
-                    console.error("Backend berhasil memproses tapi tidak menyimpan result:", response.data);
-                    alert("Hasil dihitung tetapi gagal disimpan ke server. Silakan coba lagi atau hubungi administrator.");
+                    console.error(
+                        "Backend berhasil memproses tapi tidak menyimpan result:",
+                        response.data,
+                    );
+                    alert(
+                        "Hasil dihitung tetapi gagal disimpan ke server. Silakan coba lagi atau hubungi administrator.",
+                    );
+                    setIsSubmitting(false);
                     return;
                 }
 
@@ -204,8 +220,12 @@ const PengerjaanSoal = () => {
                 window.location.href = "/perserta-tes/hasil-ringkas";
             }
         } catch (error) {
-            console.error("Terjadi kesalahan saat submit DISC:", error?.response?.data || error.message || error);
+            console.error(
+                "Terjadi kesalahan saat submit DISC:",
+                error?.response?.data || error.message || error,
+            );
             alert("Gagal memproses tes. Pastikan koneksi aman dan coba lagi.");
+            setIsSubmitting(false);
         }
     };
 
@@ -224,8 +244,19 @@ const PengerjaanSoal = () => {
 
     const handleTimeUpRetry = () => {
         // Reset answers and errors, restart timer and go to first question
-        setAnswers(Object.fromEntries(Array.from({ length: totalQuestions }, (_, i) => [i + 1, { M: null, L: null }])));
-        setErrors(Object.fromEntries(Array.from({ length: totalQuestions }, (_, i) => [i + 1, ""])));
+        setAnswers(
+            Object.fromEntries(
+                Array.from({ length: totalQuestions }, (_, i) => [
+                    i + 1,
+                    { M: null, L: null },
+                ]),
+            ),
+        );
+        setErrors(
+            Object.fromEntries(
+                Array.from({ length: totalQuestions }, (_, i) => [i + 1, ""]),
+            ),
+        );
         setCurrentQuestion(1);
         setTimeLeft(10 * 60);
         setShowTimeUpModal(false);
@@ -241,9 +272,9 @@ const PengerjaanSoal = () => {
     useEffect(() => {
         let keepAlive = null;
         const ping = () => {
-            fetch('/heartbeat', {
-                credentials: 'same-origin',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            fetch("/heartbeat", {
+                credentials: "same-origin",
+                headers: { "X-Requested-With": "XMLHttpRequest" },
             }).catch(() => {});
         };
 
@@ -271,7 +302,11 @@ const PengerjaanSoal = () => {
         const newAnswers = { ...answers[currentQuestion], [column]: value };
         setAnswers((prev) => ({ ...prev, [currentQuestion]: newAnswers }));
 
-        if (newAnswers.M !== null && newAnswers.L !== null && newAnswers.M === newAnswers.L) {
+        if (
+            newAnswers.M !== null &&
+            newAnswers.L !== null &&
+            newAnswers.M === newAnswers.L
+        ) {
             setErrors((prev) => ({
                 ...prev,
                 [currentQuestion]:
@@ -712,9 +747,17 @@ const PengerjaanSoal = () => {
                     box-shadow: 0 4px 12px rgba(255, 217, 102, 0.3);
                 }
 
-                .ps-btn-submit:hover {
+                .ps-btn-submit:hover:not(:disabled) {
                     transform: translateY(-2px);
                     box-shadow: 0 6px 16px rgba(255, 217, 102, 0.4);
+                }
+
+                .ps-btn-submit:disabled {
+                    background: #D4AF37;
+                    color: #8B7919;
+                    cursor: not-allowed;
+                    opacity: 0.7;
+                    box-shadow: none;
                 }
 
                 .ps-btn-ghost {
@@ -852,7 +895,6 @@ const PengerjaanSoal = () => {
             `}</style>
 
             <div className="ps-wrapper">
-
                 {/* ── Time's Up Modal ── */}
                 {showTimeUpModal && (
                     <div className="ps-modal-overlay high-z">
@@ -863,11 +905,19 @@ const PengerjaanSoal = () => {
                             <div
                                 className="ps-modal-icon"
                                 style={{
-                                    background: "linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)",
-                                    boxShadow: "0 10px 20px rgba(220,38,38,0.25)",
+                                    background:
+                                        "linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)",
+                                    boxShadow:
+                                        "0 10px 20px rgba(220,38,38,0.25)",
                                 }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="40"
+                                    height="40"
+                                    fill="currentColor"
+                                    viewBox="0 0 16 16"
+                                >
                                     <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
                                     <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
                                 </svg>
@@ -875,19 +925,48 @@ const PengerjaanSoal = () => {
                             <h2>Waktu Habis!</h2>
                             {allAnswered ? (
                                 <>
-                                    <p>Waktu pengerjaan tes telah berakhir. Jawaban Anda akan dikirim secara otomatis.</p>
-                                    <button className="ps-btn-submit" onClick={handleSubmit}>
-                                        Lanjutkan
+                                    <p>
+                                        Waktu pengerjaan tes telah berakhir.
+                                        Jawaban Anda akan dikirim secara
+                                        otomatis.
+                                    </p>
+                                    <button
+                                        className="ps-btn-submit"
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? "Memproses..." : "Lanjutkan"}
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <p>Waktu pengerjaan tes telah berakhir namun beberapa soal belum terisi. Silakan kerjakan kembali.</p>
-                                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                                        <button className="ps-btn-submit" onClick={handleTimeUpRetry}>
+                                    <p>
+                                        Waktu pengerjaan tes telah berakhir
+                                        namun beberapa soal belum terisi.
+                                        Silakan kerjakan kembali.
+                                    </p>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            gap: 8,
+                                            marginTop: 12,
+                                        }}
+                                    >
+                                        <button
+                                            className="ps-btn-submit"
+                                            onClick={handleTimeUpRetry}
+                                        >
                                             Kerjakan Kembali
                                         </button>
-                                        <button className="ps-btn-ghost" onClick={() => { setShowTimeUpModal(false); router.visit('/perserta-tes/dashboard'); }}>
+                                        <button
+                                            className="ps-btn-ghost"
+                                            onClick={() => {
+                                                setShowTimeUpModal(false);
+                                                router.visit(
+                                                    "/perserta-tes/dashboard",
+                                                );
+                                            }}
+                                        >
                                             Keluar
                                         </button>
                                     </div>
@@ -899,7 +978,10 @@ const PengerjaanSoal = () => {
 
                 {/* ── Confirmation Modal ── */}
                 {allAnswered && showConfirmation && (
-                    <div className="ps-modal-overlay" onClick={() => setShowConfirmation(false)}>
+                    <div
+                        className="ps-modal-overlay"
+                        onClick={() => setShowConfirmation(false)}
+                    >
                         <div
                             className="ps-modal-box"
                             style={{ borderTop: "8px solid #5558d4" }}
@@ -908,29 +990,49 @@ const PengerjaanSoal = () => {
                             <div
                                 className="ps-modal-icon"
                                 style={{
-                                    background: "linear-gradient(135deg, #5558d4 0%, #7c3aed 100%)",
-                                    boxShadow: "0 10px 20px rgba(85,88,212,0.25)",
+                                    background:
+                                        "linear-gradient(135deg, #5558d4 0%, #7c3aed 100%)",
+                                    boxShadow:
+                                        "0 10px 20px rgba(85,88,212,0.25)",
                                 }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="40"
+                                    height="40"
+                                    fill="currentColor"
+                                    viewBox="0 0 16 16"
+                                >
                                     <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z" />
                                     <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z" />
                                 </svg>
                             </div>
                             <h2>Akhiri Tes</h2>
                             <p>
-                                Anda telah menyelesaikan semua pertanyaan. Apakah Anda yakin
-                                ingin mengirimkan jawaban Anda sekarang?
+                                Anda telah menyelesaikan semua pertanyaan.
+                                Apakah Anda yakin ingin mengirimkan jawaban Anda
+                                sekarang?
                             </p>
                             <div className="ps-summary-box">
-                                <div className="ps-summary-label">Total Pertanyaan Dijawab</div>
-                                <div className="ps-summary-count">{totalQuestions} / {totalQuestions}</div>
+                                <div className="ps-summary-label">
+                                    Total Pertanyaan Dijawab
+                                </div>
+                                <div className="ps-summary-count">
+                                    {totalQuestions} / {totalQuestions}
+                                </div>
                             </div>
                             <div className="ps-modal-buttons">
-                                <button className="ps-btn-submit" onClick={handleSubmit}>
-                                    Ya, Selesaikan Tes
+                                <button
+                                    className="ps-btn-submit"
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Memproses..." : "Ya, Selesaikan Tes"}
                                 </button>
-                                <button className="ps-btn-ghost" onClick={handleRetry}>
+                                <button
+                                    className="ps-btn-ghost"
+                                    onClick={handleRetry}
+                                >
                                     Batal
                                 </button>
                             </div>
@@ -942,20 +1044,23 @@ const PengerjaanSoal = () => {
                 <div className="ps-sidebar">
                     <div className="ps-sidebar-title">Daftar Soal</div>
                     <div className="ps-grid">
-                        {Array.from({ length: totalQuestions }, (_, i) => i + 1).map((num) => {
+                        {Array.from(
+                            { length: totalQuestions },
+                            (_, i) => i + 1,
+                        ).map((num) => {
                             const isAnswered =
                                 answers[num]?.M !== null &&
                                 answers[num]?.L !== null &&
                                 answers[num]?.M !== answers[num]?.L;
                             const isActive = currentQuestion === num;
                             return (
-                                <button
+                                <div
                                     key={num}
-                                    onClick={() => setCurrentQuestion(num)}
                                     className={`question-button ${isActive ? "active" : isAnswered ? "answered" : "unanswered"}`}
+                                    style={{ cursor: "default" }}
                                 >
                                     {num}
-                                </button>
+                                </div>
                             );
                         })}
                     </div>
@@ -963,17 +1068,18 @@ const PengerjaanSoal = () => {
 
                 {/* ── Main Content ── */}
                 <div className="ps-main">
-
                     {/* Timer */}
                     <div
                         className="ps-timer"
                         style={{
-                            background: timeLeft <= 60
-                                ? "linear-gradient(135deg, #DC2626 0%, #991B1B 100%)"
-                                : "linear-gradient(135deg, #5558d4 0%, #7c3aed 100%)",
-                            boxShadow: timeLeft <= 60
-                                ? "0 4px 12px rgba(220,38,38,0.4)"
-                                : "0 4px 12px rgba(85,88,212,0.3)",
+                            background:
+                                timeLeft <= 60
+                                    ? "linear-gradient(135deg, #DC2626 0%, #991B1B 100%)"
+                                    : "linear-gradient(135deg, #5558d4 0%, #7c3aed 100%)",
+                            boxShadow:
+                                timeLeft <= 60
+                                    ? "0 4px 12px rgba(220,38,38,0.4)"
+                                    : "0 4px 12px rgba(85,88,212,0.3)",
                         }}
                     >
                         <div className="ps-timer-label">WAKTU TERSISA</div>
@@ -982,41 +1088,50 @@ const PengerjaanSoal = () => {
 
                     {/* Mobile question grid */}
                     <div className="ps-mobile-grid" style={{ display: "none" }}>
-                        <span className="ps-mobile-grid-title">Daftar Soal</span>
-                        {Array.from({ length: totalQuestions }, (_, i) => i + 1).map((num) => {
+                        <span className="ps-mobile-grid-title">
+                            Daftar Soal
+                        </span>
+                        {Array.from(
+                            { length: totalQuestions },
+                            (_, i) => i + 1,
+                        ).map((num) => {
                             const isAnswered =
                                 answers[num]?.M !== null &&
                                 answers[num]?.L !== null &&
                                 answers[num]?.M !== answers[num]?.L;
                             const isActive = currentQuestion === num;
                             return (
-                                <button
+                                <div
                                     key={num}
-                                    onClick={() => setCurrentQuestion(num)}
                                     className={`question-button ${isActive ? "active" : isAnswered ? "answered" : "unanswered"}`}
+                                    style={{ cursor: "default" }}
                                 >
                                     {num}
-                                </button>
+                                </div>
                             );
                         })}
                     </div>
 
                     <div className="content-area">
-
                         {/* Header card */}
                         <div className="ps-header-card">
                             <h1>Pertanyaan {currentQuestion}</h1>
-                            <p>Pilih 2 karakteristik: 1 yang paling cocok (M) dan 1 yang paling tidak cocok (L) dalam diri anda</p>
+                            <p>
+                                Pilih 2 karakteristik: 1 yang paling cocok (M)
+                                dan 1 yang paling tidak cocok (L) dalam diri
+                                anda
+                            </p>
                         </div>
 
                         {/* Question box */}
                         <div className="ps-question-box">
-
                             {/* Column headers */}
                             <div className="ps-col-headers">
                                 <div className="ps-col-header">M</div>
                                 <div className="ps-col-header">L</div>
-                                <div className="ps-col-header text-left">karakteristik</div>
+                                <div className="ps-col-header text-left">
+                                    karakteristik
+                                </div>
                             </div>
 
                             {/* Error */}
@@ -1033,7 +1148,10 @@ const PengerjaanSoal = () => {
                                         key={item.id}
                                         className="ps-option-row"
                                         style={{
-                                            background: index % 2 === 0 ? "white" : "#F9FAFB",
+                                            background:
+                                                index % 2 === 0
+                                                    ? "white"
+                                                    : "#F9FAFB",
                                             borderBottom:
                                                 index < currentData.length - 1
                                                     ? "1px solid #E5E7EB"
@@ -1043,16 +1161,31 @@ const PengerjaanSoal = () => {
                                         {/* M radio */}
                                         <div
                                             className="ps-radio-cell"
-                                            onClick={() => handleAnswerChange(index, "M", item.id)}
+                                            onClick={() =>
+                                                handleAnswerChange(
+                                                    index,
+                                                    "M",
+                                                    item.id,
+                                                )
+                                            }
                                         >
                                             <div
                                                 className={`custom-radio ${answers[currentQuestion]?.M === item.id ? "checked" : ""}`}
                                                 style={{
-                                                    borderColor: answers[currentQuestion]?.M === item.id ? "#333366" : "#9CA3AF",
-                                                    background:  answers[currentQuestion]?.M === item.id ? "#333366" : "white",
+                                                    borderColor:
+                                                        answers[currentQuestion]
+                                                            ?.M === item.id
+                                                            ? "#333366"
+                                                            : "#9CA3AF",
+                                                    background:
+                                                        answers[currentQuestion]
+                                                            ?.M === item.id
+                                                            ? "#333366"
+                                                            : "white",
                                                 }}
                                             >
-                                                {answers[currentQuestion]?.M === item.id && (
+                                                {answers[currentQuestion]?.M ===
+                                                    item.id && (
                                                     <div className="custom-radio-dot" />
                                                 )}
                                             </div>
@@ -1061,16 +1194,31 @@ const PengerjaanSoal = () => {
                                         {/* L radio */}
                                         <div
                                             className="ps-radio-cell"
-                                            onClick={() => handleAnswerChange(index, "L", item.id)}
+                                            onClick={() =>
+                                                handleAnswerChange(
+                                                    index,
+                                                    "L",
+                                                    item.id,
+                                                )
+                                            }
                                         >
                                             <div
                                                 className={`custom-radio ${answers[currentQuestion]?.L === item.id ? "checked" : ""}`}
                                                 style={{
-                                                    borderColor: answers[currentQuestion]?.L === item.id ? "#333366" : "#9CA3AF",
-                                                    background:  answers[currentQuestion]?.L === item.id ? "#333366" : "white",
+                                                    borderColor:
+                                                        answers[currentQuestion]
+                                                            ?.L === item.id
+                                                            ? "#333366"
+                                                            : "#9CA3AF",
+                                                    background:
+                                                        answers[currentQuestion]
+                                                            ?.L === item.id
+                                                            ? "#333366"
+                                                            : "white",
                                                 }}
                                             >
-                                                {answers[currentQuestion]?.L === item.id && (
+                                                {answers[currentQuestion]?.L ===
+                                                    item.id && (
                                                     <div className="custom-radio-dot" />
                                                 )}
                                             </div>
@@ -1113,8 +1261,8 @@ const PengerjaanSoal = () => {
                     </div>
                 </div>
             </div>
-            <div style={{marginTop: "1px"}}>
-            <Footer />
+            <div style={{ marginTop: "1px" }}>
+                <Footer />
             </div>
         </>
     );

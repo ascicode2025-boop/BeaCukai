@@ -598,9 +598,9 @@ body {
     }
 
     .card-1 .card-icon-wrapper {
-        width: 56px;
-        height: 56px;
-        min-width: 56px;
+        width: 76px;
+        height: 76px;
+        min-width: 76px;
     }
 
     .card-1-title {
@@ -636,9 +636,9 @@ body {
     }
 
     .card-2 .card-icon-wrapper {
-        width: 56px;
-        height: 56px;
-        min-width: 56px;
+        width: 76px;
+        height: 76px;
+        min-width: 76px;
     }
 
     .card-title-top {
@@ -665,9 +665,9 @@ body {
     }
 
     .card-3 .card-icon-wrapper {
-        width: 52px;
-        height: 52px;
-        min-width: 52px;
+        width: 72px;
+        height: 72px;
+        min-width: 72px;
     }
 
     .card-number {
@@ -687,9 +687,9 @@ body {
     }
 
     .card-4 .card-icon-wrapper {
-        width: 52px;
-        height: 52px;
-        min-width: 52px;
+        width: 72px;
+        height: 72px;
+        min-width: 72px;
     }
 
     .card-title {
@@ -756,16 +756,16 @@ body {
 
     .card-1 .card-icon-wrapper,
     .card-2 .card-icon-wrapper {
-        width: 46px;
-        height: 46px;
-        min-width: 46px;
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
     }
 
     .card-3 .card-icon-wrapper,
     .card-4 .card-icon-wrapper {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
+        width: 56px;
+        height: 56px;
+        min-width: 56px;
     }
 
     .card-badge {

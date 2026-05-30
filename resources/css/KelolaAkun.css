@@ -621,17 +621,297 @@
     .kelola-akun-container {
         padding: 20px 16px;
     }
+    
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
     .form-layout {
         grid-template-columns: 1fr;
     }
+    
     .action-buttons {
         flex-direction: column;
     }
+    
     .btn-action {
         width: 100%;
         justify-content: center;
     }
+    
     .detail-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* ============ RESPONSIVE TABLE CARD LAYOUT - COMPACT ============ */
+    .table-wrapper {
+        overflow-x: visible;
+    }
+
+    .enterprise-table {
+        min-width: 100%;
+        display: block;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .enterprise-table thead {
+        display: none;
+    }
+
+    .enterprise-table tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .enterprise-table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+    .enterprise-table tbody tr:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .enterprise-table tbody tr td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 12px;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .enterprise-table tbody tr td:last-child {
+        border-bottom: none;
+        padding: 12px 16px;
+    }
+
+    /* No Column */
+    .enterprise-table tbody tr td:nth-child(1) {
+        display: none;
+    }
+
+    /* Nama & Role Column */
+    .enterprise-table tbody tr td:nth-child(2) {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 12px 16px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(2) .user-info-cell {
+        width: 100%;
+        gap: 4px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(2) .user-name {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 13px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(2) .badge-role {
+        font-size: 9px;
+        padding: 3px 8px;
+        background: #e0e7ff;
+        color: #4f46e5;
+        width: fit-content;
+    }
+
+    /* NIP Column */
+    .enterprise-table tbody tr td:nth-child(3) {
+        font-family: 'Courier New', monospace;
+        color: #64748b;
+        font-size: 11px;
+        justify-content: flex-start;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .enterprise-table tbody tr td:nth-child(3)::before {
+        content: "NIP: ";
+        font-weight: 600;
+        color: #64748b;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: 4px;
+        flex-shrink: 0;
+    }
+
+    /* Email Column */
+    .enterprise-table tbody tr td:nth-child(4) {
+        font-size: 11px;
+        color: #64748b;
+        justify-content: flex-start;
+        border-bottom: 1px solid #f1f5f9;
+        flex-wrap: wrap;
+        align-items: center;
+        word-break: break-word;
+    }
+
+    .enterprise-table tbody tr td:nth-child(4)::before {
+        content: "Email: ";
+        font-weight: 600;
+        color: #64748b;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: 4px;
+        flex-shrink: 0;
+    }
+
+    /* Status Column */
+    .enterprise-table tbody tr td:nth-child(5) {
+        justify-content: flex-start;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .enterprise-table tbody tr td:nth-child(5) .status-pill {
+        font-size: 11px;
+        padding: 4px 10px;
+        margin: 0;
+    }
+
+    /* Action Column */
+    .enterprise-table tbody tr td:nth-child(6) {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        border-bottom: none;
+        gap: 6px;
+        padding: 12px 16px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(6) .action-buttons {
+        display: flex;
+        gap: 6px;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .enterprise-table tbody tr td:nth-child(6) .btn-action {
+        padding: 6px 8px;
+        font-size: 11px;
+        white-space: nowrap;
+        flex: 1;
+        justify-content: center;
+        min-width: 60px;
+    }
+
+    .search-container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .toolbar-section {
+        margin-bottom: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kelola-akun-container {
+        padding: 16px 12px;
+    }
+
+    .header-title {
+        font-size: 20px;
+    }
+
+    .header-description p {
+        font-size: 12px;
+    }
+
+    .form-card {
+        padding: 16px;
+    }
+
+    .form-layout {
+        gap: 12px;
+    }
+
+    .form-field input,
+    .form-field select {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .btn-add {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .enterprise-table thead tr {
+        padding: 10px 12px;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .enterprise-table thead th {
+        font-size: 10px;
+    }
+
+    .enterprise-table thead th:nth-child(3) {
+        display: none;
+    }
+
+    .enterprise-table tbody tr {
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(5) {
+        display: none;
+    }
+
+    .enterprise-table tbody tr td:nth-child(6) {
+        grid-column: 2;
+    }
+
+    .enterprise-table tbody tr td:nth-child(1) .user-name {
+        font-size: 12px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(6) .action-buttons {
+        gap: 4px;
+    }
+
+    .enterprise-table tbody tr td:nth-child(6) .btn-action {
+        padding: 5px 6px;
+        font-size: 10px;
+        gap: 3px;
+    }
+
+    .btn-action {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    .modal-dialog {
+        width: 95%;
+        max-width: 420px;
+    }
+
+    .modal-content-modern {
+        padding: 16px;
+    }
+
+    .detail-grid {
+        gap: 12px;
     }
 }

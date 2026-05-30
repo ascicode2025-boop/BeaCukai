@@ -241,16 +241,16 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
             $combos = [
                 'DI' => 'Tipe Dominance dengan Influencing: Pemimpin yang karismatik dan persuasif.',
                 'DS' => 'Tipe Dominance dengan Steadiness: Pemimpin yang tegas namun stabil.',
-                'DC' => 'Tipe Dominance dengan Conscientiousness: Pemimpin yang sistematis dan efisien.',
+                'DC' => 'Tipe Dominance dengan Compliance: Pemimpin yang sistematis dan efisien.',
                 'ID' => 'Tipe Influencing dengan Dominance: Diplomat yang ambisius.',
                 'IS' => 'Tipe Influencing dengan Steadiness: Diplomat yang hangat dan konsisten.',
-                'IC' => 'Tipe Influencing dengan Conscientiousness: Diplomat yang terstruktur.',
+                'IC' => 'Tipe Influencing dengan Compliance: Diplomat yang terstruktur.',
                 'SI' => 'Tipe Steadiness dengan Influencing: Mitra yang menyenangkan dan dapat diandalkan.',
                 'SD' => 'Tipe Steadiness dengan Dominance: Mitra yang stabil namun tegas.',
-                'SC' => 'Tipe Steadiness dengan Conscientiousness: Mitra yang metodis dan teliti.',
-                'CI' => 'Tipe Conscientiousness dengan Influencing: Ahli yang komunikatif.',
-                'CS' => 'Tipe Conscientiousness dengan Steadiness: Ahli yang dapat diandalkan.',
-                'CD' => 'Tipe Conscientiousness dengan Dominance: Ahli yang berdeterminasi.',
+                'SC' => 'Tipe Steadiness dengan Compliance: Mitra yang metodis dan teliti.',
+                'CI' => 'Tipe Compliance dengan Influencing: Ahli yang komunikatif.',
+                'CS' => 'Tipe Compliance dengan Steadiness: Ahli yang dapat diandalkan.',
+                'CD' => 'Tipe Compliance dengan Dominance: Ahli yang berdeterminasi.',
             ];
 
             $comboKey    = $primaryType . ($secondaryType ?: '');

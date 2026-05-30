@@ -243,6 +243,7 @@
     color: #4b5563;
     font-size: 13px;
     line-height: 1.75;
+    text-align: justify;
 }
 
 /* ─── JPM Card ───────────────────────────────────────────────────────────── */
@@ -384,87 +385,6 @@
     transform: translateY(0);
 }
 
-/* ─── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-    .hasil-ringkas-page {
-        padding: 36px 16px 48px;
-    }
-
-    .hasil-ringkas-header {
-        margin-bottom: 28px;
-    }
-
-    .hasil-ringkas-header h1 {
-        font-size: 30px;
-    }
-
-    .hasil-ringkas-info-cards {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        margin-bottom: 20px;
-    }
-
-    .hasil-ringkas-chart-card {
-        padding: 18px 16px;
-        margin-bottom: 20px;
-    }
-
-    .chart-header-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 16px;
-        padding-bottom: 14px;
-    }
-
-    .chart-legend {
-        gap: 12px;
-    }
-
-    .ringkas-chart-svg {
-        min-height: 240px;
-    }
-
-    .hasil-ringkas-bottom-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .ringkas-main-type {
-        width: 100%;
-    }
-
-    .ringkas-jpm-card {
-        min-height: unset;
-        width: 100%;
-    }
-
-    .jpm-meter-scale,
-    .jpm-meter {
-        height: 120px;
-    }
-
-    .jpm-meter-scale {
-        font-size: 9px;
-    }
-
-    .jpm-value {
-        font-size: 28px;
-    }
-
-    .hasil-ringkas-actions {
-        margin-top: 24px;
-    }
-
-    .hasil-ringkas-actions button {
-        width: 100%;
-        padding: 13px 24px;
-        font-size: 14px;
-    }
-}
-
 /* ─── Job Standard Comparison Card ──────────────────────────────────────── */
 .ringkas-comparison-card {
     background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
@@ -472,7 +392,7 @@
     border-radius: 16px;
     padding: 28px;
     grid-column: 1 / -1;
-    min-width: 0; /* ← FIX */
+    min-width: 0;
 }
 
 .ringkas-comparison-card h4 {
@@ -546,7 +466,7 @@
     border: 1.5px solid #e0e8f8;
     border-radius: 12px;
     padding: 16px;
-    min-width: 0; /* ← FIX */
+    min-width: 0;
 }
 
 .trait-header {
@@ -566,14 +486,14 @@
     color: white;
     font-weight: 900;
     font-size: 14px;
-    flex-shrink: 0; /* ← FIX: jangan compress icon */
+    flex-shrink: 0;
 }
 
 .trait-name {
     font-size: 12px;
     font-weight: 700;
     color: #5a6b7f;
-    word-break: break-word; /* ← FIX */
+    word-break: break-word;
 }
 
 .trait-scores {
@@ -641,4 +561,329 @@
 
 .comparison-note p {
     margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE — Tablet (≤ 900px)
+   Desktop styles tidak disentuh sama sekali di atas sini
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    .hasil-ringkas-page {
+        padding: 32px 16px 48px;
+    }
+
+    /* Header */
+    .hasil-ringkas-header {
+        margin-bottom: 24px;
+    }
+
+    .hasil-ringkas-header h1 {
+        font-size: 26px;
+        letter-spacing: -0.3px;
+    }
+
+    .hasil-ringkas-header p {
+        font-size: 13px;
+    }
+
+    /* Info cards — satu kolom */
+    .hasil-ringkas-info-cards {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .hr-card {
+        padding: 16px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .hr-card span {
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+
+    .hr-card strong {
+        font-size: 14px;
+        text-align: right;
+    }
+
+    /* Chart card */
+    .hasil-ringkas-chart-card {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .chart-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+    }
+
+    .chart-legend {
+        gap: 10px;
+    }
+
+    .ringkas-chart-svg {
+        min-height: 220px;
+    }
+
+    /* Bottom grid — 1 kolom */
+    .hasil-ringkas-bottom-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    /* Cards-only juga 1 kolom di tablet */
+    .hasil-ringkas-bottom-grid.cards-only {
+        grid-template-columns: 1fr;
+    }
+
+    /* Summary card */
+    .ringkas-summary-card {
+        min-height: unset;
+    }
+
+    .trait-badge {
+        min-width: unset;
+        width: 100%;
+        white-space: normal;
+        text-align: center;
+    }
+
+    /* JPM card — landscape style di tablet */
+    .ringkas-jpm-card {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 20px;
+    }
+
+    .jpm-meter-wrap {
+        max-width: 220px;
+    }
+
+    .jpm-meter-scale,
+    .jpm-meter {
+        height: 120px;
+    }
+
+    .jpm-meter-scale {
+        font-size: 9px;
+    }
+
+    .jpm-value {
+        font-size: 28px;
+    }
+
+    /* Comparison card */
+    .ringkas-comparison-card {
+        padding: 20px;
+        grid-column: unset;
+    }
+
+    .ringkas-comparison-card h4 {
+        font-size: 16px;
+    }
+
+    .fitness-percentage {
+        font-size: 26px;
+    }
+
+    .trait-fitness-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    /* Actions */
+    .hasil-ringkas-actions {
+        margin-top: 20px;
+    }
+
+    .hasil-ringkas-actions button {
+        width: 100%;
+        padding: 13px 24px;
+        font-size: 14px;
+    }
+}
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE — Mobile (≤ 480px)
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .hasil-ringkas-page {
+        padding: 20px 12px 40px;
+    }
+
+    /* Header */
+    .hasil-ringkas-header h1 {
+        font-size: 20px;
+    }
+
+    .hasil-ringkas-header p {
+        font-size: 12px;
+    }
+
+    /* Info cards — kompak */
+    .hr-card {
+        padding: 12px 14px;
+        border-radius: 12px;
+    }
+
+    .hr-card strong {
+        font-size: 13px;
+    }
+
+    /* Summary card */
+    .ringkas-summary-card {
+        padding: 16px;
+    }
+
+    .summary-label {
+        font-size: 13px;
+    }
+
+    .trait-badge {
+        font-size: 10px;
+        padding: 10px 12px;
+        min-height: 34px;
+        min-width: 150px;
+    }
+
+    .summary-text {
+        font-size: 12px;
+        line-height: 1.7;
+        text-align: justify;
+    }
+
+    /* JPM card */
+    .ringkas-jpm-card {
+        padding: 16px;
+    }
+
+    .ringkas-jpm-card h4 {
+        font-size: 14px;
+    }
+
+    .jpm-value {
+        font-size: 36px;
+    }
+
+    .jpm-meter-wrap {
+        max-width: 180px;
+    }
+
+    .jpm-meter-scale,
+    .jpm-meter {
+        height: 100px;
+    }
+
+    .jpm-note {
+        font-size: 10px;
+        padding: 6px 10px;
+    }
+
+    /* Comparison card */
+    .ringkas-comparison-card {
+        padding: 16px;
+    }
+
+    .ringkas-comparison-card h4 {
+        font-size: 14px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+
+    .job-standard-title {
+        font-size: 13px;
+        padding: 8px 12px;
+        margin-bottom: 14px;
+    }
+
+    .fitness-percentage {
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .fitness-label {
+        font-size: 11px;
+    }
+
+    .fitness-meter {
+        height: 14px;
+    }
+
+    /* Trait fitness — 2 kolom tetap di mobile kecil */
+    .trait-fitness-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .trait-fitness-item {
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .trait-label-badge {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+
+    .trait-name {
+        font-size: 11px;
+    }
+
+    .score-value {
+        font-size: 14px;
+    }
+
+    .score-label {
+        font-size: 10px;
+    }
+
+    .score-row {
+        padding: 6px;
+    }
+
+    .comparison-note {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    /* List boxes */
+    .ringkas-list-box {
+        padding: 16px;
+    }
+
+    .ringkas-list-box h4 {
+        font-size: 13px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+
+    .ringkas-list-box ul {
+        font-size: 12px;
+        line-height: 1.7;
+        padding-left: 16px;
+    }
+
+    .ringkas-list-box li {
+        margin-bottom: 4px;
+    }
+
+    /* Actions */
+    .hasil-ringkas-actions button {
+        font-size: 13px;
+        padding: 12px 20px;
+        border-radius: 10px;
+    }
 }

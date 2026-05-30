@@ -39,6 +39,7 @@ class DiscResult extends Model
         'time_spent_seconds',
         'test_date',
         'idempotency_key',
+        'jpm',
     ];
 
     /**

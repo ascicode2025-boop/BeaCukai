@@ -179,7 +179,7 @@ export default function LandingPage() {
         ============================================ */
         .header-fixed-container {
           position: absolute;
-          top: 43.48px;
+          top: 50.48px;
           left: 34px;
           width: calc(100% - 84px);
           display: flex;
@@ -238,7 +238,7 @@ export default function LandingPage() {
           display: flex;
           align-items: center;
           margin-left: auto;
-          margin-right: 30px;
+          margin-right: -10px;
           width: 100px;
         }
 
@@ -802,76 +802,85 @@ export default function LandingPage() {
         }
 
         /* ============================================
-           FOOTER
+           NEW FOOTER STYLES (UPDATED FROM IMAGE)
         ============================================ */
         .footer-section {
           background: radial-gradient(50% 50% at 50% 50%, rgba(255, 204, 0, 0.79) 0%, rgba(251, 228, 136, 0.7821) 100%);
           color: #2d3269;
-          padding: 60px 80px;
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
+          padding: 60px 80px 40px 80px;
           border-radius: 120px 120px 0 0;
+          position: relative;
         }
 
-        .footer-left {
-          max-width: 480px;
-        }
-
-        .footer-left h3 {
+        .footer-title-shadow {
           font-weight: 900;
           font-size: 26px;
-          margin-bottom: 15px;
           color: #2d3269;
           text-transform: uppercase;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+          margin-bottom: 5px;
+          text-align: left;
         }
 
-        .footer-left p {
-          font-size: 13px;
-          line-height: 1.5;
+        .footer-divider {
+          width: 100%;
+          height: 1px;
+          background-color: rgba(45, 50, 105, 0.4);
           margin-bottom: 25px;
-          color: #2d3269;
-          font-weight: 500;
         }
 
-        .footer-socials {
+        .footer-content-container {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 60px;
+          align-items: start;
+        }
+
+        .footer-left-col {
           display: flex;
+          flex-direction: column;
           gap: 20px;
-          font-size: 22px;
+          text-align: left;
+        }
+
+        .footer-name-block {
+          font-size: 13px;
           color: #2d3269;
+          font-weight: 400;
+          line-height: 1.3;
         }
 
-        .footer-socials i { cursor: pointer; transition: opacity 0.2s; }
-        .footer-socials i:hover { opacity: 0.7; }
-
-        .footer-right {
-          display: flex;
-          margin-top: 15px;
-        }
-
-        .supported-by {
-          display: flex;
-          gap: 15px;
-          font-size: 14px;
-          color: #4a5578;
-        }
-
-        .supported-by .label {
-          white-space: nowrap;
-          color: #2d3269;
-          font-weight: 600;
-        }
-
-        .supported-by .content {
-          line-height: 1.4;
-          color: #4a5578;
-        }
-
-        .supported-by .content strong {
-          color: #2d3269;
+        .footer-name-title {
           font-weight: 800;
           display: block;
-          margin-top: 5px;
+          margin-top: 2px;
+        }
+
+        .footer-icons-row {
+          display: flex;
+          gap: 15px;
+          font-size: 20px;
+          color: #2d3269;
+          align-items: center;
+        }
+
+        .footer-icons-row i {
+          cursor: pointer;
+          transition: transform 0.2s;
+          transform: scaleX(-1);
+          display: inline-block;
+        }
+
+        .footer-icons-row i:hover {
+          transform: scaleX(-1) translateY(-2px);
+        }
+
+        .footer-right-col {
+          font-size: 11px;
+          color: #2d3269;
+          text-align: right;
+          line-height: 1.4;
+          max-width: 400px;
         }
 
         /* ============================================
@@ -898,7 +907,7 @@ export default function LandingPage() {
           }
 
           .logo-main { width: 80px; }
-          .logo-container { margin-right: 0; }
+          .logo-container { margin-left: auto; margin-right: 0; }
 
           .hero-section { padding: 0 20px 20px 0; }
 
@@ -954,14 +963,17 @@ export default function LandingPage() {
           .inner-test-card img { height: 190px; margin-bottom: 20px; }
           .test-example-btn { padding: 13px 30px; font-size: 13px; }
 
+          /* Updated Footer Responsive Tablet */
           .footer-section {
-            padding: 50px 50px;
+            padding: 50px 50px 30px 50px;
             border-radius: 80px 80px 0 0;
-            gap: 30px;
           }
-
-          .footer-left h3 { font-size: 22px; }
-          .footer-left p { font-size: 12px; }
+          .footer-divider { margin-bottom: 20px; }
+          .footer-content-container { gap: 40px; }
+          .footer-title-shadow { font-size: 22px; }
+          .footer-name-block { font-size: 12px; }
+          .footer-icons-row { font-size: 18px; gap: 12px; }
+          .footer-right-col { font-size: 10px; }
         }
 
         /* ============================================
@@ -1008,16 +1020,37 @@ export default function LandingPage() {
           .assessment-right { width: 100%; }
           .inner-test-card { max-width: 100%; }
 
+          /* Updated Footer Responsive Small Tablet */
           .footer-section {
             border-radius: 60px 60px 0 0;
-            padding: 40px 40px;
+            padding: 40px 40px 25px 40px;
           }
+          .footer-divider { margin-bottom: 15px; }
+          .footer-content-container {
+             display: flex;
+             flex-direction: column;
+             gap: 15px;
+          }
+          .footer-left-col {
+             text-align: center;
+             align-items: center;
+          }
+          .footer-right-col {
+             text-align: center;
+             max-width: 100%;
+          }
+          .footer-icons-row { justify-content: center; }
         }
 
         /* ============================================
            MOBILE: max 767px — Hamburger Menu
         ============================================ */
         @media (max-width: 767px) {
+          .logo-container.fade-out {
+            opacity: 0.3;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+          }
           .header-fixed-container {
             top: 18px;
             left: 0;
@@ -1028,16 +1061,15 @@ export default function LandingPage() {
             gap: 12px;
           }
 
-          /* Tampilkan hamburger, sembunyikan nav capsule */
           .hamburger-btn { display: flex; }
           .nav-capsule { display: none !important; }
 
           .logo-container {
-            margin-left: 230px;
+            margin-left: auto;
+            margin-right: -16px;
             width: 80px;
           }
 
-          /* Hero – stack vertikal, sembunyikan gambar rotated */
           .hero-section {
             flex-direction: column;
             padding: 20px 16px 30px;
@@ -1074,7 +1106,6 @@ export default function LandingPage() {
             font-size: 14px;
           }
 
-          /* DISC cards – 1 kolom */
           .disc-section {
             padding: 32px 16px;
             grid-template-columns: 1fr;
@@ -1102,7 +1133,6 @@ export default function LandingPage() {
           .card-body-custom h5 { font-size: 14px; margin-bottom: 5px; }
           .card-body-custom p { font-size: 11px; line-height: 1.3; }
 
-          /* Assessment */
           .assessment-container { padding: 28px 16px; }
 
           .assessment-box {
@@ -1133,7 +1163,6 @@ export default function LandingPage() {
             font-size: 13px;
           }
 
-          /* Test question wrapper */
           .test-question-wrapper { padding: 16px; }
 
           .test-question-header {
@@ -1173,22 +1202,39 @@ export default function LandingPage() {
             left: 16px;
           }
 
-          /* Footer */
+          /* Updated Footer Responsive Mobile */
           .footer-section {
+            display: flex;
             flex-direction: column;
             align-items: flex-start;
-            padding: 40px 28px;
+            padding: 40px 28px 25px 28px;
             border-radius: 40px 40px 0 0;
-            gap: 28px;
+            gap: 0;
           }
 
-          .footer-left { max-width: 100%; }
-          .footer-left h3 { font-size: 20px; margin-bottom: 12px; }
-          .footer-left p { font-size: 12px; margin-bottom: 18px; }
-          .footer-socials { font-size: 20px; gap: 16px; }
+          .footer-divider { margin-bottom: 20px; }
 
-          .footer-right { margin-top: 0; width: 100%; }
-          .supported-by { font-size: 13px; }
+          .footer-content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+          }
+
+          .footer-left-col {
+            text-align: left;
+            align-items: flex-start;
+          }
+
+          .footer-right-col {
+            text-align: left;
+            max-width: 100%;
+          }
+
+          .footer-title-shadow { font-size: 20px; margin-bottom: 8px; text-align: left; }
+          .footer-name-block { font-size: 11px; }
+          .footer-icons-row { font-size: 18px; gap: 14px; justify-content: flex-start; }
+          .footer-right-col { font-size: 10px; }
         }
 
         /* ============================================
@@ -1261,7 +1307,6 @@ export default function LandingPage() {
           .inner-test-card img { height: 130px; margin-bottom: 12px; }
           .test-example-btn { padding: 10px 20px; font-size: 12px; }
 
-          /* Test question pada mobile kecil */
           .test-question-wrapper { padding: 12px; }
 
           .test-question-header {
@@ -1299,23 +1344,22 @@ export default function LandingPage() {
             left: 12px;
           }
 
-          /* Footer */
+          /* Updated Footer Responsive Small Mobile */
           .footer-section {
-            padding: 32px 20px;
+            padding: 32px 20px 20px 20px;
             border-radius: 30px 30px 0 0;
-            gap: 22px;
           }
-
-          .footer-left h3 { font-size: 18px; }
-          .footer-left p { font-size: 11px; }
-          .footer-socials { font-size: 18px; gap: 14px; }
-          .supported-by { font-size: 12px; flex-direction: column; gap: 4px; }
+          .footer-divider { margin-bottom: 15px; }
+          .footer-content-container { gap: 12px; }
+          .footer-title-shadow { font-size: 18px; }
+          .footer-name-block { font-size: 10px; }
+          .footer-icons-row { font-size: 16px; gap: 12px; }
+          .footer-right-col { font-size: 9px; }
         }
       `}</style>
 
             {/* ── HEADER ── */}
             <header className="header-fixed-container">
-                {/* Hamburger: hanya tampil di mobile */}
                 <button
                     className={`hamburger-btn ${sidebarOpen ? "open" : ""}`}
                     onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -1326,7 +1370,6 @@ export default function LandingPage() {
                     <span></span>
                 </button>
 
-                {/* Nav Capsule: hanya tampil di desktop/tablet */}
                 <div className="nav-capsule">
                     <button
                         className={`nav-link-item ${activeNav === "DISC" ? "active" : ""}`}
@@ -1356,8 +1399,9 @@ export default function LandingPage() {
                     </Link>
                 </div>
 
-                {/* Logo */}
-                <div className="logo-container">
+                <div
+                    className={`logo-container ${sidebarOpen ? "fade-out" : ""}`}
+                >
                     <img
                         src="/assets/LogoBC.png"
                         alt="Logo"
@@ -1390,7 +1434,7 @@ export default function LandingPage() {
                     className={`nav-link-item ${activeNav === "ABOUT US" ? "active" : ""}`}
                     onClick={() => scrollToSection("footer", "ABOUT US")}
                 >
-                    KONTAK  KAMI
+                    KONTAK KAMI
                 </button>
                 <Link
                     href="/login"
@@ -1505,7 +1549,6 @@ export default function LandingPage() {
                     </div>
                 ) : (
                     <div className="test-question-wrapper">
-                        {/* Back Button */}
                         <button
                             onClick={handleCloseTest}
                             className="back-button"
@@ -1528,7 +1571,6 @@ export default function LandingPage() {
                             </svg>
                         </button>
 
-                        {/* Header */}
                         <div className="test-question-header">
                             <h3>Soal ke-{currentQuestion}</h3>
                             <div className="instructions">
@@ -1547,7 +1589,6 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Table */}
                         <div className="test-question-table">
                             <div className="table-header">
                                 <div className="table-header-cell">M</div>
@@ -1592,14 +1633,12 @@ export default function LandingPage() {
                             ))}
                         </div>
 
-                        {/* Error */}
                         {testErrors[currentQuestion] && (
                             <div className="test-error-message">
                                 {testErrors[currentQuestion]}
                             </div>
                         )}
 
-                        {/* Navigation */}
                         <div className="test-navigation">
                             <button
                                 className="test-nav-btn back"
@@ -1623,39 +1662,57 @@ export default function LandingPage() {
                 )}
             </section>
 
-            {/* ── FOOTER ── */}
+            {/* ── FOOTER (UPDATED FROM IMAGE) ── */}
             <footer className="footer-section" id="footer">
-                <div className="footer-left">
-                    <h3>KONTAK KAMI</h3>
-                    <p>
-                        Tes DISC Bea Cukai adalah tes kepribadian untuk menilai
-                        karakter, cara kerja, komunikasi, dan kecocokan peserta
-                        dengan lingkungan kerja Bea Cukai. Tes ini mengukur 4
-                        tipe kepribadian: Dominance, Influence, Steadiness, dan
-                        Compliance.
-                    </p>
-                    <div className="footer-socials">
-                        <i className="fab fa-instagram"></i>
-                        <i
-                            className="fas fa-phone-alt"
-                            style={{
-                                transform: "rotateY(180deg)",
-                                display: "inline-block",
-                            }}
-                        ></i>
-                        <i className="fas fa-envelope"></i>
-                    </div>
-                </div>
+                <h3 className="footer-title-shadow">KONTAK KAMI</h3>
+                <div className="footer-divider"></div>
 
-                <div className="footer-right">
-                    <div className="supported-by">
-                        <div className="content">
-                            Bagian Pengembangan
-                            <br />
-                            Kepegawaian
-                            <br />
-                            <strong>Sekretariat DJBC</strong>
+                <div className="footer-content-container">
+                    {/* Left Column: Name block and Icons */}
+                    <div className="footer-left-col">
+                        <div className="footer-name-block">
+                            Bagian Pengembangan Kepegawaian
+                            <span className="footer-name-title">
+                                Sekretariat DJBC
+                            </span>
                         </div>
+                        <div className="footer-icons-row">
+                            <a
+                                href="https://www.instagram.com/pengembangan.djbc?igsh=MWQ3cWloenE2MnJ5bA=="
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    color: "inherit",
+                                    textDecoration: "none",
+                                }}
+                                title="Instagram"
+                            >
+                                <i className="fab fa-instagram"></i>
+                            </a>
+                            <i className="fas fa-phone-alt" title="Phone"></i>
+                            <i className="fas fa-envelope" title="Email"></i>
+                            <a
+                                href="https://maps.app.goo.gl/TjcYLZymEsBJtRrR9"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    color: "inherit",
+                                    textDecoration: "none",
+                                }}
+                                title="Location"
+                            >
+                                <i className="fas fa-map-marker-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Address */}
+                    <div className="footer-right-col">
+                        Jl. Jenderal Ahmad Yani, RT.12/RW.6, Pisangan Tim., Kec.
+                        Pulo
+                        <br />
+                        Gadung, Kota Jakarta Timur, Daerah Khusus Ibukota
+                        Jakarta 13230
                     </div>
                 </div>
             </footer>

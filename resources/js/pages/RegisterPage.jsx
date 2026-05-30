@@ -28,7 +28,6 @@ export default function RegisterPage() {
 
     const allErrors = { ...initialErrors, ...errors };
 
-    // Filter jabatan berdasarkan search
     const filteredJabatan = jobStandards.filter((job) =>
         job.job_title.toLowerCase().includes(jabatanSearch.toLowerCase())
     );
@@ -74,7 +73,6 @@ export default function RegisterPage() {
         }
     }, [flashMessage]);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
             const dropdownElement = document.querySelector('.jabatan-dropdown-wrapper');
@@ -203,6 +201,9 @@ export default function RegisterPage() {
                     font-size: 14px;
                     font-weight: bold;
                     z-index: 9999;
+                    max-width: calc(100% - 40px);
+                    width: auto;
+                    text-align: center;
                 }
 
                 /* Success Modal */
@@ -215,6 +216,7 @@ export default function RegisterPage() {
                     align-items: center;
                     justify-content: center;
                     z-index: 10000;
+                    padding: 20px;
                 }
 
                 .success-modal {
@@ -223,6 +225,7 @@ export default function RegisterPage() {
                     padding: 40px;
                     text-align: center;
                     max-width: 400px;
+                    width: 100%;
                     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
                     animation: slideIn 0.3s ease-out;
                 }
@@ -375,6 +378,7 @@ export default function RegisterPage() {
                     border: none;
                     outline: none;
                     box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+                    min-width: 0;
                 }
 
                 .input-capsule[type="text"],
@@ -439,14 +443,8 @@ export default function RegisterPage() {
                 }
 
                 @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-8px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    from { opacity: 0; transform: translateY(-8px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
 
                 .toggle-password {
@@ -459,6 +457,8 @@ export default function RegisterPage() {
                     cursor: pointer;
                     color: #2b3168;
                     font-size: 14px;
+                    padding: 6px;
+                    touch-action: manipulation;
                 }
 
                 .signup-btn-container {
@@ -511,36 +511,165 @@ export default function RegisterPage() {
                     text-decoration: underline;
                 }
 
-                /* Animasi floating dekorasi */
                 .deco-float-up   { animation: floatCircle 6s ease-in-out infinite; }
                 .deco-float-down { animation: floatCircleReverse 7s ease-in-out infinite; }
                 .deco-float-slow { animation: floatCircle 9s ease-in-out infinite; }
 
+                /* ======= RESPONSIVE MOBILE ======= */
                 @media (max-width: 768px) {
+                    .register-wrapper {
+                        padding: 20px 16px;
+                        padding-top: 40px;
+                        align-items: flex-start;
+                    }
+
                     .register-card {
                         flex-direction: column;
                         width: 100%;
+                        max-width: 440px;
+                        border-radius: 20px;
+                        margin-left: auto;
+                        margin-right: auto;
                     }
-                    .register-left { display: none; }
-                    .register-right { padding: 30px 20px; }
-                    .register-right h2 { font-size: 20px; margin-bottom: 30px; }
-                    .character-img { position: relative; height: 250px; bottom: 0; }
+
+                    .register-left {
+                        display: none;
+                    }
+
+                    .register-right {
+                        padding: 36px 24px 32px 24px;
+                        min-height: unset;
+                    }
+
+                    .register-right h2 {
+                        font-size: 20px;
+                        margin-bottom: 24px;
+                        letter-spacing: 0.5px;
+                    }
+
                     .form-group-custom {
                         flex-direction: column;
                         align-items: flex-start;
                         margin-bottom: 14px;
+                        gap: 6px;
                     }
-                    .label-custom { width: 100%; margin-bottom: 6px; font-size: 13px; }
-                    .input-wrapper { width: 100%; }
-                    .input-capsule { width: 100%; height: 34px; font-size: 12px; }
-                    .signup-btn { font-size: 13px; padding: 8px 20px; }
-                    .footer-text { font-size: 12px; }
-                    .regist-here-link { font-size: 11px; }
+
+                    .label-custom {
+                        width: 100%;
+                        font-size: 13px;
+                        margin-bottom: 0;
+                    }
+
+                    .input-wrapper {
+                        width: 100%;
+                    }
+
+                    .input-capsule {
+                        width: 100%;
+                        height: 40px;
+                        font-size: 13px;
+                        padding: 8px 14px;
+                        border-radius: 18px;
+                    }
+
+                    /* Dropdown jabatan di mobile */
+                    .jabatan-dropdown-button {
+                        height: 40px;
+                        font-size: 13px;
+                        padding: 8px 14px;
+                        border-radius: 18px;
+                    }
+
+                    .jabatan-dropdown-menu {
+                        /* Pastikan dropdown tidak keluar layar */
+                        left: 0;
+                        right: 0;
+                        max-width: 100%;
+                    }
+
+                    .toggle-password {
+                        right: 10px;
+                        font-size: 13px;
+                        padding: 8px;
+                    }
+
+                    .signup-btn-container {
+                        margin-top: 16px;
+                    }
+
+                    .signup-btn {
+                        font-size: 14px;
+                        padding: 12px 24px;
+                        min-height: 46px;
+                        margin-top: 6px;
+                        touch-action: manipulation;
+                    }
+
+                    .footer-text {
+                        font-size: 12px;
+                        margin-top: 16px;
+                        gap: 4px;
+                        text-align: center;
+                        flex-wrap: wrap;
+                    }
+
+                    .regist-here-link {
+                        font-size: 12px;
+                    }
+
+                    /* Sembunyikan dekorasi animasi di mobile agar tidak overflow */
+                    .deco-float-up,
+                    .deco-float-down,
+                    .deco-float-slow {
+                        display: none;
+                    }
+
+                    /* Success modal di mobile */
+                    .success-modal {
+                        padding: 28px 20px;
+                        border-radius: 16px;
+                    }
+
+                    .success-modal h3 {
+                        font-size: 20px;
+                    }
+
+                    .success-icon {
+                        width: 64px;
+                        height: 64px;
+                        font-size: 32px;
+                        margin-bottom: 16px;
+                    }
+                }
+
+                /* Layar sangat kecil (< 360px) */
+                @media (max-width: 360px) {
+                    .register-right {
+                        padding: 28px 16px 24px 16px;
+                    }
+
+                    .register-right h2 {
+                        font-size: 18px;
+                        margin-bottom: 20px;
+                    }
+
+                    .input-capsule {
+                        font-size: 12px;
+                        height: 38px;
+                    }
+
+                    .label-custom {
+                        font-size: 12px;
+                    }
+
+                    .signup-btn {
+                        font-size: 13px;
+                        min-height: 44px;
+                    }
                 }
             `}</style>
 
             {/* ======= DEKORASI LINGKARAN BACKGROUND ======= */}
-            {/* Besar - kanan atas */}
             <div
                 className="deco-float-up"
                 style={{
@@ -556,7 +685,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Sedang - kiri bawah */}
             <div
                 className="deco-float-down"
                 style={{
@@ -572,7 +700,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Kecil - kiri atas */}
             <div
                 className="deco-float-slow"
                 style={{
@@ -588,7 +715,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Kecil - kanan bawah */}
             <div
                 className="deco-float-up"
                 style={{
@@ -604,7 +730,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Outline - tengah kiri */}
             <div
                 className="deco-float-down"
                 style={{
@@ -620,7 +745,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Outline - tengah kanan */}
             <div
                 className="deco-float-slow"
                 style={{
@@ -635,7 +759,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Outline besar - bawah tengah */}
             <div
                 className="deco-float-up"
                 style={{
@@ -651,7 +774,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Titik solid - atas kanan */}
             <div
                 className="deco-float-slow"
                 style={{
@@ -666,7 +788,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Titik solid - bawah kiri */}
             <div
                 className="deco-float-down"
                 style={{
@@ -681,7 +802,6 @@ export default function RegisterPage() {
                     pointerEvents: "none",
                 }}
             />
-            {/* Titik sedang - tengah kanan */}
             <div
                 className="deco-float-up"
                 style={{
@@ -720,7 +840,7 @@ export default function RegisterPage() {
 
                     <form onSubmit={handleSubmit}>
                         {[
-                            ["Nama", "name", "text"],
+                            ["Nama Lengkap", "name", "text"],
                             ["NIP", "nip", "text"],
                             ["Email", "email", "email"],
                             ["Telepon", "telepon", "text"],
@@ -754,10 +874,13 @@ export default function RegisterPage() {
                                         alignItems: "center",
                                         justifyContent: "space-between",
                                         color: data.unit_kerja ? "#2b3168" : "#999",
+                                        height: "36px",
                                     }}
                                 >
-                                    <span>{data.unit_kerja || "Pilih Jabatan Anda"}</span>
-                                    <span style={{ fontSize: "12px", marginLeft: "10px" }}>
+                                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                                        {data.unit_kerja || "Pilih Jabatan Anda"}
+                                    </span>
+                                    <span style={{ fontSize: "12px", marginLeft: "10px", flexShrink: 0 }}>
                                         {showJabatanDropdown ? "▲" : "▼"}
                                     </span>
                                 </div>

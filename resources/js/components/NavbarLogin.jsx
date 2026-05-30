@@ -8,6 +8,8 @@ import {
     PersonCircle,
 } from "react-bootstrap-icons";
 import { useForm, usePage, router } from "@inertiajs/react";
+import InitialAvatar from "./InitialAvatar";
+import ProfilePhotoWithFallback from "./ProfilePhotoWithFallback";
 
 const NavbarLogin = ({ children }) => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
@@ -268,20 +270,11 @@ const NavbarLogin = ({ children }) => {
                                 }}
                                 title="Profil"
                             >
-                                {profilePhotoUrl ? (
-                                    <img
-                                        src={profilePhotoUrl}
-                                        alt="Foto Profil"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            borderRadius: "50%",
-                                        }}
-                                    />
-                                ) : (
-                                    <PersonCircle size={45} color="#002366" />
-                                )}
+                                <ProfilePhotoWithFallback
+                                    photoUrl={profilePhotoUrl}
+                                    user={user}
+                                    size={45}
+                                />
                             </div>
                         </div>
                     </div>
@@ -299,20 +292,11 @@ const NavbarLogin = ({ children }) => {
                                 }}
                                 title="Profil"
                             >
-                                {profilePhotoUrl ? (
-                                    <img
-                                        src={profilePhotoUrl}
-                                        alt="Foto Profil"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            borderRadius: "50%",
-                                        }}
-                                    />
-                                ) : (
-                                    <PersonCircle size={24} color="#002366" />
-                                )}
+                                <ProfilePhotoWithFallback
+                                    photoUrl={profilePhotoUrl}
+                                    user={user}
+                                    size={24}
+                                />
                                 <ChevronDown
                                     size={16}
                                     style={{
