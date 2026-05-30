@@ -149,7 +149,7 @@ class DiscScoringTest extends TestCase
         $primaryTrait = $payload['jpm']['primary_trait'];
         $primaryGraph3 = $payload['graph_scores']['Graph_3'][$primaryTrait];
 
-        $expected = (int) round((($primaryGraph3 + 28) / 56) * 100);
+        $expected = (int) round((($primaryGraph3 + 8) / 16) * 100);
         $expected = max(0, min(100, $expected));
 
         $this->assertSame($expected, $payload['jpm']['percentage']);
