@@ -12,10 +12,12 @@ use App\Http\Controllers\Admin\KelolaAkunController;
 use App\Http\Controllers\Admin\KelolaJabatanController;
 use App\Http\Controllers\Admin\ResultController;
 use App\Http\Controllers\DiscController;
+use App\Http\Controllers\FeedbackController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DiscResult;
 use App\Models\User;
 use App\Models\JobStandard;
+use App\Models\UserFeedback;
 
 // ─── Helper: transform DiscResult ke format yang dipakai frontend ─────────────
 // Dipakai oleh route peserta DAN admin agar data selalu konsisten
@@ -303,6 +305,9 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/photo/{id}', [ProfileController::class, 'photo'])->name('profile.photo');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Feedback routes
+    Route::post('/api/Feedback', [FeedbackController::class, 'store'])->name('Feedback.store');
 });
 
 // Admin routes
@@ -347,4 +352,17 @@ Route::prefix('admin')->middleware(['admin', 'session.timeout'])->group(function
             'discResultData' => transformDiscResult($result),
         ]);
     })->name('admin.hasil-ringkas');
+
+    // Feedback Admin Routes
+    Route::get('/Feedback', function () {
+        $Feedbacks = \App\Models\UserFeedback::with(['user', 'discResult'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return Inertia::render('admin/FeedbackList', [
+            'Feedbacks' => $Feedbacks,
+        ]);
+    })->name('admin.Feedback');
+
+    Route::delete('/Feedback/{id}', [FeedbackController::class, 'destroy'])->name('admin.Feedback.destroy');
 });

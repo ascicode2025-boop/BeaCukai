@@ -916,7 +916,7 @@ export default function LoginPage() {
                             className="signin-btn"
                             disabled={processing}
                         >
-                            {processing ? "Loading..." : "Masuk"}
+                            {processing ? "Memuat..." : "Masuk"}
                         </button>
                         <Link
                             href="/forgot-password"

@@ -99,7 +99,7 @@ export default function RegisterPage() {
             !data.password ||
             !data.password_confirmation
         ) {
-            showError("⚠️ Semua field wajib diisi");
+            showError("⚠️ Semua kolom wajib diisi");
             return;
         }
         if (!/^\d+$/.test(data.nip)) {
@@ -1046,7 +1046,7 @@ export default function RegisterPage() {
                                 className="signup-btn"
                                 disabled={processing}
                             >
-                                {processing ? "Loading..." : "Daftar"}
+                                {processing ? "Memuat..." : "Daftar"}
                             </button>
                         </div>
                     </form>

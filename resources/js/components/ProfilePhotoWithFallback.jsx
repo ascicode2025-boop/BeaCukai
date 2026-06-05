@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import InitialAvatar from "./InitialAvatar";
 
 /**
  * Komponen untuk menampilkan profil foto dengan fallback ke inisial
- * @param {Object} props - Props komponen
- * @param {string} props.photoUrl - URL foto profil
- * @param {Object} props.user - Data user untuk inisial fallback
- * @param {number} props.size - Ukuran avatar (default: 45)
- * @param {string} props.altText - Text alternatif untuk img tag
+ * - Render <img> jika photoUrl tersedia
+ * - Jika <img> gagal load (404/403/etc), otomatis fallback ke InitialAvatar
  */
 const ProfilePhotoWithFallback = ({
     photoUrl,
@@ -15,10 +12,18 @@ const ProfilePhotoWithFallback = ({
     size = 45,
     altText = "Foto Profil",
 }) => {
-    const [imageError, setImageError] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [imgError, setImgError] = useState(false);
 
-    if (!photoUrl || imageError) {
+    useEffect(() => {
+        // reset saat photoUrl berubah
+        setImgError(false);
+    }, [photoUrl]);
+
+    const shouldShowImage = useMemo(() => {
+        return !!photoUrl && !imgError;
+    }, [photoUrl, imgError]);
+
+    if (!shouldShowImage) {
         return <InitialAvatar user={user} size={size} />;
     }
 
@@ -26,20 +31,16 @@ const ProfilePhotoWithFallback = ({
         <img
             src={photoUrl}
             alt={altText}
+            onError={() => setImgError(true)}
             style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
                 borderRadius: "50%",
             }}
-            onError={() => {
-                setImageError(true);
-            }}
-            onLoad={() => {
-                setLoading(false);
-            }}
         />
     );
 };
 
 export default ProfilePhotoWithFallback;
+

@@ -512,7 +512,7 @@ const GenerateHasil = () => {
                         className="btn btn-detail"
                         onClick={handleLihatDetail}
                     >
-                        <span className="btn-icon">📄</span> Lihat Detail
+                        <span className="btn-icon">📄</span> Lihat Ringkasan
                     </button>
                     <button className="btn btn-back" onClick={handleKembali}>
                         <span className="btn-icon">←</span> Kembali

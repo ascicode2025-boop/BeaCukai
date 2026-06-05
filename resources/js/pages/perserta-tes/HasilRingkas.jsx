@@ -3,6 +3,7 @@ import { usePage, router } from "@inertiajs/react";
 import "../../../css/HasilRingkas.css";
 import NavbarLogin from "../../components/NavbarLogin";
 import Footer from "../../components/Footer";
+import FeedbackModal from "../../components/FeedbackModal";
 
 const TRAITS = {
     D: { name: "Dominance", color: "#facc15" },
@@ -33,6 +34,7 @@ const HasilRingkas = () => {
     const discResultData = props.discResultData;
     const jobStandards = props.jobStandards || [];
     const [apiData, setApiData] = useState(null);
+    const [showFeedback, setShowFeedback] = useState(false);
 
     function formatTraitBadge(trait) {
         if (!TRAITS[trait]) return "-";
@@ -100,11 +102,20 @@ const HasilRingkas = () => {
         const reportData = apiData.report_data || apiData.report || {};
 
         // Primary & secondary trait dari database atau fallback ke sorting
-        const primaryTrait = apiData.primary_trait || reportData.primary_trait || sortedTraits[0] || "-";
-        const secondaryTrait = apiData.secondary_trait || reportData.secondary_trait || sortedTraits[1] || "-";
+        const primaryTrait =
+            apiData.primary_trait ||
+            reportData.primary_trait ||
+            sortedTraits[0] ||
+            "-";
+        const secondaryTrait =
+            apiData.secondary_trait ||
+            reportData.secondary_trait ||
+            sortedTraits[1] ||
+            "-";
 
         // JPM dari backend (sudah dihitung dengan benar)
-        const jpm = apiData.jpm?.percentage ??
+        const jpm =
+            apiData.jpm?.percentage ??
             Math.round(
                 ((Math.max(...Object.values(graph3)) - minGraph) /
                     (maxGraph - minGraph)) *
@@ -112,12 +123,17 @@ const HasilRingkas = () => {
             );
 
         // Summary dari database (bukan hardcoded)
-        const longSummary = apiData.summary || reportData.summary || TRAIT_DESCRIPTIONS[primaryTrait] || "";
+        const longSummary =
+            apiData.summary ||
+            reportData.summary ||
+            TRAIT_DESCRIPTIONS[primaryTrait] ||
+            "";
 
         // ═══ Perbandingan dengan Standar Jabatan ═══
         const jobStandard = jobStandards.find(
             (job) =>
-                job.job_title?.toLowerCase() === user?.unit_kerja?.toLowerCase()
+                job.job_title?.toLowerCase() ===
+                user?.unit_kerja?.toLowerCase(),
         );
 
         // Prefer server-provided comparison if available to ensure consistency
@@ -136,7 +152,7 @@ const HasilRingkas = () => {
                 // Normalisasi selisih ke persentase (max selisih adalah 16, dari -8 ke 8)
                 const fitnessPercentage = Math.max(
                     0,
-                    100 - (difference / 16) * 100
+                    100 - (difference / 16) * 100,
                 );
 
                 traitComparison[trait] = {
@@ -330,7 +346,8 @@ const HasilRingkas = () => {
                                 style={{ color: jpmColor.text }}
                             >
                                 {summary.jobStandardComparison?.hasStandard
-                                    ? summary.jobStandardComparison.overallFitness
+                                    ? summary.jobStandardComparison
+                                          .overallFitness
                                     : summary.jpm}
                                 %
                             </span>
@@ -347,8 +364,9 @@ const HasilRingkas = () => {
                                             height: `${
                                                 summary.jobStandardComparison
                                                     ?.hasStandard
-                                                    ? summary.jobStandardComparison
-                                          .overallFitness
+                                                    ? summary
+                                                          .jobStandardComparison
+                                                          .overallFitness
                                                     : summary.jpm
                                             }%`,
                                             background: `linear-gradient(180deg, ${jpmColor.bg} 0%, ${jpmColor.text} 100%)`,
@@ -358,7 +376,7 @@ const HasilRingkas = () => {
                                             {summary.jobStandardComparison
                                                 ?.hasStandard
                                                 ? summary.jobStandardComparison
-                                          .overallFitness
+                                                      .overallFitness
                                                 : summary.jpm}
                                             %
                                         </span>
@@ -369,7 +387,8 @@ const HasilRingkas = () => {
                                 <div className="jpm-note">
                                     <small>
                                         Berdasarkan perbandingan dengan standar
-                                        jabatan {summary.jobStandardComparison.jobTitle}
+                                        jabatan{" "}
+                                        {summary.jobStandardComparison.jobTitle}
                                     </small>
                                 </div>
                             )}
@@ -388,7 +407,11 @@ const HasilRingkas = () => {
                                         Kesesuaian Keseluruhan
                                     </div>
                                     <span className="fitness-percentage">
-                                        {summary.jobStandardComparison.overallFitness}%
+                                        {
+                                            summary.jobStandardComparison
+                                                .overallFitness
+                                        }
+                                        %
                                     </span>
                                     <div className="fitness-meter">
                                         <div
@@ -458,7 +481,9 @@ const HasilRingkas = () => {
                                         Perbandingan ini menunjukkan tingkat
                                         kesesuaian profil DISC Anda dengan
                                         standar karakter yang dibutuhkan untuk
-                                        posisi {summary.jobStandardComparison.jobTitle}.
+                                        posisi{" "}
+                                        {summary.jobStandardComparison.jobTitle}
+                                        .
                                     </p>
                                 </div>
                             </div>
@@ -499,11 +524,38 @@ const HasilRingkas = () => {
                         </div>
                     </section>
 
-                    <section className="hasil-ringkas-actions">
+                    <section
+                        className="hasil-ringkas-actions"
+                        style={{ gap: "10px" }}
+                    >
                         <button onClick={handleDownloadNow}>
                             Download sebagai PDF
                         </button>
+                        <button
+                            onClick={() => setShowFeedback(true)}
+                            style={{
+                                background:
+                                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                color: "white",
+                                border: "none",
+                                padding: "12px 24px",
+                                borderRadius: "8px",
+                                fontSize: "16px",
+                                fontWeight: "700",
+                                cursor: "pointer",
+                                transition: "all 0.3s",
+                            }}
+                        >
+                            💬 Berikan Ulasan
+                        </button>
                     </section>
+
+                    {showFeedback && (
+                        <FeedbackModal
+                            discResultId={apiData?.id}
+                            onClose={() => setShowFeedback(false)}
+                        />
+                    )}
                 </div>
             </NavbarLogin>
             <Footer />

@@ -354,7 +354,7 @@ const PengerjaanSoal = () => {
                 /* ── Sidebar ── */
                 .ps-sidebar {
                     width: 200px;
-                    height: 475px;
+                    height: 568px;
                     border-radius: 12px;
                     background: linear-gradient(180deg, #F8F9FA 0%, #FFFFFF 100%);
                     padding: 25px;
@@ -462,6 +462,25 @@ const PengerjaanSoal = () => {
                     text-align: left;
                     padding-left: 20px;
                     border-right: none;
+                }
+
+                .ps-col-header-label {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .ps-col-header-main {
+                    font-size: 14px;
+                    font-weight: 800;
+                    color: #333366;
+                }
+
+                .ps-col-header-sub {
+                    font-size: 10px;
+                    color: #6B7280;
+                    font-weight: 600;
                 }
 
                 .ps-error {
@@ -863,6 +882,10 @@ const PengerjaanSoal = () => {
                         font-size: 11px;
                     }
 
+                    .ps-col-header-sub {
+                        font-size: 9px;
+                    }
+
                     .ps-col-header.text-left { padding-left: 12px; }
 
                     .ps-option-row {
@@ -935,7 +958,9 @@ const PengerjaanSoal = () => {
                                         onClick={handleSubmit}
                                         disabled={isSubmitting}
                                     >
-                                        {isSubmitting ? "Memproses..." : "Lanjutkan"}
+                                        {isSubmitting
+                                            ? "Memproses..."
+                                            : "Lanjutkan"}
                                     </button>
                                 </>
                             ) : (
@@ -1027,7 +1052,9 @@ const PengerjaanSoal = () => {
                                     onClick={handleSubmit}
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? "Memproses..." : "Ya, Selesaikan Tes"}
+                                    {isSubmitting
+                                        ? "Memproses..."
+                                        : "Ya, Selesaikan Tes"}
                                 </button>
                                 <button
                                     className="ps-btn-ghost"
@@ -1117,20 +1144,93 @@ const PengerjaanSoal = () => {
                         <div className="ps-header-card">
                             <h1>Pertanyaan {currentQuestion}</h1>
                             <p>
-                                Pilih 2 karakteristik: 1 yang paling cocok (M)
-                                dan 1 yang paling tidak cocok (L) dalam diri
-                                anda
+                                Pilih 2 karakteristik di bawah ini yang paling
+                                menggambarkan diri Anda:
                             </p>
+                            <div
+                                style={{
+                                    marginTop: "12px",
+                                    fontSize: "13px",
+                                    opacity: 0.95,
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr 1fr",
+                                    gap: "16px",
+                                }}
+                            >
+                                <div>
+                                    <strong style={{ color: "#FFD966" }}>
+                                        M = MIRIP
+                                    </strong>
+                                    <br />
+                                    Karakteristik yang paling
+                                    <br />
+                                    cocok dengan diri Anda
+                                </div>
+                                <div>
+                                    <strong style={{ color: "#FFD966" }}>
+                                        L = TIDAK MIRIP
+                                    </strong>
+                                    <br />
+                                    Karakteristik yang paling
+                                    <br />
+                                    tidak cocok dengan diri Anda
+                                </div>
+                            </div>
                         </div>
 
                         {/* Question box */}
                         <div className="ps-question-box">
                             {/* Column headers */}
                             <div className="ps-col-headers">
-                                <div className="ps-col-header">M</div>
-                                <div className="ps-col-header">L</div>
+                                <div className="ps-col-header">
+                                    <div className="ps-col-header-label">
+                                        <div className="ps-col-header-main">
+                                            M
+                                        </div>
+                                        <div className="ps-col-header-sub">
+                                            Mirip
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="ps-col-header">
+                                    <div className="ps-col-header-label">
+                                        <div className="ps-col-header-main">
+                                            L
+                                        </div>
+                                        <div className="ps-col-header-sub">
+                                            Tidak Mirip
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="ps-col-header text-left">
-                                    karakteristik
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px",
+                                            height: "100%",
+                                        }}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            fill="#5558d4"
+                                            viewBox="0 0 16 16"
+                                        >
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                                        </svg>
+                                        <span
+                                            style={{
+                                                fontWeight: "700",
+                                                color: "#333366",
+                                                fontSize: "12px",
+                                            }}
+                                        >
+                                            KARAKTERISTIK
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 

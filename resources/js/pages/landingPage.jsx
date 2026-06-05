@@ -1563,8 +1563,8 @@ export default function LandingPage() {
                                     fillRule="evenodd"
                                     clipRule="evenodd"
                                     d="M41.25 38.2837C36.6625 32.6837 32.5888 29.5062 29.0288 28.7512C25.4688 27.9963 22.0794 27.8822 18.8606 28.4091V38.4375L3.75 22.0734L18.8606 6.5625V16.0941C24.8125 16.1409 29.8725 18.2762 34.0406 22.5C38.2081 26.7237 40.6113 31.985 41.25 38.2837Z"
-                                    fill="#002366"
-                                    stroke="#002366"
+                                    fill="#ffffff"
+                                    stroke="#adb6c6"
                                     strokeWidth="2"
                                     strokeLinejoin="round"
                                 />
@@ -1689,7 +1689,20 @@ export default function LandingPage() {
                             >
                                 <i className="fab fa-instagram"></i>
                             </a>
-                            <i className="fas fa-phone-alt" title="Phone"></i>
+                            <a
+                                href="tel:(021)4890308"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    color: "inherit",
+                                    textDecoration: "none",
+                                }}
+                                title="Location"
+                            >
+                                <i className="fas fa-phone-alt" title="Phone"></i>
+                            </a>
+
+
                             <i className="fas fa-envelope" title="Email"></i>
                             <a
                                 href="https://maps.app.goo.gl/TjcYLZymEsBJtRrR9"

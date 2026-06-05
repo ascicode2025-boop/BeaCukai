@@ -20,9 +20,23 @@ const NavbarLogin = ({ children }) => {
 
     // Get user dari auth.user yang di-share oleh middleware
     const user = props.auth?.user || props.user || null;
-    const profilePhotoUrl =
-        user?.profile_photo_url ||
-        (user?.profile_photo ? `/storage/${user.profile_photo}` : null);
+
+    // Normalisasi URL foto profil:
+    // - Jika backend sudah kirim URL lengkap (`profile_photo_url`), pakai langsung.
+    // - Jika backend kirim nama file (`profile_photo`), jadikan /storage/<nama_file>.
+    // - Jika kosong, biarkan null agar fallback InitialAvatar yang mengambil user.name.
+    const profilePhotoUrl = (() => {
+        const url = user?.profile_photo_url;
+        if (url) return url;
+
+        const filename = user?.profile_photo;
+        if (filename) return `/storage/${filename}`;
+
+        return null;
+    })();
+
+
+
 
     // Detect window resize for responsive behavior
     useEffect(() => {

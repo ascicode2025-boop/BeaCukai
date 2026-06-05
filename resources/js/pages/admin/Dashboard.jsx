@@ -19,11 +19,35 @@ const AdminDashboard = () => {
         peserta_per_jabatan: [],
         tes_per_bulan: [],
         disc_distribution: [],
+        Feedback_stats: [
+            { label: "Umum", value: 0, color: "#7C3AED" },
+            { label: "Bug", value: 0, color: "#DC2626" },
+            { label: "Fitur", value: 0, color: "#3B82F6" },
+            { label: "Lainnya", value: 0, color: "#6B7280" },
+        ],
         recent_users: [],
     };
 
     const admin = adminData;
-    const stats = statsData;
+    const stats = {
+        total_peserta: 0,
+        total_tes_selesai: 0,
+        total_admins: 0,
+        jabatan_terbanyak: "Belum ada data",
+        peserta_jabatan: 0,
+        disc_averages: { D: 0, I: 0, S: 0, C: 0 },
+        peserta_per_jabatan: [],
+        tes_per_bulan: [],
+        disc_distribution: [],
+        Feedback_stats: [
+            { label: "Umum", value: 0, color: "#7C3AED" },
+            { label: "Bug", value: 0, color: "#DC2626" },
+            { label: "Fitur", value: 0, color: "#3B82F6" },
+            { label: "Lainnya", value: 0, color: "#6B7280" },
+        ],
+        recent_users: [],
+        ...statsData,
+    };
 
     const handleKelolaAkun = () => {
         router.visit("/admin/kelola-akun");
@@ -35,6 +59,10 @@ const AdminDashboard = () => {
 
     const handleDataPeserta = () => {
         router.visit("/admin/data-peserta");
+    };
+
+    const handleFeedback = () => {
+        router.visit("/admin/Feedback");
     };
 
     const formatMonth = (monthStr) => {
@@ -131,7 +159,6 @@ const AdminDashboard = () => {
 
                     {/* Card 2 – Jabatan Terbanyak */}
                     <div className="admin-stat-card card-2">
-                        {/* Ikon di kiri */}
                         <div className="card-icon-wrapper">
                             <div className="card-icon">
                                 <svg
@@ -154,7 +181,6 @@ const AdminDashboard = () => {
                             </div>
                         </div>
 
-                        {/* Konten di kanan */}
                         <div className="card-2-content">
                             <h3 className="card-title-top">
                                 Jabatan Terbanyak
@@ -276,6 +302,70 @@ const AdminDashboard = () => {
                         }))}
                         layout="right"
                     />
+                </div>
+
+                {/* ── Feedback Chart ── */}
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "32px",
+                    }}
+                >
+                    <div
+                        style={{
+                            width: "100%",
+                            maxWidth: "500px",
+                            background: "white",
+                            borderRadius: "12px",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                            padding: "24px",
+                        }}
+                    >
+                        <DonutChart
+                            title="Ulasan Pengguna"
+                            centerText={calculateCenterText(
+                                stats.Feedback_stats,
+                            )}
+                            legend={stats.Feedback_stats.map((item) => ({
+                                value: item.value,
+                                label: item.label,
+                                color: item.color,
+                            }))}
+                            layout="right"
+                        />
+                        <button
+                            onClick={handleFeedback}
+                            style={{
+                                width: "100%",
+                                marginTop: "16px",
+                                padding: "12px 16px",
+                                background:
+                                    "linear-gradient(180deg, rgba(253, 203, 2, 0.85) 0%, #002366 100%)",
+                                color: "#ffffff",
+                                border: "none",
+                                borderRadius: "10px",
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                boxShadow:
+                                    "0 4px 12px rgba(102, 126, 234, 0.3)",
+                                transition: "all 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = "translateY(-2px)";
+                                e.target.style.boxShadow =
+                                    "0 6px 16px rgba(102, 126, 234, 0.4)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = "translateY(0)";
+                                e.target.style.boxShadow =
+                                    "0 4px 12px rgba(102, 126, 234, 0.3)";
+                            }}
+                        >
+                            📋 Lihat Ulasan
+                        </button>
+                    </div>
                 </div>
             </div>
             <Footer />

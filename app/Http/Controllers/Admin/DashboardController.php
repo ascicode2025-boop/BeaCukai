@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\DiscResult;
 use App\Models\JobStandard;
+use App\Models\UserFeedback;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -187,9 +188,40 @@ class DashboardController extends Controller
 
         $discDistribution = array_values($discDistributionByMonth);
 
+        // ===== GET FEEDBACK STATISTICS BY CATEGORY =====
+
+        $feedbackStats = UserFeedback::select('category', DB::raw('COUNT(*) as total'))
+            ->groupBy('category')
+            ->get()
+            ->keyBy('category');
+
+        $categoryMapping = [
+            'feedback' => 'Umum',
+            'bug' => 'Bug',
+            'feature' => 'Fitur',
+            'other' => 'Lainnya',
+        ];
+
+        $colorMapping = [
+            'Umum' => '#7C3AED',
+            'Bug' => '#DC2626',
+            'Fitur' => '#3B82F6',
+            'Lainnya' => '#6B7280',
+        ];
+
+        $feedbackStatsFormatted = [];
+        foreach ($categoryMapping as $dbValue => $displayLabel) {
+            $count = $feedbackStats->get($dbValue)?->total ?? 0;
+            $feedbackStatsFormatted[] = [
+                'label' => $displayLabel,
+                'value' => $count,
+                'color' => $colorMapping[$displayLabel],
+            ];
+        }
+
         // ===== COMPILE ALL STATISTICS =====
 
-$stats = [
+        $stats = [
             'total_peserta' => $totalPeserta,
             'total_tes_selesai' => $totalTesSelesai,
             'total_admins' => $totalAdmins,
@@ -204,6 +236,7 @@ $stats = [
             'peserta_per_jabatan' => $pesertaPerJabatan,
             'tes_per_bulan' => $tesPerBulan,
             'disc_distribution' => $discDistribution,
+            'Feedback_stats' => $feedbackStatsFormatted,
             'recent_users' => $recentUsers,
             '_debug' => [
                 'admin_id' => $admin->id ?? null,

@@ -1005,8 +1005,7 @@ const JabatanComparisonModal = ({
                                         </span>
                                     ),
                                 )}
-                                <span className="jabatan-banner-disc-label">
-                                </span>
+                                <span className="jabatan-banner-disc-label"></span>
                             </div>
                         </div>
                     </div>
@@ -1206,12 +1205,42 @@ const LihatHasilAdmin = () => {
 
     const [showPreview, setShowPreview] = useState(false);
     const [showJabatanComparison, setShowJabatanComparison] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterJabatan, setFilterJabatan] = useState("Semua");
 
     const handleView = (id) =>
         router.visit(`/admin/data-peserta?user_id=${id}`);
     const handleKembali = () => router.visit("/admin/data-peserta");
 
     const selectedId = peserta?.id ?? null;
+
+    // Extract unique jabatan list
+    const uniqueJabatan = [
+        "Semua",
+        ...new Set(pesertaData.map((p) => p.jabatan).filter(Boolean)),
+    ];
+
+    // Helper function to get profile photo URL
+    const getProfilePhotoUrl = (user) => {
+        if (!user) return null;
+        if (user.profile_photo_url) return user.profile_photo_url;
+        if (user.profile_photo) {
+            return user.profile_photo.startsWith("http")
+                ? user.profile_photo
+                : `/profile/photo/${user.id}`;
+        }
+        return null;
+    };
+
+    // Filter peserta based on search and jabatan filter
+    const filteredPesertaData = pesertaData.filter((p) => {
+        const matchesSearch =
+            p.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.nip.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesJabatan =
+            filterJabatan === "Semua" || p.jabatan === filterJabatan;
+        return matchesSearch && matchesJabatan;
+    });
 
     const graphSections = [
         {
@@ -1254,27 +1283,101 @@ const LihatHasilAdmin = () => {
                                 <h2>Daftar Peserta</h2>
                                 {pesertaData.length > 0 && (
                                     <span className="peserta-count-badge">
+                                        {filteredPesertaData.length} dari{" "}
                                         {pesertaData.length} peserta
                                     </span>
                                 )}
                             </div>
+
+                            {/* Search and Filter Section */}
+                            {pesertaData.length > 0 && (
+                                <div className="peserta-list-controls">
+                                    <div className="peserta-search-box">
+                                        <input
+                                            type="text"
+                                            placeholder="Cari nama atau NIP..."
+                                            value={searchTerm}
+                                            onChange={(e) =>
+                                                setSearchTerm(e.target.value)
+                                            }
+                                            className="peserta-search-input"
+                                        />
+                                        {searchTerm && (
+                                            <button
+                                                className="peserta-search-clear"
+                                                onClick={() =>
+                                                    setSearchTerm("")
+                                                }
+                                                title="Hapus pencarian"
+                                            >
+                                                ✕
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div className="peserta-filter-box">
+                                        <label className="peserta-filter-label">
+                                            Jabatan:
+                                        </label>
+                                        <select
+                                            value={filterJabatan}
+                                            onChange={(e) =>
+                                                setFilterJabatan(e.target.value)
+                                            }
+                                            className="peserta-filter-select"
+                                        >
+                                            {uniqueJabatan.map((jabatan) => (
+                                                <option
+                                                    key={jabatan}
+                                                    value={jabatan}
+                                                >
+                                                    {jabatan}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="peserta-list-body">
-                                {pesertaData.length === 0 ? (
+                                {filteredPesertaData.length === 0 ? (
                                     <div className="peserta-empty">
                                         <span className="peserta-empty-icon">
                                             📋
                                         </span>
-                                        <p>Belum ada data peserta.</p>
+                                        <p>
+                                            {pesertaData.length === 0
+                                                ? "Belum ada data peserta."
+                                                : "Tidak ada peserta yang cocok dengan filter."}
+                                        </p>
                                     </div>
                                 ) : (
-                                    pesertaData.map((p) => (
+                                    filteredPesertaData.map((p) => (
                                         <div
                                             key={p.id}
                                             className={`peserta-card-item${selectedId === p.id ? " active" : ""}`}
                                             onClick={() => handleView(p.id)}
                                         >
                                             <div className="peserta-avatar">
-                                                {getInitials(p.nama)}
+                                                {p.profile_photo ? (
+                                                    <img
+                                                        src={
+                                                            p.profile_photo.startsWith(
+                                                                "http",
+                                                            )
+                                                                ? p.profile_photo
+                                                                : `/profile/photo/${p.id}`
+                                                        }
+                                                        alt={p.nama}
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "cover",
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    getInitials(p.nama)
+                                                )}
                                             </div>
                                             <div className="peserta-card-info">
                                                 <div className="peserta-card-name">
@@ -1319,9 +1422,26 @@ const LihatHasilAdmin = () => {
                                     <div className="detail-header">
                                         <div className="detail-name-row">
                                             <div className="detail-avatar">
-                                                {getInitials(
-                                                    peserta.name ??
-                                                        peserta.nama,
+                                                {getProfilePhotoUrl(peserta) ? (
+                                                    <img
+                                                        src={getProfilePhotoUrl(
+                                                            peserta,
+                                                        )}
+                                                        alt={
+                                                            peserta.name ??
+                                                            peserta.nama
+                                                        }
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "cover",
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    getInitials(
+                                                        peserta.name ??
+                                                            peserta.nama,
+                                                    )
                                                 )}
                                             </div>
                                             <div>

@@ -141,6 +141,108 @@ body {
     border: 1px solid rgba(91, 94, 246, 0.15);
 }
 
+/* ---- SEARCH AND FILTER CONTROLS ---- */
+.peserta-list-controls {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--color-border-light);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #fafbfc;
+}
+
+.peserta-search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.peserta-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    font-size: 13px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: white;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.peserta-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.peserta-search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(91, 94, 246, 0.1);
+}
+
+.peserta-search-box::before {
+    content: "🔍";
+    position: absolute;
+    left: 10px;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.peserta-search-clear {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    transition: color 0.2s ease;
+}
+
+.peserta-search-clear:hover {
+    color: #6b7280;
+}
+
+.peserta-filter-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.peserta-filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+.peserta-filter-select {
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+}
+
+.peserta-filter-select:hover {
+    border-color: var(--color-primary-light);
+}
+
+.peserta-filter-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(91, 94, 246, 0.1);
+}
+
 .peserta-list-body {
     max-height: 640px;
     overflow-y: auto;
@@ -202,6 +304,7 @@ body {
     flex-shrink: 0;
     text-transform: uppercase;
     transition: all 0.2s ease;
+    overflow: hidden;
 }
 
 .peserta-card-info {
