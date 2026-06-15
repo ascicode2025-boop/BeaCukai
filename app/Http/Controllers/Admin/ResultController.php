@@ -51,45 +51,44 @@ class ResultController extends Controller
                 $query->orderByDesc('test_date')->orderByDesc('id');
             }])
             ->orderBy('name')
-            ->get(['id', 'name', 'nip', 'unit_kerja'])
+            ->get(['id', 'name', 'nip', 'unit_kerja', 'profile_photo'])
             ->map(function ($user, $index) use ($jobStandards) {
                 $latestResult = $user->discResults->first();
 
-                $jpm = 0;
+                $jpm = null;
+                $status = 'Belum Tes';
+                $hasValidJob = false;
+
                 if ($latestResult) {
                     $graph3 = $latestResult->graph_scores_change ?? [];
-
-                    // Prioritas: kesesuaian jabatan → completion_percentage → hitung dari graph
                     $jobFitness = $this->calculateJobFitness($graph3, $user->unit_kerja ?? '', $jobStandards);
 
                     if ($jobFitness !== null) {
                         $jpm = $jobFitness;
-                    } elseif ($latestResult->completion_percentage !== null) {
-                        $jpm = (int) $latestResult->completion_percentage;
-                    } elseif (!empty($graph3)) {
-                        $maxScore = max($graph3['D'] ?? 0, $graph3['I'] ?? 0, $graph3['S'] ?? 0, $graph3['C'] ?? 0);
-                        $jpm = (int) round((($maxScore - (-8)) / 16) * 100);
+                        $hasValidJob = true;
+                        
+                        if ($jpm >= 85)      $status = 'Sangat Cocok';
+                        elseif ($jpm >= 70)  $status = 'Cocok';
+                        elseif ($jpm >= 55)  $status = 'Cukup Cocok';
+                        else                 $status = 'Kurang Cocok';
+                    } else {
+                        // Jika job tidak valid/tidak ada standar, status dikosongkan/N/A
+                        $status = 'Belum Dipetakan';
                     }
                 }
 
-                $status = 'Belum Tes';
-                if ($latestResult) {
-                    if ($jpm >= 85)      $status = 'Sangat Cocok';
-                    elseif ($jpm >= 70)  $status = 'Cocok';
-                    elseif ($jpm >= 55)  $status = 'Cukup Cocok';
-                    else                 $status = 'Kurang Cocok';
-                }
-
                 return [
-                    'id'          => $user->id,
-                    'no'          => $index + 1,
-                    'nama'        => $user->name,
-                    'nip'         => $user->nip,
-                    'jabatan'     => $user->unit_kerja ?? 'Belum diisi',
-                    'tanggalTes'  => $latestResult?->test_date?->format('d-m-Y') ?? '-',
-                    'skorDominan' => $latestResult?->primary_type ?? '-',
-                    'jpm'         => $jpm,
-                    'status'      => $status,
+                    'id'            => $user->id,
+                    'no'            => $index + 1,
+                    'nama'          => $user->name,
+                    'nip'           => $user->nip,
+                    'jabatan'       => $user->unit_kerja ?? 'Belum diisi',
+                    'tanggalTes'    => $latestResult?->test_date?->format('d-m-Y') ?? '-',
+                    'skorDominan'   => $latestResult?->primary_type ?? '-',
+                    'jpm'           => $jpm,
+                    'has_valid_job' => $hasValidJob,
+                    'status'        => $status,
+                    'profile_photo' => $user->profile_photo,
                 ];
             })
             ->values()
@@ -109,18 +108,13 @@ class ResultController extends Controller
                     ->map(function ($result, $index) use ($peserta, $jobStandards) {
                         $graph3 = $result->graph_scores_change ?? [];
 
-                        // Prioritas: kesesuaian jabatan → completion_percentage → hitung dari graph
+                        $jpm = null;
+                        $hasValidJob = false;
                         $jobFitness = $this->calculateJobFitness($graph3, $peserta->unit_kerja ?? '', $jobStandards);
 
                         if ($jobFitness !== null) {
                             $jpm = $jobFitness;
-                        } elseif ($result->completion_percentage !== null) {
-                            $jpm = (int) $result->completion_percentage;
-                        } else {
-                            $maxScore = !empty($graph3)
-                                ? max($graph3['D'] ?? 0, $graph3['I'] ?? 0, $graph3['S'] ?? 0, $graph3['C'] ?? 0)
-                                : 0;
-                            $jpm = (int) round((($maxScore - (-8)) / 16) * 100);
+                            $hasValidJob = true;
                         }
 
                         return [
@@ -136,6 +130,7 @@ class ResultController extends Controller
                             'report_data'         => $result->report_data,
                             'summary'             => $result->summary,
                             'jpm'                 => $jpm,
+                            'has_valid_job'       => $hasValidJob,
                             'completion_percentage' => $result->completion_percentage,
                         ];
                     })
@@ -146,7 +141,15 @@ class ResultController extends Controller
         return Inertia::render('admin/LihatHasilAdmin', [
             'admin'          => $admin,
             'pesertaData'    => $pesertaData,
-            'peserta'        => $peserta,
+            'peserta'        => $peserta ? [
+                'id'            => $peserta->id,
+                'name'          => $peserta->name,
+                'nip'           => $peserta->nip,
+                'unit_kerja'    => $peserta->unit_kerja,
+                'email'         => $peserta->email,
+                'telepon'       => $peserta->telepon,
+                'profile_photo' => $peserta->profile_photo,
+            ] : null,
             'allDiscResults' => $allDiscResults,
             'discResult'     => !empty($allDiscResults) ? $allDiscResults[0] : null,
             'jobStandards'   => $jobStandards->map(fn($job) => [

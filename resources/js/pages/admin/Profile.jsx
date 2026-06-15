@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { PencilFill } from "react-bootstrap-icons";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
+import InitialAvatar from "../../components/InitialAvatar";
 
 const MAX_PROFILE_PHOTO_SIZE = 7 * 1024 * 1024; // 7MB
 const PROFILE_PHOTO_SIZE = 512;
 
 const Profile = ({ user = {} }) => {
+    const { jobStandards = [] } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         nama: user.name || "",
         nip: user.nip || "",
@@ -20,15 +22,52 @@ const Profile = ({ user = {} }) => {
 
     const [focusedField, setFocusedField] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showJabatanDropdown, setShowJabatanDropdown] = useState(false);
+    const [jabatanSearch, setJabatanSearch] = useState("");
+
+    const getProfilePhotoUrlHelper = (user) => {
+        if (!user) return null;
+        if (user.profile_photo) {
+            return user.profile_photo.startsWith("http")
+                ? user.profile_photo
+                : `/profile/photo/${user.id}`;
+        }
+        return user.profile_photo_url || null;
+    };
+
     const [profilePreview, setProfilePreview] = useState(
-        user.profile_photo_url || null,
+        getProfilePhotoUrlHelper(user),
     );
     const [photoClientError, setPhotoClientError] = useState("");
     const fileInputRef = useRef(null);
 
+    const filteredJabatan = jobStandards.filter((job) =>
+        job.job_title.toLowerCase().includes(jabatanSearch.toLowerCase())
+    );
+
+    const handleJabatanSelect = (jobTitle) => {
+        setData("unit_kerja", jobTitle);
+        setShowJabatanDropdown(false);
+        setJabatanSearch("");
+    };
+
     useEffect(() => {
-        setProfilePreview(user.profile_photo_url || null);
-    }, [user.profile_photo_url]);
+        const handleClickOutside = (e) => {
+            const dropdownElement = document.querySelector('.jabatan-dropdown-wrapper');
+            if (dropdownElement && !dropdownElement.contains(e.target)) {
+                setShowJabatanDropdown(false);
+            }
+        };
+
+        if (showJabatanDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [showJabatanDropdown]);
+
+    useEffect(() => {
+        setProfilePreview(getProfilePhotoUrlHelper(user));
+    }, [user.profile_photo, user.profile_photo_url, user.id]);
 
     // Auto-close modal after 3 seconds
     useEffect(() => {
@@ -797,7 +836,7 @@ const Profile = ({ user = {} }) => {
                                             }}
                                         />
                                     ) : (
-                                        "👤"
+                                        <InitialAvatar user={user} size={100} />
                                     )}
                                 </div>
                                 {/* Edit Photo Button */}
@@ -1055,23 +1094,117 @@ const Profile = ({ user = {} }) => {
                             </div>
 
                             {/* Unit Kerja */}
-                            <div className="form-field" style={rowStyle}>
+                            <div className="form-field jabatan-dropdown-wrapper" style={{ ...rowStyle, position: "relative" }}>
                                 <label style={labelStyle}>Unit Kerja</label>
-                                <input
-                                    type="text"
-                                    style={createInputStyle(
-                                        focusedField === "unit_kerja",
-                                    )}
-                                    value={data.unit_kerja}
-                                    onChange={(e) =>
-                                        setData("unit_kerja", e.target.value)
-                                    }
-                                    onFocus={() =>
-                                        setFocusedField("unit_kerja")
-                                    }
-                                    onBlur={() => setFocusedField(null)}
-                                    placeholder="Contoh: Manager"
-                                />
+                                
+                                <div
+                                    style={{
+                                        ...createInputStyle(focusedField === "unit_kerja" || showJabatanDropdown),
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        color: data.unit_kerja ? "#1e1b4b" : "#94a3b8",
+                                    }}
+                                    onClick={() => {
+                                        setShowJabatanDropdown(!showJabatanDropdown);
+                                        setFocusedField("unit_kerja");
+                                    }}
+                                >
+                                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                                        {data.unit_kerja || "Pilih Jabatan Anda"}
+                                    </span>
+                                    <span style={{ fontSize: "12px", marginLeft: "10px", flexShrink: 0 }}>
+                                        {showJabatanDropdown ? "▲" : "▼"}
+                                    </span>
+                                </div>
+
+                                {showJabatanDropdown && (
+                                    <div
+                                        style={{
+                                            position: "absolute",
+                                            top: "calc(100% + 5px)",
+                                            left: 0,
+                                            right: 0,
+                                            background: "white",
+                                            border: "1px solid #e2e8f0",
+                                            borderRadius: "12px",
+                                            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+                                            zIndex: 1000,
+                                            overflow: "hidden",
+                                        }}
+                                    >
+                                        <div style={{ padding: "10px", borderBottom: "1px solid #f1f5f9" }}>
+                                            <input
+                                                type="text"
+                                                placeholder="Cari jabatan..."
+                                                value={jabatanSearch}
+                                                onChange={(e) => setJabatanSearch(e.target.value)}
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{
+                                                    ...createInputStyle(true),
+                                                    height: "36px",
+                                                    fontSize: "12px",
+                                                    background: "#f8fafc",
+                                                    boxShadow: "none"
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div
+                                            style={{
+                                                maxHeight: "220px",
+                                                overflowY: "auto",
+                                            }}
+                                        >
+                                            {filteredJabatan.length > 0 ? (
+                                                filteredJabatan.map((jabatan) => (
+                                                    <div
+                                                        key={jabatan.id}
+                                                        onClick={() => handleJabatanSelect(jabatan.job_title)}
+                                                        style={{
+                                                            padding: "12px 16px",
+                                                            cursor: "pointer",
+                                                            background: data.unit_kerja === jabatan.job_title ? "#f1f5f9" : "white",
+                                                            borderBottom: "1px solid #f8fafc",
+                                                            fontSize: "13px",
+                                                            fontWeight: data.unit_kerja === jabatan.job_title ? "700" : "600",
+                                                            color: data.unit_kerja === jabatan.job_title ? "#4f46e5" : "#334155",
+                                                            transition: "all 0.2s",
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            if (data.unit_kerja !== jabatan.job_title) {
+                                                                e.target.style.background = "#f8fafc";
+                                                                e.target.style.color = "#1e293b";
+                                                            }
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            if (data.unit_kerja !== jabatan.job_title) {
+                                                                e.target.style.background = "white";
+                                                                e.target.style.color = "#334155";
+                                                            }
+                                                        }}
+                                                    >
+                                                        {jabatan.job_title}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div
+                                                    style={{
+                                                        padding: "16px",
+                                                        textAlign: "center",
+                                                        color: "#94a3b8",
+                                                        fontSize: "13px",
+                                                        fontWeight: "500"
+                                                    }}
+                                                >
+                                                    Tidak ada jabatan yang cocok
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {errors.unit_kerja && (
                                     <span
                                         style={{
@@ -1326,19 +1459,19 @@ const Profile = ({ user = {} }) => {
                                     overflow: "hidden",
                                 }}
                             >
-                                {profilePreview ? (
-                                    <img
-                                        src={profilePreview}
-                                        alt="Foto Profil"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                ) : (
-                                    "👤"
-                                )}
+                                    {profilePreview ? (
+                                        <img
+                                            src={profilePreview}
+                                            alt="Foto Profil"
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover",
+                                            }}
+                                        />
+                                    ) : (
+                                        <InitialAvatar user={user} size={150} />
+                                    )}
                             </div>
                             {/* Ikon Edit di Avatar */}
                             <button

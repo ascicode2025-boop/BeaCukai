@@ -56,8 +56,7 @@ const KelolaAkun = () => {
     const normalizeText = (value) => (value ?? "").toString().toLowerCase();
 
     const formatRole = (role) => {
-        if (role === "super_admin") return "Super Admin";
-        if (role === "admin") return "Admin";
+        if (role === "super_admin" || role === "admin") return "Admin";
         return "Peserta";
     };
 
@@ -207,6 +206,11 @@ const KelolaAkun = () => {
     const ToggleButton = ({ akun }) => {
         const isToggling = togglingIds.has(akun.id);
         const willDeactivate = akun.is_active;
+
+        // Admin dan super_admin tidak bisa dinonaktifkan
+        if (akun.role_key === "admin" || akun.role_key === "super_admin") {
+            return null;
+        }
 
         if (isToggling) {
             return (

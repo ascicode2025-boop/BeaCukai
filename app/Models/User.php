@@ -27,9 +27,12 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'is_verified',
         'unit_kerja',
         'telepon',
         'profile_photo',
+        'register_otp',
+        'register_otp_expires_at',
         'verification_code',
         'verification_code_expires_at',
         'password_reset_requested_at',
@@ -44,7 +47,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'super_admin']);
+        return $this->role === 'admin';
     }
 
     /**
@@ -52,7 +55,7 @@ class User extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return false; // Deprecated, all admins are equal now
     }
 
     /**
@@ -81,6 +84,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_active' => 'boolean',
+        'is_verified' => 'boolean',
+        'register_otp_expires_at' => 'datetime',
         'password' => 'hashed',
     ];
 

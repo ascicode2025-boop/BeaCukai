@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use App\Mail\RegistrationMail;
+use App\Mail\RegistrationOtpMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -23,8 +23,7 @@ class RegisterController extends Controller
     public function store(RegisterRequest $request)
     {
         try {
-            // Simpan plain password sebelum di-hash
-            $plainPassword = $request->password;
+            $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
             $user = User::create([
                 'name' => $request->name,
@@ -33,13 +32,16 @@ class RegisterController extends Controller
                 'unit_kerja' => $request->unit_kerja,
                 'telepon' => $request->telepon,
                 'password' => Hash::make($request->password),
+                'is_verified' => false,
+                'register_otp' => Hash::make($otpCode),
+                'register_otp_expires_at' => now()->addMinutes(10),
             ]);
 
-            // Kirim email notifikasi registrasi
+            // Kirim email notifikasi OTP
             try {
-                Mail::to($user->email)->send(new RegistrationMail($user, $plainPassword));
+                Mail::to($user->email)->send(new RegistrationOtpMail($user, $otpCode));
             } catch (\Exception $mailError) {
-                Log::error('Email sending failed: ' . $mailError->getMessage());
+                Log::error('Email OTP sending failed: ' . $mailError->getMessage());
                 // Email gagal tapi user tetap berhasil dibuat
             }
 
@@ -47,7 +49,7 @@ class RegisterController extends Controller
             return redirect('/login')->with([
                 'success' => 'Registrasi berhasil!',
                 'email' => $request->email,
-                'message' => 'Silakan cek email Anda untuk informasi login.'
+                'message' => 'Silakan login menggunakan NIP dan password Anda. Anda akan diminta memasukkan kode OTP yang telah dikirim ke email.'
             ]);
         } catch (\Exception $e) {
             // Jika ada error, redirect back dengan error message

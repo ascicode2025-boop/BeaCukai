@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
-use App\Mail\RegistrationMail;
+use App\Mail\RegistrationOtpMail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,6 +63,8 @@ class KelolaAkunController extends Controller
             'password' => ['required', 'string', 'min:6'],
         ]);
 
+        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
         $user = User::create([
             'name' => $validated['name'],
             'nip' => $validated['nip'],
@@ -72,6 +74,9 @@ class KelolaAkunController extends Controller
             'telepon' => $validated['telepon'] ?? null,
             'password' => Hash::make($validated['password']),
             'is_active' => true,
+            'is_verified' => false,
+            'register_otp' => Hash::make($otpCode),
+            'register_otp_expires_at' => now()->addMinutes(10),
         ]);
 
         if (config('mail.default') === 'log') {
@@ -83,14 +88,14 @@ class KelolaAkunController extends Controller
 
         try {
             Mail::to($validated['email'])->send(
-                new RegistrationMail($user, $validated['password'])
+                new RegistrationOtpMail($user, $otpCode)
             );
         } catch (\Throwable $exception) {
-            Log::error('Gagal mengirim email registrasi: ' . $exception->getMessage());
+            Log::error('Gagal mengirim email OTP registrasi: ' . $exception->getMessage());
             return back()->with('warning', 'Akun berhasil ditambahkan, tetapi email gagal dikirim.');
         }
 
-        return back()->with('success', 'Akun berhasil ditambahkan dan email sudah dikirim.');
+        return back()->with('success', 'Akun berhasil ditambahkan dan email OTP sudah dikirim.');
     }
 
     /**
@@ -100,6 +105,11 @@ class KelolaAkunController extends Controller
     {
         if ($user->id === Auth::id()) {
             return back()->with('error', 'Tidak dapat menonaktifkan akun sendiri.');
+        }
+
+        // Admin tidak dapat dinonaktifkan
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Akun administrator tidak dapat dinonaktifkan.');
         }
 
         $user->is_active = !$user->is_active;

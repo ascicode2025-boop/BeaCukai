@@ -19,13 +19,13 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Administrator',
                 'nip' => '123456789',
-                'email' => 'admin@beacukai.go.id',
+                'email' => 'adibedil542@gmail.com',
                 'password' => Hash::make('admin123'),
-                'role' => 'super_admin',
-                'unit_kerja' => 'Super Admin',
+                'role' => 'admin', // Diubah dari super_admin menjadi admin
+                'unit_kerja' => 'Admin',
                 'telepon' => '021-1234567',
-                // Default admin profile photo stored in storage/app/public/profile-photos
-                'profile_photo' => 'profile-photos/GyeUlQtkIL3TTNNVoS2fmq1XbAb9urBBd8DKGOyS.jpg',
+                'is_verified' => true, // Bypass OTP untuk seed admin
+                'profile_photo' => null, // Set null agar fallback ke inisial bekerja
             ]
         );
 

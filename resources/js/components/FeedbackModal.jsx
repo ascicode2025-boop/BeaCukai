@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const CATEGORIES = [
-    { value: "feedback", label: "Umum", icon: "⭐" },
+    { value: "Feedback", label: "Umum", icon: "⭐" },
     { value: "bug", label: "Bug", icon: "🐛" },
     { value: "feature", label: "Fitur", icon: "💡" },
     { value: "other", label: "Lainnya", icon: "•••" },
@@ -269,7 +269,7 @@ export default function FeedbackModal({ discResultId, onClose }) {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [message, setMessage] = useState("");
-    const [category, setCategory] = useState("feedback");
+    const [category, setCategory] = useState("Feedback");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState("");

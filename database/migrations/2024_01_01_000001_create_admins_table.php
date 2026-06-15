@@ -31,7 +31,7 @@ return new class extends Migration
         DB::table('admins')->insert([
             'name' => 'Administrator',
             'username' => 'admin',
-            'email' => 'admin@beacukai.go.id',
+            'email' => 'adibedil542@gmail.com',
             'password' => Hash::make('admin123'),
             'profile_photo' => 'profile-photos/GyeUlQtkIL3TTNNVoS2fmq1XbAb9urBBd8DKGOyS.jpg',
             'role' => 'super_admin',

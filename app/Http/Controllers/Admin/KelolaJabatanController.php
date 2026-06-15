@@ -36,6 +36,11 @@ class KelolaJabatanController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // Paksakan uppercase sebelum divalidasi
+        $request->merge([
+            'job_code' => strtoupper($request->job_code)
+        ]);
+
         $validated = $request->validate([
             'job_code' => 'required|string|max:50|unique:job_standards,job_code',
             'job_title' => 'required|string|max:255',
@@ -52,23 +57,19 @@ class KelolaJabatanController extends Controller
 
     public function update(Request $request, JobStandard $jobStandard): RedirectResponse
     {
+        // Paksakan uppercase sebelum divalidasi
+        $request->merge([
+            'job_code' => strtoupper($request->job_code)
+        ]);
+
         $validated = $request->validate([
+            'job_code' => 'required|string|max:50|unique:job_standards,job_code,' . $jobStandard->id,
             'job_title' => 'required|string|max:255',
             'd' => 'required|integer|min:-12|max:12',
             'i' => 'required|integer|min:-12|max:12',
             's' => 'required|integer|min:-12|max:12',
             'c' => 'required|integer|min:-12|max:12',
         ]);
-
-        $jobCode = $this->buildJobCode(
-            $validated['job_title'],
-            $validated['d'],
-            $validated['i'],
-            $validated['s'],
-            $validated['c'],
-        );
-
-        $validated['job_code'] = $jobCode;
 
         $jobStandard->update($validated);
 
@@ -80,19 +81,5 @@ class KelolaJabatanController extends Controller
         $jobStandard->delete();
 
         return back()->with('success', 'Jabatan berhasil dihapus.');
-    }
-
-    private function buildJobCode(string $title, int $d, int $i, int $s, int $c): string
-    {
-        $title = trim($title);
-
-        if ($title === '') {
-            return '';
-        }
-
-        $first = mb_substr($title, 0, 1);
-        $last = mb_substr($title, mb_strlen($title) - 1, 1);
-
-        return strtoupper($first . $last . abs($d) . abs($i) . abs($s) . abs($c));
     }
 }

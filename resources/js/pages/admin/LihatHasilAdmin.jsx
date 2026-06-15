@@ -731,6 +731,17 @@ const PreviewModal = ({ peserta, discResult, jobStandards, onClose }) => {
 /* ══════════════════════════════════════════════════════════════
    JABATAN COMPARISON MODAL
    ══════════════════════════════════════════════════════════════ */
+const getProfilePhotoUrlHelper = (user) => {
+    if (!user) return null;
+    if (user.profile_photo_url) return user.profile_photo_url;
+    if (user.profile_photo) {
+        return user.profile_photo.startsWith("http")
+            ? user.profile_photo
+            : `/profile/photo/${user.id}`;
+    }
+    return null;
+};
+
 const calculateFitnessPerserta = (pesertaDisc, standardDisc) => {
     if (!pesertaDisc || !standardDisc) return 0;
     let totalFitness = 0;
@@ -921,8 +932,20 @@ const JabatanComparisonModal = ({
                 <div className="jabatan-modal-body">
                     <div className="jabatan-peserta-banner">
                         <div className="jabatan-peserta-banner-left">
-                            <div className="jabatan-peserta-avatar">
-                                {getInitials(name)}
+                            <div className="jabatan-peserta-avatar" style={{ overflow: "hidden" }}>
+                                {getProfilePhotoUrlHelper({ profile_photo: peserta.profile_photo, id: peserta.id }) ? (
+                                    <img
+                                        src={getProfilePhotoUrlHelper({ profile_photo: peserta.profile_photo, id: peserta.id })}
+                                        alt={name}
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                ) : (
+                                    getInitials(name)
+                                )}
                             </div>
                             <div>
                                 <div className="jabatan-peserta-name">
@@ -1220,18 +1243,6 @@ const LihatHasilAdmin = () => {
         ...new Set(pesertaData.map((p) => p.jabatan).filter(Boolean)),
     ];
 
-    // Helper function to get profile photo URL
-    const getProfilePhotoUrl = (user) => {
-        if (!user) return null;
-        if (user.profile_photo_url) return user.profile_photo_url;
-        if (user.profile_photo) {
-            return user.profile_photo.startsWith("http")
-                ? user.profile_photo
-                : `/profile/photo/${user.id}`;
-        }
-        return null;
-    };
-
     // Filter peserta based on search and jabatan filter
     const filteredPesertaData = pesertaData.filter((p) => {
         const matchesSearch =
@@ -1358,16 +1369,10 @@ const LihatHasilAdmin = () => {
                                             className={`peserta-card-item${selectedId === p.id ? " active" : ""}`}
                                             onClick={() => handleView(p.id)}
                                         >
-                                            <div className="peserta-avatar">
-                                                {p.profile_photo ? (
+                                            <div className="peserta-avatar" style={{ overflow: "hidden" }}>
+                                                {getProfilePhotoUrlHelper({ profile_photo: p.profile_photo, id: p.id }) ? (
                                                     <img
-                                                        src={
-                                                            p.profile_photo.startsWith(
-                                                                "http",
-                                                            )
-                                                                ? p.profile_photo
-                                                                : `/profile/photo/${p.id}`
-                                                        }
+                                                        src={getProfilePhotoUrlHelper({ profile_photo: p.profile_photo, id: p.id })}
                                                         alt={p.nama}
                                                         style={{
                                                             width: "100%",
@@ -1388,18 +1393,36 @@ const LihatHasilAdmin = () => {
                                                 </div>
                                             </div>
                                             <div className="peserta-card-right">
-                                                {p.jpm != null && (
-                                                    <span className="jpm-pill">
+                                                {p.has_valid_job ? (
+                                                    <span className="jpm-pill" title="Kesesuaian Jabatan (JPM)">
                                                         {p.jpm}%
+                                                    </span>
+                                                ) : (
+                                                    <span className="jpm-pill" style={{ background: '#f1f5f9', color: '#94a3b8', border: '1px solid #cbd5e1' }} title="Jabatan belum dipetakan">
+                                                        N/A
                                                     </span>
                                                 )}
                                                 <span className="peserta-card-date">
                                                     {p.tanggalTes || "-"}
                                                 </span>
-                                                <span
-                                                    className="status-dot"
-                                                    title={p.status}
-                                                />
+                                                {p.has_valid_job && p.status !== 'Belum Dipetakan' && (
+                                                    <span
+                                                        className="status-dot"
+                                                        title={p.status}
+                                                        style={{
+                                                            backgroundColor:
+                                                                p.status === "Sangat Cocok"
+                                                                    ? "#22c55e"
+                                                                    : p.status === "Cocok"
+                                                                      ? "#3b82f6"
+                                                                      : p.status === "Cukup Cocok"
+                                                                        ? "#f59e0b"
+                                                                        : p.status === "Kurang Cocok"
+                                                                          ? "#ef4444"
+                                                                          : "#9ca3af",
+                                                        }}
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     ))
@@ -1422,9 +1445,9 @@ const LihatHasilAdmin = () => {
                                     <div className="detail-header">
                                         <div className="detail-name-row">
                                             <div className="detail-avatar">
-                                                {getProfilePhotoUrl(peserta) ? (
+                                                {getProfilePhotoUrlHelper(peserta) ? (
                                                     <img
-                                                        src={getProfilePhotoUrl(
+                                                        src={getProfilePhotoUrlHelper(
                                                             peserta,
                                                         )}
                                                         alt={
@@ -1559,15 +1582,23 @@ const LihatHasilAdmin = () => {
                                                         )}
                                                         <div className="dominant-jpm">
                                                             <div className="dominant-jpm-label">
-                                                                JPM
+                                                                {discResult.has_valid_job ? "JPM" : "JPM"}
                                                             </div>
                                                             <div>
-                                                                <span className="dominant-jpm-value">
-                                                                    {currentJPM}
-                                                                </span>
-                                                                <span className="dominant-jpm-pct">
-                                                                    %
-                                                                </span>
+                                                                {discResult.has_valid_job ? (
+                                                                    <>
+                                                                        <span className="dominant-jpm-value">
+                                                                            {currentJPM}
+                                                                        </span>
+                                                                        <span className="dominant-jpm-pct">
+                                                                            %
+                                                                        </span>
+                                                                    </>
+                                                                ) : (
+                                                                    <span className="dominant-jpm-value" style={{ fontSize: '18px', color: '#94a3b8' }}>
+                                                                        N/A
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1712,12 +1743,12 @@ const LihatHasilAdmin = () => {
                                                         Rekomendasi Jabatan
                                                         Cocok
                                                     </div>
-                                                    <div className="jabatan-teaser-sub">
-                                                        Temukan jabatan lain
-                                                        yang sesuai berdasarkan
-                                                        profil DISC & skor JPM
-                                                        peserta.
-                                                    </div>
+                                                      <div className="jabatan-teaser-sub">
+                                                          Temukan jabatan lain
+                                                          yang sesuai berdasarkan
+                                                          profil DISC & skor Kesesuaian Jabatan (JPM)
+                                                          peserta.
+                                                      </div>
                                                 </div>
                                             </div>
                                             <button

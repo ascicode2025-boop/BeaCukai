@@ -28,10 +28,24 @@ class DiscController extends Controller
             'answers' => 'required|array|min:24',
             'answers.*' => 'array',
             'answers.*.M' => 'required|string',
-            'answers.*.L' => 'required|string',
+            'answers.*.L' => 'required|string|different:answers.*.M',
         ]);
 
         $answers = $validated['answers'];
+
+        // Cek secara manual kalau-kalau validasi array Laravel lolos 
+        // karena cara pengiriman key-value dari frontend (M dan L harus beda karakter terakhir)
+        foreach ($answers as $qNum => $choices) {
+            $mostLetter = substr($choices['M'], -1);
+            $leastLetter = substr($choices['L'], -1);
+
+            if ($mostLetter === $leastLetter) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Validasi Gagal: Pilihan 'Most' dan 'Least' tidak boleh sama pada soal nomor {$qNum}.",
+                ], 422);
+            }
+        }
 
         // Idempotency: check optional Idempotency-Key header to avoid duplicate submissions
         $idempotencyKey = $request->header('Idempotency-Key') ?? $request->header('Idempotency_key') ?? null;

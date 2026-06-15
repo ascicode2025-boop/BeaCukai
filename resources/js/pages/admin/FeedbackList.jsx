@@ -12,7 +12,7 @@ const CATEGORY_CONFIG = {
         border: "#BFDBFE",
         label: "Fitur",
     },
-    feedback: {
+    Feedback: {
         bg: "#F3E8FF",
         color: "#6D28D9",
         border: "#DDD6FE",

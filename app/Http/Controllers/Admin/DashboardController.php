@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $totalTesSelesai = DiscResult::count();
 
         // Total admins
-        $totalAdmins = User::whereIn('role', ['admin', 'super_admin'])->count();
+        $totalAdmins = User::where('role', 'admin')->count();
 
         // ===== GET MOST COMMON JOB/UNIT KERJA =====
 
@@ -196,10 +196,10 @@ class DashboardController extends Controller
             ->keyBy('category');
 
         $categoryMapping = [
-            'feedback' => 'Umum',
-            'bug' => 'Bug',
-            'feature' => 'Fitur',
-            'other' => 'Lainnya',
+            'Feedback' => 'Umum',
+            'bug'      => 'Bug',
+            'feature'  => 'Fitur',
+            'other'    => 'Lainnya',
         ];
 
         $colorMapping = [

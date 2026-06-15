@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'guest.custom' => \App\Http\Middleware\GuestMiddleware::class,
             'session.timeout' => \App\Http\Middleware\SessionTimeout::class,
+            'verified.custom' => \App\Http\Middleware\CheckIsVerified::class,
         ]);
 
         $middleware->web(append: [

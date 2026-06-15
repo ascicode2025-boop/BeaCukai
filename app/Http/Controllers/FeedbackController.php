@@ -17,7 +17,7 @@ class FeedbackController extends Controller
         $validated = $request->validate([
             'message' => 'required|string|min:10|max:1000',
             'rating' => 'nullable|integer|min:1|max:5',
-            'category' => 'nullable|in:feedback,bug,feature,other',
+            'category' => 'nullable|in:Feedback,bug,feature,other',
             'disc_result_id' => 'nullable|exists:disc_results,id',
         ]);
 
@@ -28,7 +28,7 @@ class FeedbackController extends Controller
             'disc_result_id' => $validated['disc_result_id'] ?? null,
             'message' => $validated['message'],
             'rating' => $validated['rating'] ?? null,
-            'category' => $validated['category'] ?? 'feedback',
+            'category' => $validated['category'] ?? 'Feedback',
             'email' => $user->email,
             'phone' => $user->telepon ?? null,
         ]);

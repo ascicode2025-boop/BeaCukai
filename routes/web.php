@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\VerifyOtpController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\KelolaAkunController;
@@ -149,8 +150,15 @@ Route::middleware('guest.custom')->group(function () {
     Route::post('/forgot-password/reset',       [ForgotPasswordController::class, 'resetPassword'])->name('forgot-password.reset');
 });
 
+// Verifikasi OTP Route (butuh auth tapi sebelum dicegah middleware full)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/verify-otp', [VerifyOtpController::class, 'show'])->name('verify-otp.show');
+    Route::post('/verify-otp', [VerifyOtpController::class, 'verify'])->name('verify-otp.verify');
+    Route::post('/verify-otp/resend', [VerifyOtpController::class, 'resend'])->name('verify-otp.resend');
+});
+
 // Protected routes
-Route::middleware(['auth', 'session.timeout'])->group(function () {
+Route::middleware(['auth', 'verified.custom', 'session.timeout'])->group(function () {
 
     Route::get('/perserta-tes/dashboard', function () {
         $user = Auth::user();
@@ -311,7 +319,7 @@ Route::middleware(['auth', 'session.timeout'])->group(function () {
 });
 
 // Admin routes
-Route::prefix('admin')->middleware(['admin', 'session.timeout'])->group(function () {
+Route::prefix('admin')->middleware(['admin', 'verified.custom', 'session.timeout'])->group(function () {
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/data-peserta', [ResultController::class, 'hasil'])->name('admin.data-peserta');

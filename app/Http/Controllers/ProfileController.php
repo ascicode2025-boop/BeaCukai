@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Models\JobStandard;
 
 class ProfileController extends Controller
 {
@@ -19,6 +20,7 @@ class ProfileController extends Controller
 
         return inertia($profilePage, [
             'user' => $user,
+            'jobStandards' => JobStandard::all(['id', 'job_title']),
         ]);
     }
 
@@ -72,6 +74,14 @@ class ProfileController extends Controller
      */
     public function photo($id)
     {
+        $currentUser = Auth::user();
+
+        // Keamanan: Cek apakah user yang login berhak melihat foto ini
+        // Jika dia BUKAN admin, DAN ID yang diminta BUKAN miliknya sendiri, tolak.
+        if ($currentUser && $currentUser->role !== 'admin' && (string) $currentUser->id !== (string) $id) {
+            abort(403, 'Unauthorized. Anda tidak memiliki izin melihat foto ini.');
+        }
+
         $user = User::findOrFail($id);
 
         if ($user->profile_photo) {

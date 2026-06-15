@@ -21,6 +21,21 @@ export default function LandingPage() {
         4: "",
         5: "",
     });
+    
+    // State untuk popup telepon custom
+    const [showPhonePopup, setShowPhonePopup] = useState(false);
+
+    const handlePhoneClick = (e) => {
+        // Deteksi apakah perangkat adalah mobile atau bukan
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Jika dari Desktop/Laptop, tahan pop-up bawaan browser (localhost) dan tampilkan Pop-up kita
+        if (!isMobile) {
+            e.preventDefault();
+            setShowPhonePopup(true);
+        }
+        // Jika dari Mobile/HP, biarkan aksi default jalan (buka aplikasi Telepon natif HP)
+    };
 
     const scrollToSection = (id, navName) => {
         setActiveNav(navName);
@@ -1693,6 +1708,7 @@ export default function LandingPage() {
                                 href="tel:(021)4890308"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={handlePhoneClick}
                                 style={{
                                     color: "inherit",
                                     textDecoration: "none",
@@ -1728,7 +1744,98 @@ export default function LandingPage() {
                         Jakarta 13230
                     </div>
                 </div>
-            </footer>
-        </>
-    );
-}
+                </footer>
+
+                {/* Pop-up Telepon Custom */}
+                {showPhonePopup && (
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            zIndex: 10000,
+                            padding: "20px",
+                        }}
+                        onClick={() => setShowPhonePopup(false)}
+                    >
+                        <div
+                            style={{
+                                background: "white",
+                                borderRadius: "20px",
+                                padding: "30px",
+                                width: "100%",
+                                maxWidth: "400px",
+                                textAlign: "center",
+                                boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+                                animation: "slideUp 0.3s ease-out",
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div
+                                style={{
+                                    width: "60px",
+                                    height: "60px",
+                                    background: "linear-gradient(135deg, #4A569D 0%, #2d3269 100%)",
+                                    color: "white",
+                                    borderRadius: "50%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "24px",
+                                    margin: "0 auto 20px",
+                                }}
+                            >
+                                <i className="fas fa-phone-alt"></i>
+                            </div>
+                            <h3 style={{ color: "#2b3168", fontWeight: 800, marginBottom: "15px", fontSize: "20px" }}>
+                                Hubungi Kami
+                            </h3>
+                            <p style={{ color: "#666", fontSize: "14px", marginBottom: "20px", lineHeight: "1.5" }}>
+                                Silakan hubungi nomor telepon berikut pada jam kerja:
+                            </p>
+                            <div
+                                style={{
+                                    background: "#f8f9fa",
+                                    padding: "15px",
+                                    borderRadius: "10px",
+                                    border: "2px solid #e0e0e0",
+                                    fontSize: "24px",
+                                    fontWeight: 800,
+                                    color: "#4A569D",
+                                    letterSpacing: "1px",
+                                    marginBottom: "25px",
+                                }}
+                            >
+                                (021) 4890308
+                            </div>
+                            <button
+                                onClick={() => setShowPhonePopup(false)}
+                                style={{
+                                    background: "#FFCA08",
+                                    color: "#2b3168",
+                                    border: "none",
+                                    padding: "12px 30px",
+                                    borderRadius: "25px",
+                                    fontWeight: 800,
+                                    fontSize: "14px",
+                                    cursor: "pointer",
+                                    width: "100%",
+                                    transition: "all 0.3s ease",
+                                }}
+                                onMouseOver={(e) => e.target.style.filter = "brightness(1.05)"}
+                                onMouseOut={(e) => e.target.style.filter = "none"}
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </>
+        );
+    }

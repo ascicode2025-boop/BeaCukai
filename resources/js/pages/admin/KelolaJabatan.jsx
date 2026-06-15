@@ -97,6 +97,7 @@ const KelolaJabatan = () => {
     const handleEdit = (jabatan) => {
         setSelectedJabatan(jabatan);
         setStandardValues({
+            job_code: jabatan.job_code || "",
             D: jabatan.D,
             I: jabatan.I,
             S: jabatan.S,
@@ -111,8 +112,10 @@ const KelolaJabatan = () => {
         setNewJabatan((prev) => ({
             ...prev,
             [field]:
-                field === "nama" || field === "job_code"
+                field === "nama"
                     ? value
+                    : field === "job_code"
+                    ? value.toUpperCase()
                     : parseInt(value) || 0,
         }));
     };
@@ -156,7 +159,11 @@ const KelolaJabatan = () => {
     };
 
     const handleStandardChange = (key, value) => {
-        setStandardValues((prev) => ({ ...prev, [key]: parseInt(value) || 0 }));
+        if (key === 'job_code') {
+            setStandardValues((prev) => ({ ...prev, [key]: value.toUpperCase() }));
+        } else {
+            setStandardValues((prev) => ({ ...prev, [key]: parseInt(value) || 0 }));
+        }
     };
 
     const handleSimpan = () => {
@@ -166,6 +173,7 @@ const KelolaJabatan = () => {
             `/admin/manage-positions/${selectedJabatan.id}`,
             {
                 _method: "put",
+                job_code: standardValues.job_code,
                 job_title: selectedJabatan.nama,
                 d: standardValues.D,
                 i: standardValues.I,
@@ -555,23 +563,28 @@ const KelolaJabatan = () => {
                                     <h3 className="jabatan-info-title">
                                         Jabatan
                                     </h3>
-                                    <p className="jabatan-info-name">
-                                        {selectedJabatan.nama}
+                                    <input
+                                        type="text"
+                                        value={selectedJabatan.nama}
+                                        onChange={(e) => setSelectedJabatan({...selectedJabatan, nama: e.target.value})}
+                                        className="form-input"
+                                        style={{ marginBottom: '10px', fontSize: '16px', fontWeight: 'bold', color: '#1e293b' }}
+                                    />
+                                    
+                                    <h3 className="jabatan-info-title" style={{ marginTop: '10px' }}>
+                                        Kode Jabatan (Opsional)
+                                    </h3>
+                                    <input
+                                        type="text"
+                                        placeholder="Cth: 0100 atau MGR001"
+                                        value={standardValues.job_code || ""}
+                                        onChange={(e) => handleStandardChange('job_code', e.target.value)}
+                                        className="form-input"
+                                        style={{ fontFamily: "'DM Mono', monospace", fontSize: '13px' }}
+                                    />
+                                    <p style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                                        Masukkan kode resmi jabatan DJBC/CEISA (Maks 50 karakter).
                                     </p>
-                                    {selectedJabatan.job_code && (
-                                        <p
-                                            style={{
-                                                fontSize: 12,
-                                                fontWeight: 600,
-                                                color: "#475569",
-                                                margin: 0,
-                                                fontFamily:
-                                                    "'DM Mono', monospace",
-                                            }}
-                                        >
-                                            {selectedJabatan.job_code}
-                                        </p>
-                                    )}
                                 </div>
 
                                 <div className="standard-values-modal">

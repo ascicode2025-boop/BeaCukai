@@ -79,6 +79,11 @@ class LoginController extends Controller
         // Set initial session activity time
         session(['last_activity_time' => time()]);
 
+        // Intercept jika user belum terverifikasi
+        if (!$user->is_verified) {
+            return redirect('/verify-otp');
+        }
+
         // Debug - check if login successful
         Log::info('Login successful', [
             'user_id' => Auth::id(),
