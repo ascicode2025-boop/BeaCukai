@@ -6,53 +6,36 @@
     background: radial-gradient(50% 50% at 50% 50%, #FFCC00 0%, #FFFFFF 100%);
     border-top: 1px solid rgba(255, 200, 0, 0.4);
     box-shadow: 0 -2px 12px rgba(255, 204, 0, 0.25);
-    padding: 10px 0;
+    padding: 12px 0;
     border-radius: 50px 50px 0 0;
 }
 
 .footer-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    justify-content: center; /* Memaksa isi ke pojok kanan */
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 40px;
 }
 
 .footer-text {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: #002366;
     font-family: 'Oxanium', sans-serif;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
     white-space: nowrap;
-}
-
-.footer-logo-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.footer-logo {
-    width: 18px;
-    height: 18px;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
 }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 480px) {
-    .footer {
-        padding: 8px 0;
+    .footer-container {
+        padding: 0 20px;
+        justify-content: center; /* Bisa diubah ke center jika di HP ingin di tengah */
     }
 
     .footer-text {
         font-size: 12px;
-    }
-
-    .footer-logo {
-        width: 30px;
-        height: 30px;
     }
 }

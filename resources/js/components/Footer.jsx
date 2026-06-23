@@ -5,13 +5,9 @@ const Footer = () => {
     return (
         <footer className="footer">
             <div className="footer-container">
-                <span className="footer-text">Didukung Oleh:</span>
-                <div className="footer-logo-wrapper">
-                    <img
-                                src="/assets/LogoBC.png"
-                                alt="Logo"
-                                className="brand-logo"
-                            />
+                {/* Bagian kanan: Teks Sekretariat DJBC */}
+                <div className="footer-right">
+                    <span className="footer-text">Sekretariat DJBC</span>
                 </div>
             </div>
         </footer>
